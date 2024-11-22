@@ -1,33 +1,140 @@
-# `Turborepo` Vite starter
+# Broly
 
-This is an official starter Turborepo.
+> Order on Starknet, write on Bitcoin, get money trustlessly, repeat
 
-## Using this example
+Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management and escrow. It enables trustless Bitcoin inscriptions with guaranteed payments through smart contracts.
 
-Run the following command:
+## Architecture
 
-```sh
-npx create-turbo@latest -e with-vite
+```mermaid
+flowchart TB
+    subgraph Frontend
+        UI[React UI]
+        BW[Bitcoin Wallet]
+        SW[Starknet Wallet]
+    end
+
+    subgraph Backend
+        API[REST API]
+        DB[(Database)]
+    end
+
+    subgraph Starknet
+        OB[Orderbook Contract]
+        ES[Escrow Contract]
+    end
+
+    subgraph Bitcoin
+        BTC[Bitcoin Network]
+    end
+
+    subgraph Inscribor
+        IS[Inscription Service]
+        OM[Order Monitor]
+    end
+
+    UI --> API
+    UI <--> BW
+    UI <--> SW
+    API --> DB
+    SW <--> OB
+    SW <--> ES
+    IS --> BTC
+    OM --> OB
+    OM --> ES
+    API --> IS
+    IS --> API
 ```
 
-## What's inside?
+## Flow
 
-This Turborepo includes the following packages and apps:
+1. User connects both Bitcoin and Starknet wallets
+2. User creates an inscription order:
+   - Specifies inscription content and reward amount
+   - Order is created on Starknet orderbook
+   - Funds are locked in escrow contract
+3. Inscribor service:
+   - Monitors pending orders
+   - Creates Bitcoin inscriptions
+   - Triggers escrow release on successful inscription
+4. User receives inscription, inscribor receives reward
 
-### Apps and Packages
+## Project Structure
 
-- `docs`: a vanilla [vite](https://vitejs.dev) ts app
-- `web`: another vanilla [vite](https://vitejs.dev) ts app
-- `@repo/ui`: a stub component & utility library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: shared `eslint` configurations
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+```text
+broly/
+├── apps/
+│   ├── app/               # Frontend React application
+│   └── backend/           # REST API service
+├── packages/
+│   ├── inscribor/         # Bitcoin inscription service
+│   └── onchain/           # Starknet smart contracts
+├── package.json
+└── turbo.json
+```
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Technology Stack
 
-### Utilities
+- Frontend:
+  - React + TypeScript
+  - Vite
+  - TailwindCSS
+  - Starknet.js
+  - BitcoinJS-lib
+- Backend:
+  - Node.js
+  - Express
+  - REST API
+- Smart Contracts:
+  - Cairo (Starknet)
+  - Scarb
+- Inscribor:
+  - Node.js
+  - BitcoinJS-lib
+  - Starknet.js
 
-This Turborepo has some additional tools already setup for you:
+## Getting Started
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+1. Start development environment:
+
+```bash
+pnpm dev
+```
+
+## Components
+
+### Frontend (web)
+
+- Dashboard view for pending inscriptions
+- New inscription order form
+- Wallet connections (Bitcoin + Starknet)
+- Order status tracking
+
+### Backend (backend)
+
+- REST API for order management
+- Status tracking endpoints
+- Order history
+
+### Smart Contracts (onchain)
+
+- Orderbook contract
+- Escrow contract
+- Payment handling
+
+### Inscribor Service
+
+- Order monitoring
+- Bitcoin inscription creation
+- Transaction verification
+- Starknet interaction for escrow release
+
+## License
+
+Broly is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
