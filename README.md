@@ -1,4 +1,4 @@
-# Broly
+# Bitcoin Registry Orchestrates Like Yesterday (B.R.O.L.Y)
 
 > Order on Starknet, write on Bitcoin, get money trustlessly, repeat
 
