@@ -1,0 +1,26 @@
+.tab__nav {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab__nav:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transform: scale(1.04) translateY(-2px);
+}
+
+.tab__nav:active {
+  color: #c0c0f0;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transform: scale(1.0) translateY(0px);
+}
+
+.tab__nav.active {
+  color: #c0c0f0;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
