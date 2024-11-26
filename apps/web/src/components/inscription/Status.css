@@ -1,0 +1,28 @@
+.InscriptionStatus__dot--active {
+  background-color: rgba(20, 200, 20, 1);
+  box-shadow: 0 0 4px rgba(20, 200, 20, 1);
+}
+
+/* pending animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 1px rgba(20, 200, 20, 1);
+    background-color: rgba(120, 120, 120, 1);
+  }
+  50% {
+    box-shadow: 0 0 5px rgba(20, 200, 20, 1);
+    background-color: rgba(120, 160, 120, 1);
+  }
+  100% {
+    box-shadow: 0 0 1px rgba(20, 200, 20, 1);
+    background-color: rgba(120, 120, 120, 1);
+  }
+}
+
+.InscriptionStatus__dot--pending {
+  animation: pulse 1s infinite;
+}
+
+.InscriptionStatus__text--active {
+  color: rgba(20, 200, 20, 1);
+}

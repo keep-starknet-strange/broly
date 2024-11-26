@@ -64,7 +64,7 @@ flowchart TB
 ```text
 broly/
 ├── apps/
-│   ├── app/               # Frontend React application
+│   ├── web/               # Frontend React application
 │   └── backend/           # REST API service
 ├── packages/
 │   ├── inscribor/         # Bitcoin inscription service

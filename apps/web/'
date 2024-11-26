@@ -1,0 +1,22 @@
+import React, { useState } from "react";
+
+function InscriptionForm(props: any) {
+  const dropOptions = ["Image", "Text"];
+  const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
+  return (
+    <form className="flex flex-row items-center justify-center">
+      <label htmlFor="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="Email"
+        required
+      />
+      <DropButton
+      <button type="submit">Inscribe</button>
+    </form>
+  );
+}
+
+export default InscriptionForm;
