@@ -6,11 +6,11 @@ pub trait IOrderbook<TContractState> {
         satoshi: felt252, 
         currency_fee: felt252, 
         submitter_fee: felt252
-    ) -> u16;
-    fn cancel_inscription(ref self: TContractState, inscription_id: u16);
-    fn lock_inscription(ref self: TContractState, inscription_id: u16);
-    fn submit_inscription(ref self: TContractState, inscription_id: u16);
-    fn query_inscription(self: @TContractState, inscription_id: u16) -> (ByteArray, felt252);
+    ) -> u32;
+    fn cancel_inscription(ref self: TContractState, inscription_id: u32);
+    fn lock_inscription(ref self: TContractState, inscription_id: u32);
+    fn submit_inscription(ref self: TContractState, inscription_id: u32);
+    fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, felt252);
 }
 
 #[starknet::contract]
@@ -25,15 +25,15 @@ mod Orderbook {
     #[storage]
     struct Storage {
         // ID of the next inscription.
-        new_inscription_id: u16,
+        new_inscription_id: u32,
         // A map from the inscription ID to a tuple with the inscribed 
         // data and submitter fee.
-        inscriptions: Map<u16, (ByteArray, felt252)>,
+        inscriptions: Map<u32, (ByteArray, felt252)>,
         // A map from the inscription ID to status. Possible values:
         // 'Open', 'Locked', 'Closed'.
-        inscription_statuses: Map<u16, felt252>,
+        inscription_statuses: Map<u32, felt252>,
         // A map from the inscription ID to the potential submitters.
-        submitters: Map<u16, Map<ContractAddress, ContractAddress>>,
+        submitters: Map<u32, Map<ContractAddress, ContractAddress>>,
     }
 
     #[abi(embed_v0)]
@@ -52,7 +52,7 @@ mod Orderbook {
             satoshi: felt252, 
             currency_fee: felt252, 
             submitter_fee: felt252
-        ) -> u16 {
+        ) -> u32 {
             assert(
                 currency_fee == 'STRK'.into() || currency_fee == 'ETH'.into(), 
                 'The currency is not supported'
@@ -66,7 +66,7 @@ mod Orderbook {
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
         /// - `(ByteArray, felt252)`, the tuple with the inscribed data and the fee.
-        fn query_inscription(self: @ContractState, inscription_id: u16) -> (ByteArray, felt252) {
+        fn query_inscription(self: @ContractState, inscription_id: u32) -> (ByteArray, felt252) {
             self.inscriptions.read(inscription_id)
         }
 
@@ -74,14 +74,14 @@ mod Orderbook {
         /// Inputs: 
         /// - `inscription_id: felt252`, the ID of the inscription the user wants to 
         /// cancel. 
-        fn cancel_inscription(ref self: ContractState, inscription_id: u16) {}
+        fn cancel_inscription(ref self: ContractState, inscription_id: u32) {}
 
         /// Called by a submitter. Multiple submitters are allowed to lock the 
         /// inscription simultaneously. The fee will be received only by the 
         /// submitter that will actually create the inscription on Bitcoin. 
         /// Inputs: 
         /// - `inscription_id: felt252`, the ID of the inscription being locked. 
-        fn lock_inscription(ref self: ContractState, inscription_id: u16) {
+        fn lock_inscription(ref self: ContractState, inscription_id: u32) {
             let submitter = get_caller_address();
             let mut submitters = self.submitters.entry(inscription_id);
             
@@ -93,7 +93,7 @@ mod Orderbook {
         /// inscription changes from 'Locked' to 'Closed'.
         /// Inputs: 
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
-        fn submit_inscription(ref self: ContractState, inscription_id: u16) {
+        fn submit_inscription(ref self: ContractState, inscription_id: u32) {
             // TODO: how do we process the transaction hash? 
         }
     }
