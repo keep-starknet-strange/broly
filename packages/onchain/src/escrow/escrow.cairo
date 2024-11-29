@@ -8,7 +8,7 @@ mod Escrow {
     #[storage]
     struct Storage {}
 
-    #[external(v0)]
+    #[abi(embed_v0)]
     impl EscrowImpl of super::IEscrow<ContractState> {
         fn greet(ref self: ContractState) -> felt252 {
             'Kakarotto'

@@ -7,11 +7,13 @@ edition = "2024_07"
 
 [dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.33.0" }
+openzeppelin = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v0.16.0" }
 starknet = "2.8.4"
 
 [[target.starknet-contract]]
 casm = true
 sierra = true
+build-external-contracts = ["openzeppelin_presets::erc20::ERC20Upgradeable"]
 
 [dev-dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.33.0" }
