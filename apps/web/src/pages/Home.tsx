@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionForm from "../components/inscription/Form";
 import InscriptionStatus from "../components/inscription/Status";
@@ -17,12 +18,12 @@ function Home() {
     },
     {
       id: 3,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
+      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif",
       type: "image"
     },
     {
       id: 4,
-      content: "Hello, World 2!",
+      content: "Hello, World 2!\nThis is a multiline text.\mThis text is long.\nAnd another line\nAnd another longer line\n...\nHello\nWorld\nLorum\nIpsum\nText\n...\nMore\nLines",
       type: "text"
     },
     {
@@ -32,7 +33,7 @@ function Home() {
     },
     {
       id: 6,
-      content: "Hello, World 3!",
+      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
       type: "text"
     },
     {
@@ -70,23 +71,25 @@ function Home() {
   const [isInscribing, setIsInscribing] = useState(false);
   return (
     <div className="w-full flex flex-col h-max">
-      <div className="w-full flex flex-col items-center justify-center py-8 bg-slate-900 shadow-lg">
+      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
-        <h2 className="text-lg mb-4">Starknet's Decentralized Inscriptor Network</h2>
+        <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
         <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} />
         {isInscribing && <InscriptionStatus />}
       </div>
-      <div className="w-full flex flex-col items-center py-2 bg-slate-700 h-full border-t-2 border-slate-800">
+      <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
-          <h1 className="text-xl font-bold px-4">Latest Inscriptions</h1>
-          <p className="text-sm font-bold px-4 tab__nav">Explore &rarr;</p>
+          <h1 className="text-xl font-bold px-4">Recent Inscriptions</h1>
+          <NavLink to="/inscriptions" className="flex flex-row items-center">
+            <p className="text-sm font-bold px-4 tab__nav">Explore &rarr;</p>
+          </NavLink>
         </div>
         <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
           {latestInscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}
         </div>
-        <button className="button__primary w-fit mb-4">Load More...</button>
+        <button className="button--gradient button__primary w-fit mb-4">Load More...</button>
       </div>
     </div>
   );

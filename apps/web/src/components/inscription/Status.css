@@ -1,28 +1,41 @@
+/* variables */
+:root {
+  --status-active-color: rgba(20, 200, 20, 1);
+  --status-active-color-dark: rgba(20, 150, 20, 1);
+  --status-pending-color: rgba(120, 160, 120, 1);
+  --status-inactive-color: rgba(120, 120, 120, 1);
+}
+
 .InscriptionStatus__dot--active {
-  background-color: rgba(20, 200, 20, 1);
-  box-shadow: 0 0 4px rgba(20, 200, 20, 1);
+  background-color: var(--status-active-color);
+  box-shadow: 0 0 4px var(--status-active-color-dark);
+}
+
+.InscriptionStatus__line--active {
+  background-color: var(--status-active-color-dark);
+  box-shadow: 0 0 3px var(--status-active-color-dark);
 }
 
 /* pending animation */
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 1px rgba(20, 200, 20, 1);
-    background-color: rgba(120, 120, 120, 1);
+    box-shadow: 0 0 1px var(--status-active-color-dark);
+    background-color: var(--status-pending-color);
   }
   50% {
-    box-shadow: 0 0 5px rgba(20, 200, 20, 1);
-    background-color: rgba(120, 160, 120, 1);
+    box-shadow: 0 0 5px var(--status-active-color);
+    background-color: var(--status-pending-color);
   }
   100% {
-    box-shadow: 0 0 1px rgba(20, 200, 20, 1);
-    background-color: rgba(120, 120, 120, 1);
+    box-shadow: 0 0 1px var(--status-active-color-dark);
+    background-color: var(--status-pending-color);
   }
 }
 
 .InscriptionStatus__dot--pending {
-  animation: pulse 1s infinite;
+  animation: pulse 1.3s infinite;
 }
 
 .InscriptionStatus__text--active {
-  color: rgba(20, 200, 20, 1);
+  color: var(--status-active-color-dark);
 }

@@ -1,11 +1,24 @@
-.DropButton {
+/* variables */
+:root {
+  --dropbutton-primary: rgb(101, 25, 126);
+  --dropbutton-primary-dark: rgb(80, 20, 100);
+  --dropbutton-primary-darker: rgb(60, 15, 80);
+  --dropbutton-primary-darkest: rgb(40, 10, 60);
+}
+
+.DropButton__container {
   position: relative;
+
+}
+
+.DropButton {
   display: flex;
   flex-direction: row;
   font-size: 1.2rem;
-  background-color: slateblue;
+  color: #f8f8f8;
+  background-image: linear-gradient(to bottom right, var(--dropbutton-primary), var(--dropbutton-primary-dark));
   padding: 0.25rem 0.5rem 0.25rem 0.75rem;
-  border: 1px;
+  border: 1px solid var(--dropbutton-primary-dark);
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -13,7 +26,6 @@
 }
 
 .DropButton__label {
-  color: white;
   padding-right: 0.5rem;
   border-right: 1px solid #a0a0c0;
 }
@@ -24,7 +36,7 @@
 }
 
 .DropButton:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -34,6 +46,7 @@
 }
 
 .DropButton__options {
+  color: #f8f8f8;
   position: absolute;
   top: 100%;
   left: 0;
@@ -43,23 +56,25 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #080858c0;
+  background-image: linear-gradient(to bottom right, var(--dropbutton-primary-dark), var(--dropbutton-primary-darker));
   border: 1px solid #080838;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 6px var(--dropbutton-primary-darkest);
 }
 
 .DropButton__option {
-  color: white;
+  border-top: 2px solid var(--dropbutton-primary-darkest);
+  padding-top: 2px;
+  width: 100%;
   cursor: pointer;
+  text-align: center;
 }
 
 .DropButton__option:hover {
   text-decoration: underline;
-  color: #a0a0c0;
 }
 
 .DropButton__option:active {
-  color: #a0a0c0;
+  text-decoration: none;
 }

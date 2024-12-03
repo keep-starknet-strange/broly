@@ -1,0 +1,63 @@
+/* Variables */
+:root {
+  --property-color-0: rgb(220, 42, 145);
+  --property-color-0-light: rgb(160, 22, 90);
+  --property-color-0-border: rgb(140, 2, 70);
+  --property-color-1: rgb(42, 220, 145);
+  --property-color-1-light: rgb(22, 160, 90);
+  --property-color-1-border: rgb(2, 140, 70);
+  --property-color-2: rgb(42, 145, 220);
+  --property-color-2-light: rgb(22, 90, 160);
+  --property-color-2-border: rgb(2, 70, 140);
+  --property-color-3: rgb(145, 42, 220);
+  --property-color-3-light: rgb(90, 22, 160);
+  --property-color-3-border: rgb(70, 2, 140);
+  --property-color-4: rgb(220, 145, 42);
+  --property-color-4-light: rgb(160, 90, 22);
+  --property-color-4-border: rgb(140, 70, 2);
+  --property-color-5: rgb(145, 220, 42);
+  --property-color-5-light: rgb(90, 160, 22);
+  --property-color-5-border: rgb(70, 140, 2);
+}
+
+.Property__bg--default {
+  background-image: linear-gradient(to bottom right, var(--color-secondary), var(--color-secondary-dark));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--0 {
+  background-image: linear-gradient(to bottom right, var(--property-color-0), var(--property-color-0-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--1 {
+  background-image: linear-gradient(to bottom right, var(--property-color-1), var(--property-color-1-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--2 {
+  background-image: linear-gradient(to bottom right, var(--property-color-2), var(--property-color-2-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--3 {
+  background-image: linear-gradient(to bottom right, var(--property-color-3), var(--property-color-3-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--4 {
+  background-image: linear-gradient(to bottom right, var(--property-color-4), var(--property-color-4-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.Property__bg--5 {
+  background-image: linear-gradient(to bottom right, var(--property-color-5), var(--property-color-5-light));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

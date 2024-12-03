@@ -3,10 +3,10 @@ import InscriptionTextView from "./TextView";
 import InscriptionImageView from "./ImageView";
 import "./View.css";
 
-function InscriptionView(props: any) {
+function InscriptionRequestView(props: any) {
   return (
     <div className="View__container">
-      <NavLink to={`/inscription/${props.inscription.id}`}>
+      <NavLink to={`/request/${props.inscription.id}`}>
         {props.inscription.type === "text" ? (
           <InscriptionTextView content={props.inscription.content} />
         ) : (
@@ -17,4 +17,4 @@ function InscriptionView(props: any) {
   );
 }
 
-export default InscriptionView;
+export default InscriptionRequestView;

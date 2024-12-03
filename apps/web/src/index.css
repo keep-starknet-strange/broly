@@ -2,19 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* variables */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --color-primary: rgb(22, 19, 16);
+  --color-primary-light: rgb(30, 28, 27);
+  --color-secondary: rgb(42, 220, 145);
+  --color-secondary-dark: rgba(22, 160, 90, 1);
+  --color-tertiary: rgb(19, 16, 22);
+  --color-tertiary-dark: rgba(8, 8, 10);
+}
+
+:root {
+  font-family: Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: #f9f9f9;
   background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Pinging animation */
+@keyframes ping {
+  0% {
+    scale: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    scale: 1.04;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  }
+  100% {
+    scale: 1;
+    box-shadow: 0  2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes active {
+  0% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
 body {
@@ -35,9 +73,20 @@ body {
   }
 }
 
+.button--gradient {
+  background-image: linear-gradient(to bottom right, var(--color-secondary), var(--color-secondary-dark));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.button__secondary--gradient {
+  background-image: linear-gradient(to bottom right, var(--dropbutton-primary), var(--dropbutton-primary-dark));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
 .button__primary {
-  background-color: slateblue;
-  border: 1px;
+  border: 1px solid var(--color-secondary-dark);
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
   font-size: 1.2rem;
@@ -45,6 +94,17 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   transition: all 0.2s;
+}
+
+.button__primary--pinging {
+  animation: ping 1.5s infinite;
+}
+
+.button__primary--disabled {
+  background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light));
+  border: 1px solid var(--color-primary-light);
+  cursor: not-allowed;
+  color: #a0a0a0;
 }
 
 .button__primary:hover {
@@ -57,9 +117,23 @@ body {
   transform: translateY(0) scale(1);
 }
 
-.button__submit {
-  background-color: slateblue;
-  border: 1px;
+.heading__color--primary {
+  background-color: var(--color-tertiary);
+}
+
+.bg__color--primary {
+  background-color: var(--color-primary);
+  background-image: linear-gradient(to bottom, var(--color-primary) 0%, var(--color-primary-light));
+}
+
+.bg__color--tertiary {
+  background-image: linear-gradient(to bottom, var(--color-tertiary) 80%, var(--color-tertiary-dark));
+}
+
+.button__secondary {
+  background-color: var(--color-secondary);
+  color: #f9f9f9;
+  border: 1px solid var(--dropbutton-primary-dark);
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
   font-size: 1.2rem;
@@ -69,12 +143,74 @@ body {
   transition: all 0.2s;
 }
 
-.button__submit:hover {
+.button__secondary:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px) scale(1.02);
 }
 
-.button__submit:active {
+.button__secondary:active {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(0) scale(1);
+}
+
+.button__secondary--disabled {
+  background-color: var(--color-secondary-dark);
+  cursor: not-allowed;
+  color: #a0a0a0;
+}
+
+.button__secondary--pinging {
+  animation: ping 1.5s infinite;
+}
+
+.button__secondary--active {
+  background-image: linear-gradient(to bottom right, var(--color-tertiary), var(--color-tertiary-dark));
+  border: 1px solid var(--color-tertiary-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: active 1.5s infinite;
+}
+
+.input__search {
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 1.2rem;
+  color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input__search:focus {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.button__circle {
+  border: 2px solid var(--color-tertiary);
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  transition: all 0.2s;
+}
+
+.button__circle:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.button__circle:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(0) scale(1);
+}
+
+.button__circle--gradient {
+  background-image: linear-gradient(to bottom right, rgba(100, 100, 100, 0.5), rgba(100, 100, 100, 0.2));
+  color: #f9f9f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }

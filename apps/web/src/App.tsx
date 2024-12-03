@@ -7,6 +7,8 @@ import Home from './pages/Home'
 import Inscriptions from './pages/Inscriptions'
 import Collection from './pages/Collection'
 import Info from './pages/Info'
+import Inscription from './pages/Inscription'
+import Request from './pages/Request'
 
 function App() {
   const [tabs, _setTabs] = useState([
@@ -16,16 +18,20 @@ function App() {
     { name: 'Info', path: '/info', component: Info },
   ])
 
+  // TODO: <Route path="*" element={<NotFound />} />
   return (
-    <div className="h-screen">
+    <div className="h-screen relative">
       <Header tabs={tabs} />
+      <div className="h-[4.5rem]" />
       <Routes>
         {tabs.map((tab) => (
           <Route key={tab.path} path={tab.path} element={<tab.component />} />
         ))}
+        <Route path="/inscription/:id" element={<Inscription />} />
+        <Route path="/request/:id" element={<Request />} />
       </Routes>
     </div>
   )
 }
 
-export default App
+export default App;

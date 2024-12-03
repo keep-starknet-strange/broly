@@ -1,11 +1,10 @@
-function InscriptionTextView(props: any) {
+function InscriptionTextLargeView(props: any) {
   // TODO: Traits and info on RHS?
-  // TODO: Text centering?
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h3 className="text-lg View__header">Message</h3>
-      <div className="flex flex-row justify-center h-full w-full h-60 overflow-y-scroll">
-        <p className="whitespace-pre-line px-4 py-2 flex-grow">
+      <div className="flex flex-row items-center justify-center h-full w-full h-60 overflow-y-scroll">
+        <p className="whitespace-pre-line text-center px-4 flex-grow">
           {props.content}
         </p>
         {false && (
@@ -19,4 +18,4 @@ function InscriptionTextView(props: any) {
   );
 }
 
-export default InscriptionTextView;
+export default InscriptionTextLargeView;
