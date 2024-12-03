@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";

@@ -1,6 +1,6 @@
 import "./Status.css";
 
-function InscriptionStatus(props: any) {
+function InscriptionStatus() {
   return (
     <div className="w-full flex flex-row justify-center items-center mt-10 mb-2">
       <div className="mx-1 flex-grow h-0.5 rounded-lg"></div>
