@@ -1,12 +1,13 @@
 use starknet::{ContractAddress};
 use snforge_std::{
-    declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
-    stop_cheat_caller_address, test_address
+    declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address_global,
+    stop_cheat_caller_address_global, test_address, start_cheat_block_number_global,
+    stop_cheat_block_number_global
 };
 use openzeppelin::presets::interfaces::{ERC20UpgradeableABIDispatcher, ERC20UpgradeableABIDispatcherTrait};
 use openzeppelin::utils::serde::SerializedAppend;
 use onchain::orderbook::interface::{OrderbookABIDispatcher, OrderbookABIDispatcherTrait};
-use onchain::utils::{constants, test_utils};
+use onchain::utils::{constants, erc20_utils};
 
 
 fn setup_orderbook(erc20_contract_address: ContractAddress) -> (OrderbookABIDispatcher, ContractAddress) {
@@ -76,34 +77,147 @@ fn test_request_inscription_fails_wrong_currency() {
 }
 
 #[test]
-fn test_request_inscription_fails_wrong_taproot_address() {}
+#[should_panic]
+fn test_request_inscription_fails_insufficient_balance() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 2000);
+
+    orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 2000
+        );
+}
 
 #[test]
-fn test_request_inscription_fails_insufficient_balance() {}
+fn test_lock_inscription_works() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 100);
+
+    let id = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+
+    start_cheat_block_number_global(1000);
+    orderbook_dispatcher.lock_inscription(id, "hash");
+    stop_cheat_block_number_global();
+}
 
 #[test]
-fn test_lock_inscription_works() {}
+#[should_panic]
+fn test_lock_inscription_fails_prior_lock_not_expired() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 100);
+
+    let id = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+
+    orderbook_dispatcher.lock_inscription(id, "hash");
+    orderbook_dispatcher.lock_inscription(id, "other_hash");
+}
 
 #[test]
-fn test_lock_inscription_fails_status_closed() {}
+#[should_panic]
+fn test_lock_inscription_fails_inscription_not_found() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 100);
+
+    let _ = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+
+    orderbook_dispatcher.lock_inscription(42, "hash");
+}
 
 #[test]
-fn test_lock_inscription_fails_prior_lock_not_expired() {}
+fn test_lock_inscription_fails_status_closed() {
+    // TODO: when `submit_inscription` is implemented
+}
 
 #[test]
-fn test_lock_inscription_fails_inscription_not_found() {}
+fn test_cancel_inscription_works() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 100);
+
+    let id = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+    
+    start_cheat_caller_address_global(contract_address); 
+    // TODO: is this the correct way to set permissions?
+    token_dispatcher.approve(contract_address, 100);
+    stop_cheat_caller_address_global();
+
+    orderbook_dispatcher.cancel_inscription(id, 'STRK'.into());
+}
 
 #[test]
-fn test_cancel_inscription_works() {}
+#[should_panic]
+fn test_cancel_inscription_fails_locked() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
+
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(contract_address, 100);
+
+    let id = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+
+    orderbook_dispatcher.lock_inscription(id, "hash");
+    orderbook_dispatcher.cancel_inscription(id, 'STRK'.into())
+}
 
 #[test]
-fn test_cancel_inscription_fails_locked() {}
+fn test_cancel_inscription_fails_closed() { 
+    // TODO: when `submit_inscription` is implemented
+}
 
 #[test]
-fn test_cancel_inscription_fails_closed() {}
+#[should_panic]
+fn test_cancel_inscription_fails_canceled() {
+    let (orderbook_dispatcher, contract_address, token_dispatcher, _) = setup();
 
-#[test]
-fn test_cancel_inscription_fails_canceled() {}
+    let test_taproot_address: ByteArray = "test";
+    let test_data: ByteArray = "data";
 
-#[test]
-fn test() {}
+    token_dispatcher.approve(contract_address, 100);
+
+    let id = orderbook_dispatcher
+        .request_inscription(
+            test_data, test_taproot_address, 1, 'STRK'.into(), 10
+        );
+    
+    start_cheat_caller_address_global(contract_address); 
+    token_dispatcher.approve(contract_address, 100);
+    stop_cheat_caller_address_global();
+
+    orderbook_dispatcher.cancel_inscription(id, 'STRK'.into());
+    orderbook_dispatcher.cancel_inscription(id, 'STRK'.into());
+}

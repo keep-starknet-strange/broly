@@ -1,9 +1,9 @@
-use core::starknet::contract_address::ContractAddress;
 use onchain::orderbook::interface::IOrderbook;
 
 #[starknet::contract]
 mod Orderbook {
     use core::byte_array::ByteArray;
+    use onchain::orderbook::interface::Status;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{ 
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePathEntry, 
@@ -20,7 +20,7 @@ mod Orderbook {
         inscriptions: Map<u32, (ByteArray, u256)>,
         // A map from the inscription ID to status. Possible values:
         // 'Open', 'Locked', 'Canceled', 'Closed'.
-        inscription_statuses: Map<u32, felt252>,
+        inscription_statuses: Map<u32, Status>,
         // A map from the inscription ID to the potential submitters.
         submitters: Map<u32, Map<ContractAddress, ContractAddress>>,
         // Locks on inscriptions. Maps the inscription ID to a tuple of
@@ -58,8 +58,8 @@ mod Orderbook {
             submitter_fee: u256,
         ) -> u32 {
             assert(
-                self.is_valid_taproot_address(receiving_address) == true, 
-                'Not a valid taproot address'
+                self.is_valid_bitcoin_address(receiving_address) == true, 
+                'Not a valid bitcoin address'
             );
             assert(
                 currency_fee == 'STRK'.into(), 
@@ -74,6 +74,7 @@ mod Orderbook {
             }
             let id = self.new_inscription_id.read();
             self.inscriptions.write(id, (inscription_data, submitter_fee));
+            self.inscription_statuses.write(id, Status::Open);
             id
         }
 
@@ -82,8 +83,8 @@ mod Orderbook {
         /// - `receiving_address: ByteArray`, the ID of the inscription.
         /// Returns:
         /// - `bool`
-        fn is_valid_taproot_address(self: @ContractState, receiving_address: ByteArray) -> bool {
-            // TODO: implement the check that the receiving address is a valid Bech32m format.
+        fn is_valid_bitcoin_address(self: @ContractState, receiving_address: ByteArray) -> bool {
+            // TODO: implement the check that the receiving address is in valid format.
             true
         }
 
@@ -103,9 +104,22 @@ mod Orderbook {
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
             let status = self.inscription_statuses.read(inscription_id);
             assert(
-                status != 'Locked'.into(),
+                status != Status::Undefined,
+                'Inscription does not exist'
+            );
+            assert(
+                status != Status::Locked,
                 'The inscription is locked'
             );
+            assert(
+                status != Status::Canceled,
+                'The inscription is canceled'
+            );
+            assert(
+                status != Status::Closed,
+                'The inscription has been closed'
+            );
+
             let caller = get_caller_address();
             // TODO: change the address to the actual escrow contract once it's implemented.
             let escrow_address = get_contract_address();
@@ -116,7 +130,7 @@ mod Orderbook {
             }
             let (inscription_data, _) = self.inscriptions.read(inscription_id);
             self.inscriptions.write(inscription_id, (inscription_data, 0));
-            self.inscription_statuses.write(inscription_id, 'Canceled'.into());
+            self.inscription_statuses.write(inscription_id, Status::Canceled);
         }
 
         /// Called by a submitter. Multiple submitters are allowed to lock the 
@@ -132,15 +146,19 @@ mod Orderbook {
         fn lock_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
             let status = self.inscription_statuses.read(inscription_id);
             assert(
-                status != 'Closed'.into(),
-                'The inscription has been closed'
+                status != Status::Undefined,
+                'Inscription does not exist'
             );
             assert(
-                status != 'Canceled'.into(),
+                status != Status::Canceled,
                 'The inscription is canceled'
             );
+            assert(
+                status != Status::Closed,
+                'The inscription has been closed'
+            );
 
-            if (status == 'Locked'.into()) {
+            if (status == Status::Locked) {
                 let (_, _, blocknumber) = self.inscription_locks.read(inscription_id);
                 // TODO: replace block time delta
                 assert(get_block_number() - blocknumber < 100, 'Prior lock has not expired'); 
@@ -150,7 +168,7 @@ mod Orderbook {
             let mut submitters = self.submitters.entry(inscription_id);
             submitters.write(submitter, submitter);
 
-            self.inscription_statuses.write(inscription_id, 'Locked'.into());
+            self.inscription_statuses.write(inscription_id, Status::Locked);
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if 
@@ -166,7 +184,7 @@ mod Orderbook {
 
             // TODO: process the submitted transaction hash, verify that it is on Bitcoin
 
-            self.inscription_statuses.write(inscription_id, 'Closed'.into());
+            self.inscription_statuses.write(inscription_id, Status::Closed);
         }
 
         /// Helper function that checks if the inscription has already been locked.

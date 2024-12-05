@@ -1,5 +1,15 @@
 use core::starknet::contract_address::ContractAddress;
 
+#[derive(Default, Drop, PartialEq, starknet::Store)]
+pub enum Status {
+    Open,
+    Locked, 
+    Canceled, 
+    Closed,
+    #[default]
+    Undefined,
+}
+
 #[starknet::interface]
 pub trait IOrderbook<TContractState> {
     fn request_inscription(
@@ -14,7 +24,7 @@ pub trait IOrderbook<TContractState> {
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
-    fn is_valid_taproot_address(self: @TContractState, receiving_address: ByteArray) -> bool;
+    fn is_valid_bitcoin_address(self: @TContractState, receiving_address: ByteArray) -> bool;
     fn is_locked(self: @TContractState, tx_hash: ByteArray) -> (bool, ContractAddress);
 }
 
@@ -32,10 +42,10 @@ pub trait OrderbookABI<TContractState> {
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
-    fn is_valid_taproot_address(self: @TContractState, receiving_address: ByteArray) -> bool;
+    fn is_valid_bitcoin_address(self: @TContractState, receiving_address: ByteArray) -> bool;
     fn is_locked(self: @TContractState, tx_hash: ByteArray) -> (bool, ContractAddress);
 
-    // ERC20
+    // ERC20 functions
     fn balance_of(self: @TContractState, account: ContractAddress) -> felt252;
     fn transfer(ref self: TContractState, recipient: ContractAddress, amount: felt252);
     fn transfer_from(

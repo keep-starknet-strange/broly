@@ -1,13 +1,13 @@
 use starknet::{ContractAddress, contract_address_const};
 
-pub const SUPPLY: u256 = 1_000_000_000_000_000_000; // 1 ETH
+pub const SUPPLY: u256 = 1_000;
 
 pub fn NAME() -> ByteArray {
-    "Ethereum"
+    "Starknet"
 }
 
 pub fn SYMBOL() -> ByteArray {
-    "ETH"
+    "STRK"
 }
 
 pub fn OWNER() -> ContractAddress {
