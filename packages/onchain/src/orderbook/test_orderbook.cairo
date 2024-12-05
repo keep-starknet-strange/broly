@@ -142,7 +142,7 @@ fn test_lock_inscription_fails_inscription_not_found() {
 }
 
 #[test]
-fn test_lock_inscription_fails_status_closed() {// TODO: when `submit_inscription` is implemented
+fn test_lock_inscription_fails_status_closed() { // TODO: when `submit_inscription` is implemented
 }
 
 #[test]
@@ -183,7 +183,7 @@ fn test_cancel_inscription_fails_locked() {
 }
 
 #[test]
-fn test_cancel_inscription_fails_closed() {// TODO: when `submit_inscription` is implemented
+fn test_cancel_inscription_fails_closed() { // TODO: when `submit_inscription` is implemented
 }
 
 #[test]
