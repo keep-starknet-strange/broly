@@ -31,7 +31,7 @@ fn setup() -> (
     OrderbookABIDispatcher, ContractAddress, ERC20UpgradeableABIDispatcher, ContractAddress,
 ) {
     // deploy an ERC20
-    let (erc20_strk, erc20_address) = test_utils::setup_erc20(test_address());
+    let (erc20_strk, erc20_address) = erc20_utils::setup_erc20(test_address());
 
     // deploy Orderbook contract
     let (orderbook, contract_address) = setup_orderbook(erc20_strk.contract_address);
