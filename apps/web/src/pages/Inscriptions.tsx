@@ -17,7 +17,7 @@ function Inscritpions() {
   });
   const defaultRequests: any[] = [];
   const [requests, setRequests] = useState(defaultRequests);
-  const [requestPagination, setRequestPagination] = useState({
+  const [requestPagination, _] = useState({
     pageLength: 10,
     page: 1
   });

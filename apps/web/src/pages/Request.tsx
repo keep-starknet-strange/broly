@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";
-import { inscription } from "../api/mock";
 
 function Request() {
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
