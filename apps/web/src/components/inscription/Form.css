@@ -1,0 +1,67 @@
+.Form__input {
+  height: 6rem;
+  background-color: var(--color-tertiary);
+  margin-right: 2rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 1rem;
+  box-shadow: 0 0 0.5rem var(--color-tertiary-dark);
+  position: relative;
+}
+
+.Form__image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 97%;
+  height: 100%;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-content: center;
+}
+
+.Form__image--grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
+  justify-content: center;
+}
+
+.Form__image:hover {
+  text-decoration: underline;
+}
+
+.Form__image__up {
+  object-fit: contain;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 1rem;
+  box-shadow: 0 0 2px var(--color-tertiary-dark);
+  background-color: var(--color-primary);
+}
+
+.Form__textarea {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+
+.Form__textarea:focus {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--color-primary) 60%,
+    var(--color-primary-light)
+  );
+  outline: 1px solid var(--color-primary-light);
+}
