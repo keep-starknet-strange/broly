@@ -1,0 +1,45 @@
+name: Cairo Contracts
+
+on: [push, pull_request]
+
+permissions: read-all
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.9.1"
+
+      - name: Check cairo format
+        run: scarb fmt --check
+        working-directory: packages/onchain
+
+      - name: Build cairo onchain
+        run: scarb build
+        working-directory: packages/onchain
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      - name: Set up Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.9.1"
+
+      - name: Set up SNForge
+        uses: foundry-rs/setup-snfoundry@v3
+        with:
+          starknet-foundry-version: "0.34.0"
+
+      - name: Run tests and generate report
+        run: snforge test
+        working-directory: packages/onchain
