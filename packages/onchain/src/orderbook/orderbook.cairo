@@ -5,9 +5,9 @@ mod Orderbook {
     use core::byte_array::ByteArray;
     use onchain::orderbook::interface::Status;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-    use starknet::storage::{ 
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePathEntry, 
-        StoragePointerReadAccess, StoragePointerWriteAccess, 
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePathEntry,
+        StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
 
@@ -15,7 +15,7 @@ mod Orderbook {
     struct Storage {
         // ID of the next inscription.
         new_inscription_id: u32,
-        // A map from the inscription ID to a tuple with the inscribed 
+        // A map from the inscription ID to a tuple with the inscribed
         // data and submitter fee.
         inscriptions: Map<u32, (ByteArray, u256)>,
         // A map from the inscription ID to status. Possible values:
@@ -26,22 +26,20 @@ mod Orderbook {
         // Locks on inscriptions. Maps the inscription ID to a tuple of
         // submitter address, precomputed transaction hash, and block number.
         inscription_locks: Map<u32, (ContractAddress, ByteArray, u64)>,
-        // STRK fee token. 
+        // STRK fee token.
         strk_token: ERC20ABIDispatcher,
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState, strk_token: ContractAddress
-    ) {
+    fn constructor(ref self: ContractState, strk_token: ContractAddress) {
         // initialize contract
         self.initializer(:strk_token);
     }
 
     #[abi(embed_v0)]
     impl OrderbookImpl of super::IOrderbook<ContractState> {
-        /// Called by a user. 
-        /// Inputs: 
+        /// Called by a user.
+        /// Inputs:
         /// - `inscription_data: ByteArray`, the data to be inscribed on Bitcoin.
         /// - `receiving_address: ByteArray`, the taproot address that will own the inscription.
         /// - `satoshi: felt252`, the Sat where the user wants to inscribe data.
@@ -50,27 +48,27 @@ mod Orderbook {
         /// Returns:
         /// - `id: felt252`, the ID of the created inscription.
         fn request_inscription(
-            ref self: ContractState, 
+            ref self: ContractState,
             inscription_data: ByteArray,
             receiving_address: ByteArray,
-            satoshi: felt252, 
-            currency_fee: felt252, 
+            satoshi: felt252,
+            currency_fee: felt252,
             submitter_fee: u256,
         ) -> u32 {
             assert(
-                self.is_valid_bitcoin_address(receiving_address) == true, 
-                'Not a valid bitcoin address'
+                self.is_valid_bitcoin_address(receiving_address) == true,
+                'Not a valid bitcoin address',
             );
-            assert(
-                currency_fee == 'STRK'.into(), 
-                'The currency is not supported'
-            );
+            assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
             let caller = get_caller_address();
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
                 // TODO: change the transfer to the escrow contract once it's implemented.
-                strk_token.transfer_from(sender: caller, recipient: escrow_address, amount: submitter_fee);
+                strk_token
+                    .transfer_from(
+                        sender: caller, recipient: escrow_address, amount: submitter_fee,
+                    );
             }
             let id = self.new_inscription_id.read();
             self.inscriptions.write(id, (inscription_data, submitter_fee));
@@ -79,7 +77,7 @@ mod Orderbook {
         }
 
         /// Helper function that checks the format of the taproot address.
-        /// Inputs: 
+        /// Inputs:
         /// - `receiving_address: ByteArray`, the ID of the inscription.
         /// Returns:
         /// - `bool`
@@ -88,7 +86,7 @@ mod Orderbook {
             true
         }
 
-        /// Inputs: 
+        /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
         /// - `(ByteArray, felt252)`, the tuple with the inscribed data and the fee.
@@ -96,29 +94,17 @@ mod Orderbook {
             self.inscriptions.read(inscription_id)
         }
 
-        /// Called by a user. 
-        /// Inputs: 
-        /// - `inscription_id: felt252`, the ID of the inscription the user wants to 
-        /// cancel. 
+        /// Called by a user.
+        /// Inputs:
+        /// - `inscription_id: felt252`, the ID of the inscription the user wants to
+        /// cancel.
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
             let status = self.inscription_statuses.read(inscription_id);
-            assert(
-                status != Status::Undefined,
-                'Inscription does not exist'
-            );
-            assert(
-                status != Status::Locked,
-                'The inscription is locked'
-            );
-            assert(
-                status != Status::Canceled,
-                'The inscription is canceled'
-            );
-            assert(
-                status != Status::Closed,
-                'The inscription has been closed'
-            );
+            assert(status != Status::Undefined, 'Inscription does not exist');
+            assert(status != Status::Locked, 'The inscription is locked');
+            assert(status != Status::Canceled, 'The inscription is canceled');
+            assert(status != Status::Closed, 'The inscription has been closed');
 
             let caller = get_caller_address();
             // TODO: change the address to the actual escrow contract once it's implemented.
@@ -133,35 +119,26 @@ mod Orderbook {
             self.inscription_statuses.write(inscription_id, Status::Canceled);
         }
 
-        /// Called by a submitter. Multiple submitters are allowed to lock the 
-        /// inscription simultaneously. The fee will be received only by the 
-        /// submitter that will actually create the inscription on Bitcoin. 
-        /// Assert that the inscription has not been closed yet. If there is a 
+        /// Called by a submitter. Multiple submitters are allowed to lock the
+        /// inscription simultaneously. The fee will be received only by the
+        /// submitter that will actually create the inscription on Bitcoin.
+        /// Assert that the inscription has not been closed yet. If there is a
         /// prior lock on the inscription, X blocks have to pass before a new
         /// lock can be created.
-        /// Inputs: 
-        /// - `inscription_id: u32`, the ID of the inscription being locked. 
+        /// Inputs:
+        /// - `inscription_id: u32`, the ID of the inscription being locked.
         /// - `tx_hash: ByteArray`, the precomputed bitcoin transaction hash that will be
-        /// submitted onchain by the submitter. 
+        /// submitted onchain by the submitter.
         fn lock_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
             let status = self.inscription_statuses.read(inscription_id);
-            assert(
-                status != Status::Undefined,
-                'Inscription does not exist'
-            );
-            assert(
-                status != Status::Canceled,
-                'The inscription is canceled'
-            );
-            assert(
-                status != Status::Closed,
-                'The inscription has been closed'
-            );
+            assert(status != Status::Undefined, 'Inscription does not exist');
+            assert(status != Status::Canceled, 'The inscription is canceled');
+            assert(status != Status::Closed, 'The inscription has been closed');
 
             if (status == Status::Locked) {
                 let (_, _, blocknumber) = self.inscription_locks.read(inscription_id);
                 // TODO: replace block time delta
-                assert(get_block_number() - blocknumber < 100, 'Prior lock has not expired'); 
+                assert(get_block_number() - blocknumber < 100, 'Prior lock has not expired');
             }
 
             let submitter = get_caller_address();
@@ -171,11 +148,11 @@ mod Orderbook {
             self.inscription_statuses.write(inscription_id, Status::Locked);
         }
 
-        /// Called by a submitter. The fee is transferred to the submitter if 
-        /// the inscription on Bitcoin has been made. The submitted hash must 
-        /// match the precomputed transaction hash in storage. If successful, 
+        /// Called by a submitter. The fee is transferred to the submitter if
+        /// the inscription on Bitcoin has been made. The submitted hash must
+        /// match the precomputed transaction hash in storage. If successful,
         /// the status of the inscription changes from 'Locked' to 'Closed'.
-        /// Inputs: 
+        /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
         /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
         fn submit_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
@@ -188,8 +165,8 @@ mod Orderbook {
         }
 
         /// Helper function that checks if the inscription has already been locked.
-        /// Inputs: 
-        /// - `tx_hash: ByteArray`, the precomputed transaction hash for the inscription 
+        /// Inputs:
+        /// - `tx_hash: ByteArray`, the precomputed transaction hash for the inscription
         /// being locked.
         /// Returns:
         /// - `(bool, ContractAddress)`
@@ -203,7 +180,7 @@ mod Orderbook {
 
     #[generate_trait]
     pub impl InternalImpl of InternalTrait {
-        /// Executed once when the Orderbook contract is deployed. Used to set 
+        /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
         fn initializer(ref self: ContractState, strk_token: ContractAddress) {
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token });
