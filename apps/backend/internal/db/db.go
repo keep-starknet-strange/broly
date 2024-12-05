@@ -23,7 +23,7 @@ func InitDB() {
 	pgPool, err := pgxpool.New(context.Background(), postgresConnString)
 	if err != nil {
 		fmt.Println("Error connecting to database: ", err)
-    os.Exit(1)
+		os.Exit(1)
 	}
 	db.Postgres = pgPool
 }

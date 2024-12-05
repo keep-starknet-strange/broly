@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:14.11-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./apps/backend/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=broly-user
+      - POSTGRES_DB=broly-db
+  backend:
+    build:
+      dockerfile: apps/backend/Dockerfile
+      context: .
+    ports:
+      - 8080:8080
+    links:
+      - postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+      - CONFIG_PATH=/configs/config.yaml
+  frontend:
+    build:
+      dockerfile: apps/web/Dockerfile
+      context: .
+    ports:
+      - 5173:5173
+    links:
+      - backend
+    volumes:
+      - ./package.json:/app/package.json
+      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
+      - ./apps/web/package.json:/app/apps/web/package.json
+      - ./apps/web/public/:/app/apps/web/public
+      - ./apps/web/src:/app/apps/web/src
+
+volumes:
+  postgres:

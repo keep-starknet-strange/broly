@@ -1,60 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionRequestView from "../components/inscription/RequestView";
+import { getHotInscriptions, getNewInscriptions, getInscriptionRequests } from "../api/inscriptions";
+import { Pagination } from "../components/Pagination";
 
 function Inscritpions() {
-  const openRequests = [
-    {
-      id: 1,
-      content: "Hello, World!",
-      type: "text"
-    },
-    {
-      id: 2,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 3,
-      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif"  ,
-      type: "image"
-    },
-    {
-      id: 4,
-      content: "Hello, World 2!\nThis is a multiline text.\mThis text is long.\nAnd another lin  e\nAnd another longer line\n...\nHello\nWorld\nLorum\nIpsum\nText\n...\nMore\nLines",
-      type: "text"
-    },
-    {
-      id: 5,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 6,
-      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
-      type: "text"
-    },
-    {
-      id: 7,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 8,
-      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
-      type: "text"
-    },
-    {
-      id: 9,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    }
-  ];
-  const allInscriptions = openRequests.concat(openRequests).splice(0, 12);
-
   const filters = ["Hot", "New", "Rare"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+
+  const defaultInscriptions: any[] = [];
+  const [inscriptions, setInscriptions] = useState(defaultInscriptions);
+  const [inscriptionsPagination, setInscriptionsPagination] = useState({
+    pageLength: 16,
+    page: 1
+  });
+  const defaultRequests: any[] = [];
+  const [requests, setRequests] = useState(defaultRequests);
+  const [requestPagination, setRequestPagination] = useState({
+    pageLength: 10,
+    page: 1
+  });
+
+  useEffect(() => {
+    const fetchInscriptions = async () => {
+      let result;
+      if (activeFilter === "Hot") {
+        result = await getHotInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
+      } else if (activeFilter === "New") {
+        result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
+      } else if (activeFilter === "Rare") {
+        console.log("TODO: get rare inscriptions");
+      }
+      if (result && result.data) {
+        if (inscriptionsPagination.page === 1) {
+          setInscriptions(result.data);
+        } else {
+          let newInscriptios = result.data.filter((inscription: any) => {
+            return !inscriptions.some((i: any) => i.id === inscription.id);
+          });
+          setInscriptions([...inscriptions, ...newInscriptios]);
+        }
+      }
+    }
+    try {
+      fetchInscriptions();
+    } catch (error) {
+      console.log("Error fetching inscriptions", error);
+    }
+  }, [inscriptionsPagination]);
+
+  const resetPagination = () => {
+    setInscriptionsPagination({
+      pageLength: 16,
+      page: 1
+    });
+  }
+
+  useEffect(() => {
+    resetPagination();
+  }, [activeFilter]);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      let result = await getInscriptionRequests(requestPagination.pageLength, requestPagination.page);
+      if (result && result.data) {
+        if (requestPagination.page === 1) {
+          setRequests(result.data);
+        } else {
+          let newRequests = result.data.filter((request: any) => {
+            return !requests.some((r: any) => r.id === request.id);
+          });
+          setRequests([...requests, ...newRequests]);
+        }
+      }
+    }
+    try {
+      fetchRequests();
+    } catch (error) {
+      console.log("Error fetching requests", error);
+    }
+  }, [requestPagination]);
 
   // TODO: Button to create new request if no requests are open
   // TODO: shadow and arrow on rhs of scrollable div
@@ -63,7 +89,7 @@ function Inscritpions() {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
         <h1 className="text-4xl font-bold">Open Inscription Requests</h1>
         <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
-          {openRequests.map((request) => {
+          {requests.map((request) => {
             return (
               <div className="">
                 <InscriptionRequestView key={request.id} inscription={request} />
@@ -94,11 +120,15 @@ function Inscritpions() {
           </div>
         </div>
         <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
-          {allInscriptions.map((inscription) => (
+          {inscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}
         </div>
-        <button className="button--gradient button__primary w-fit mb-4">Load More...</button>
+        <Pagination
+          data={inscriptions}
+          setState={setInscriptionsPagination}
+          stateValue={inscriptionsPagination}
+        />
       </div>
     </div>
   );

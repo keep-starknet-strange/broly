@@ -40,12 +40,12 @@ func InitConfig() {
 	yamlFile, err := os.ReadFile(configPath)
 	if err != nil {
 		fmt.Println("Error reading config file: ", err)
-    os.Exit(1)
+		os.Exit(1)
 	}
 
 	err = yaml.Unmarshal(yamlFile, &Conf)
 	if err != nil {
 		fmt.Println("Error parsing config file: ", err)
-    os.Exit(1)
+		os.Exit(1)
 	}
 }
