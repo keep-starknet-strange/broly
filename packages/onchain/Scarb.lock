@@ -2,13 +2,136 @@
 version = 1
 
 [[package]]
+name = "alexandria_math"
+version = "0.2.1"
+source = "git+https://github.com/keep-starknet-strange/alexandria#95d98a5182001d07673b856a356eff0e6bd05354"
+
+[[package]]
 name = "onchain"
 version = "0.1.0"
 dependencies = [
+ "alexandria_math",
+ "openzeppelin",
+ "openzeppelin_token",
+ "openzeppelin_utils",
  "snforge_std",
 ]
 
 [[package]]
+name = "openzeppelin"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_account",
+ "openzeppelin_finance",
+ "openzeppelin_governance",
+ "openzeppelin_introspection",
+ "openzeppelin_merkle_tree",
+ "openzeppelin_presets",
+ "openzeppelin_security",
+ "openzeppelin_token",
+ "openzeppelin_upgrades",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_access"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_introspection",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_account"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_introspection",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_finance"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_token",
+]
+
+[[package]]
+name = "openzeppelin_governance"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_account",
+ "openzeppelin_introspection",
+ "openzeppelin_token",
+]
+
+[[package]]
+name = "openzeppelin_introspection"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+
+[[package]]
+name = "openzeppelin_merkle_tree"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+
+[[package]]
+name = "openzeppelin_presets"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_account",
+ "openzeppelin_finance",
+ "openzeppelin_introspection",
+ "openzeppelin_token",
+ "openzeppelin_upgrades",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_security"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+
+[[package]]
+name = "openzeppelin_token"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_account",
+ "openzeppelin_introspection",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_upgrades"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+
+[[package]]
+name = "openzeppelin_utils"
+version = "0.19.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+
+[[package]]
+name = "snforge_scarb_plugin"
+version = "0.33.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
+
+[[package]]
 name = "snforge_std"
-version = "0.1.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.13.0#99c2f9d33159988efd339bd969c78d82b0b4b6f7"
+version = "0.33.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
+dependencies = [
+ "snforge_scarb_plugin",
+]
