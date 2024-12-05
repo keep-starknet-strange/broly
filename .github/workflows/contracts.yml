@@ -18,11 +18,11 @@ jobs:
 
       - name: Check cairo format
         run: scarb fmt --check
-        working-directory: onchain
+        working-directory: packages/onchain
 
       - name: Build cairo onchain
         run: scarb build
-        working-directory: onchain
+        working-directory: packages/onchain
 
   test:
     runs-on: ubuntu-latest
@@ -42,4 +42,4 @@ jobs:
 
       - name: Run tests and generate report
         run: snforge test
-        working-directory: onchain
+        working-directory: packages/onchain
