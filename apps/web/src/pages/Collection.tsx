@@ -1,61 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionRequestView from "../components/inscription/RequestView";
+import { mockAddress } from "../api/mock";
+import { getMyNewInscriptions, getMyTopInscriptions, getMyInscriptionRequests } from "../api/inscriptions";
+import { Pagination } from "../components/Pagination";
 
 function Collection() {
-  const inscriptions = [
-    {
-      id: 1,
-      content: "Hello, World!",
-      type: "text"
-    },
-    {
-      id: 2,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 3,
-      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif"  ,
-      type: "image"
-    },
-    {
-      id: 4,
-      content: "Hello, World 2!\nThis is a multiline text.\mThis text is long.\nAnd another lin  e\nAnd another longer line\n...\nHello\nWorld\nLorum\nIpsum\nText\n...\nMore\nLines",
-      type: "text"
-    },
-    {
-      id: 5,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 6,
-      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
-      type: "text"
-    },
-    {
-      id: 7,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 8,
-      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
-      type: "text"
-    },
-    {
-      id: 9,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    }
-  ];
-  const myCollection = inscriptions.concat(inscriptions).splice(0, 16);
-  const myRequests = inscriptions.splice(0, 5);
-
   const filters = ["New", "Top", "Rare", "Requests"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+
+  const defaultInscriptions: any[] = [];
+  const [collection, setCollection] = useState(defaultInscriptions);
+  const [collectionPagination, setCollectionPagination] = useState({
+    pageLength: 16,
+    page: 1
+  });
+  const defaultRequests: any[] = [];
+  const [myRequests, setMyRequests] = useState(defaultRequests);
+
+  useEffect(() => {
+    const fetchCollection = async () => {
+      let result;
+      if (activeFilter === "New") {
+        result = await getMyNewInscriptions(mockAddress, collectionPagination.pageLength, collectionPagination.page);
+      } else if (activeFilter === "Top") {
+        result = await getMyTopInscriptions(mockAddress, collectionPagination.pageLength, collectionPagination.page);
+      } else if (activeFilter === "Rare") {
+        console.log("TODO: Get rare inscriptions");
+      } else if (activeFilter === "Requests") {
+        result = await getMyInscriptionRequests(mockAddress, collectionPagination.pageLength, collectionPagination.page);
+        if (collectionPagination.page === 1) {
+          setMyRequests(result.data);
+        } else {
+          const newRequests = result.data.filter((inscription: any) => !myRequests.find((existingInscription: any) => existingInscription.id === inscription.id));
+          setMyRequests([...myRequests, ...newRequests]);
+        }
+        return;
+      }
+      if (result && result.data) {
+        if (collectionPagination.page === 1) {
+          setCollection(result.data);
+        } else {
+          const newCollection = result.data.filter((inscription: any) => !collection.find((existingInscription: any) => existingInscription.id === inscription.id));
+          setCollection([...collection, ...newCollection]);
+        }
+      }
+    }
+    try {
+      fetchCollection();
+    } catch (error) {
+      console.error(error);
+    }
+  }, [collectionPagination]);
+
+  const resetPagination = () => {
+    setCollectionPagination({
+      pageLength: 16,
+      page: 1
+    });
+  }
+
+  useEffect(() => {
+    resetPagination();
+  }, [activeFilter]);
 
   // TODO: Button to create new request if no requests are open
   // TODO: Button to view requests if requests are open
@@ -74,7 +82,7 @@ function Collection() {
         <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
           {activeFilter === "Requests" ? myRequests.map((inscription) => (
             <InscriptionRequestView key={inscription.id} inscription={inscription} />
-          )) : myCollection.map((inscription) => (
+          )) : collection.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}
         </div>
@@ -84,7 +92,11 @@ function Collection() {
               <p className="text-center">Create</p>
             </NavLink>
           )}
-          <button className="button--gradient button__primary w-fit">Load More...</button>
+          <Pagination
+            data={collection}
+            setState={setCollectionPagination}
+            stateValue={collectionPagination}
+          />
         </div>
       </div>
     </div>

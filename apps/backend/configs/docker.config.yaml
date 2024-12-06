@@ -1,0 +1,19 @@
+Api:
+  Port: 8080
+  AllowOrigins:
+    - '*'
+  AllowMethods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  AllowHeaders:
+    - Content-Type
+  Production: false
+  Admin: true
+Postgres:
+  Host: broly-postgres-1
+  Port: 5432
+  User: broly-user
+  Name: broly-db

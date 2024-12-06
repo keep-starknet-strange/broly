@@ -2,37 +2,24 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";
+import { getInscription } from "../api/inscriptions";
 
 function Inscription() {
-  let { id } = useParams<{ id: string }>();
+  let { id } = useParams<{ id: any }>();
 
   const [inscription, setInscription] = useState<any>();
   useEffect(() => {
-    // TODO: Fetch inscription by id
-    let newInscription = {
-      id: id,
-      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif",
-      type: "image",
-      owner: "Brandon",
-      sat_number: "1,012,345,678,910",
-      minted: new Date(),
-      minted_block: 800000,
-      properties: [
-        {
-          name: "Rarity",
-          value: "Legendary",
-        },
-        {
-          name: "Color",
-          value: "Purple",
-        },
-        {
-          name: "Shape",
-          value: "Round",
-        },
-      ],
-    };
-    setInscription(newInscription);
+    const fetchInscription = async () => {
+      let result = await getInscription(id);
+      if (result && result.data) {
+        setInscription(result.data);
+      }
+    }
+    try {
+      fetchInscription();
+    } catch (error) {
+      console.error(error);
+    }
   }, [id]);
 
   // TODO: Move inscription query up to parent component

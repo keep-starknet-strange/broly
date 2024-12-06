@@ -10,30 +10,7 @@ function Request() {
   const [inscription, setInscription] = useState<any>();
   useEffect(() => {
     // TODO: Fetch inscription by id
-    let newInscription = {
-      id: id,
-      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif",
-      type: "image",
-      owner: "Brandon",
-      sat_number: "1,012,345,678,910",
-      minted: new Date(),
-      minted_block: 800000,
-      properties: [
-        {
-          name: "Rarity",
-          value: "Legendary",
-        },
-        {
-          name: "Color",
-          value: "Purple",
-        },
-        {
-          name: "Shape",
-          value: "Round",
-        },
-      ],
-    };
-    setInscription(newInscription);
+    setInscription(inscription);
   }, [id]);
 
   // TODO: Move inscription query up to parent component
