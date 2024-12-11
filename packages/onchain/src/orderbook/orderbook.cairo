@@ -10,6 +10,7 @@ mod Orderbook {
         StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
+    use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
 
     #[storage]
     struct Storage {
@@ -28,12 +29,14 @@ mod Orderbook {
         inscription_locks: Map<u32, (ContractAddress, ByteArray, u64)>,
         // STRK fee token.
         strk_token: ERC20ABIDispatcher,
+        // Address of the contract checking transaction inclusion.
+        relay_address: ContractAddress,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, strk_token: ContractAddress) {
+    fn constructor(ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress) {
         // initialize contract
-        self.initializer(:strk_token);
+        self.initializer(:strk_token, :relay_address);
     }
 
     #[abi(embed_v0)]
@@ -159,7 +162,14 @@ mod Orderbook {
             let (_, precomputed_tx_hash, _) = self.inscription_locks.read(inscription_id);
             assert(precomputed_tx_hash == tx_hash, 'Precomputed hash != submitted');
 
-            // TODO: process the submitted transaction hash, verify that it is on Bitcoin
+            const selector: felt252 = selector!("prove_inclusion");
+            let to = self.relay_address.read();
+            let calldata: Array<felt252> = array![];
+
+            // TODO: assert successful inclusion call
+            call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
+
+            // TODO: assert that the witness data contains the requested inscription
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
         }
@@ -182,8 +192,9 @@ mod Orderbook {
     pub impl InternalImpl of InternalTrait {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
-        fn initializer(ref self: ContractState, strk_token: ContractAddress) {
+        fn initializer(ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress) {
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token });
+            self.relay_address.write(relay_address);
         }
     }
 }
