@@ -7,14 +7,26 @@ version = "0.2.1"
 source = "git+https://github.com/keep-starknet-strange/alexandria#95d98a5182001d07673b856a356eff0e6bd05354"
 
 [[package]]
+name = "consensus"
+version = "0.1.0"
+source = "git+https://github.com/keep-starknet-strange/raito.git?rev=02a13045b7074ae2b3247431cd91f1ad76263fb2#02a13045b7074ae2b3247431cd91f1ad76263fb2"
+dependencies = [
+ "shinigami_engine",
+ "utils",
+]
+
+[[package]]
 name = "onchain"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "consensus",
  "openzeppelin",
  "openzeppelin_token",
  "openzeppelin_utils",
  "snforge_std",
+ "utils",
+ "utu_relay",
 ]
 
 [[package]]
@@ -124,6 +136,31 @@ version = "0.19.0"
 source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
 
 [[package]]
+name = "ripemd160"
+version = "0.1.0"
+source = "git+https://github.com/j1mbo64/ripemd160_cairo.git#833e07d7d074d4ee51ceb40a5bcb4af2fe6898f3"
+
+[[package]]
+name = "sha1"
+version = "0.1.0"
+source = "git+https://github.com/j1mbo64/sha1_cairo.git#2b65bc00a829bdcc244c140d0f31feda32f8d2c4"
+
+[[package]]
+name = "shinigami_engine"
+version = "0.1.0"
+source = "git+https://github.com/keep-starknet-strange/shinigami.git?rev=3415ed6#3415ed6331d3ea2dc2de6f9ab8e0be6562585f2d"
+dependencies = [
+ "ripemd160",
+ "sha1",
+ "shinigami_utils",
+]
+
+[[package]]
+name = "shinigami_utils"
+version = "0.1.0"
+source = "git+https://github.com/keep-starknet-strange/shinigami.git?rev=3415ed6#3415ed6331d3ea2dc2de6f9ab8e0be6562585f2d"
+
+[[package]]
 name = "snforge_scarb_plugin"
 version = "0.33.0"
 source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
@@ -134,4 +171,19 @@ version = "0.33.0"
 source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
 dependencies = [
  "snforge_scarb_plugin",
+]
+
+[[package]]
+name = "utils"
+version = "0.1.0"
+source = "git+https://github.com/keep-starknet-strange/raito.git?rev=02a13045b7074ae2b3247431cd91f1ad76263fb2#02a13045b7074ae2b3247431cd91f1ad76263fb2"
+
+[[package]]
+name = "utu_relay"
+version = "0.1.0"
+source = "git+https://github.com/lana-shanghai/utu_relay.git#25f8d9799df04465c716155e9ece61d9145b0f8c"
+dependencies = [
+ "openzeppelin",
+ "openzeppelin_upgrades",
+ "utils",
 ]
