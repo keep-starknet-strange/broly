@@ -2,7 +2,7 @@ use utils::hash::Digest;
 use utu_relay::bitcoin::block::BlockHeader;
 
 #[starknet::interface]
-pub trait IBitcoinDepositor<TContractState> {
+pub trait ITransactionInclusion<TContractState> {
     fn prove_inclusion(
         ref self: TContractState,
         tx_id: Digest,
@@ -13,7 +13,7 @@ pub trait IBitcoinDepositor<TContractState> {
 }
 
 #[starknet::contract]
-mod BitcoinDepositor {
+mod TransactionInclusion {
     use onchain::utils::utils::compute_merkle_root;
     use utu_relay::bitcoin::block::BlockHashTrait;
     use starknet::{ContractAddress, get_block_timestamp};
@@ -25,7 +25,6 @@ mod BitcoinDepositor {
 
     #[storage]
     struct Storage {
-        depositor: ContractAddress,
         utu_address: ContractAddress,
     }
 
@@ -35,7 +34,7 @@ mod BitcoinDepositor {
     }
 
     #[abi(embed_v0)]
-    impl BitcoinDepositorImpl of super::IBitcoinDepositor<ContractState> {
+    impl TransactionInclusionImpl of super::ITransactionInclusion<ContractState> {
         fn prove_inclusion(
             ref self: ContractState,
             tx_id: Digest,
