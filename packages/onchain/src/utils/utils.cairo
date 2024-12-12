@@ -5,8 +5,8 @@ use utils::double_sha256::double_sha256_parent;
 ///
 /// Arguments:
 /// - `tx_hash: Digest`: The transaction hash as a Digest
-/// - `siblings: Array<(Digest, bool)>`: An array of tuples (Digest, bool), where the bool indicates if the sibling is on
-/// the right
+/// - `siblings: Array<(Digest, bool)>`: An array of tuples (Digest, bool), where the bool indicates
+/// if the sibling is on the right
 ///
 /// Returns:
 /// - `Digest`: The computed Merkle root as a Digest

@@ -34,7 +34,9 @@ mod Orderbook {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress) {
+    fn constructor(
+        ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+    ) {
         // initialize contract
         self.initializer(:strk_token, :relay_address);
     }
@@ -192,7 +194,9 @@ mod Orderbook {
     pub impl InternalImpl of InternalTrait {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
-        fn initializer(ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress) {
+        fn initializer(
+            ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+        ) {
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token });
             self.relay_address.write(relay_address);
         }
