@@ -13,3 +13,7 @@ pub fn SYMBOL() -> ByteArray {
 pub fn OWNER() -> ContractAddress {
     contract_address_const::<'owner'>()
 }
+
+pub fn UTU() -> ContractAddress {
+    contract_address_const::<'utu'>()
+}
