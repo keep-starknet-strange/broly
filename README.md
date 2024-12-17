@@ -11,11 +11,11 @@
 
 </div>
 
----
-
 > Order on Starknet, write on Bitcoin, get money trustlessly, repeat
 
 Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management and escrow. It enables trustless Bitcoin inscriptions with guaranteed payments through smart contracts.
+
+---
 
 ## Architecture
 
