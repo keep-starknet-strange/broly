@@ -1,0 +1,85 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:7.2.4-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server
+    volumes:
+      - redis:/data
+  postgres:
+    image: postgres:14.11-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./apps/backend/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=broly-user
+      - POSTGRES_DB=broly-db
+  backend:
+    build:
+      dockerfile: apps/backend/Dockerfile
+      context: .
+    ports:
+      - 8080:8080
+    links:
+      - redis
+      - postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+      - CONFIG_PATH=/configs/config.yaml
+    volumes:
+      - ./inscriptions:/app/inscriptions
+  consumer:
+    build:
+      dockerfile: apps/backend/Dockerfile.consumer
+      context: .
+    ports:
+      - 8081:8081
+    links:
+      - redis
+      - postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+  indexer:
+    build:
+      dockerfile: packages/indexer/Dockerfile
+      context: .
+    links:
+      - backend
+    environment:
+      - BROLY_CONTRACT_ADDRESS=0x0
+      - AUTH_TOKEN=${APIBARA_AUTH_TOKEN}
+      - CONSUMER_TARGET_URL=http://broly-consumer-1:8081/consume-indexer-msg
+      - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
+      - PERSIST_TO_REDIS=redis://broly-redis-1:6379
+      - INDEXER_ID=broly-indexer-id
+    restart: on-failure
+    depends_on:
+      - consumer
+  frontend:
+    build:
+      dockerfile: apps/web/Dockerfile
+      context: .
+    ports:
+      - 5173:5173
+    links:
+      - backend
+    volumes:
+      - ./package.json:/app/package.json
+      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml
+      - ./apps/web/package.json:/app/apps/web/package.json
+      - ./apps/web/public/:/app/apps/web/public
+      - ./apps/web/src:/app/apps/web/src
+
+volumes:
+  redis:
+  postgres:

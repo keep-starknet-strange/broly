@@ -1,74 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionForm from "../components/inscription/Form";
 import InscriptionStatus from "../components/inscription/Status";
+import { Pagination } from "../components/Pagination";
+import { getNewInscriptions } from "../api/inscriptions";
 
 function Home() {
-  const latestInscriptions = [
-    {
-      id: 1,
-      content: "Hello, World!",
-      type: "text"
-    },
-    {
-      id: 2,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 3,
-      content: "https://i.gifer.com/fetch/w300-preview/4b/4b8e74df2974d2ec97065e78b3551841.gif",
-      type: "image"
-    },
-    {
-      id: 4,
-      content: "Hello, World 2!\nThis is a multiline text.\mThis text is long.\nAnd another line\nAnd another longer line\n...\nHello\nWorld\nLorum\nIpsum\nText\n...\nMore\nLines",
-      type: "text"
-    },
-    {
-      id: 5,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 6,
-      content: "Hello, World 3!\nThis is a multiline text.\nThis is a multiline text 2.",
-      type: "text"
-    },
-    {
-      id: 7,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 8,
-      content: "Hello, World 4!",
-      type: "text"
-    },
-    {
-      id: 9,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 10,
-      content: "Hello, World 5!",
-      type: "text"
-    },
-    {
-      id: 11,
-      content: "https://gssc.esa.int/navipedia/images/a/a9/Example.jpg",
-      type: "image"
-    },
-    {
-      id: 12,
-      content: "Hello, World 6!",
-      type: "text"
-    },
-  ];
-
   const [isInscribing, setIsInscribing] = useState(false);
+
+  const defaultInscription: any[] = [];
+  const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
+  const [recentsPagination, setRecentsPagination] = useState({
+    pageLength: 16,
+    page: 1
+  });
+
+  useEffect(() => {
+    const fetchInscriptions = async () => {
+      let result = await getNewInscriptions(recentsPagination.pageLength, recentsPagination.page);
+      if (result.data) {
+        if (recentsPagination.page === 1) {
+          setRecentInscriptions(result.data);
+        } else {
+          const newInscriptions = result.data.filter((inscription: any) => {
+            return !recentInscriptions.some((recent: any) => recent.id === inscription.id);
+          });
+          setRecentInscriptions([...recentInscriptions, ...newInscriptions]);
+        }
+      }
+    }
+    try {
+      fetchInscriptions();
+    } catch (error) {
+      console.error(error);
+    }
+  }, [recentsPagination]);
+
   return (
     <div className="w-full flex flex-col h-max">
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
@@ -85,11 +53,15 @@ function Home() {
           </NavLink>
         </div>
         <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
-          {latestInscriptions.map((inscription) => (
+          {recentInscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}
         </div>
-        <button className="button--gradient button__primary w-fit mb-4">Load More...</button>
+        <Pagination
+          data={recentInscriptions}
+          setState={setRecentsPagination}
+          stateValue={recentsPagination}
+        />
       </div>
     </div>
   );
