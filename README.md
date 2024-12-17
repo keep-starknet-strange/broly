@@ -1,8 +1,7 @@
 <div align="center">
   <img src="apps/web/public/images/logo.png" alt="broly-logo" height="260"/>
 
-  ## BROLY
-
+  # BROLY
   ***Bitcoin Registry Orchestrates Like Yesterday***
 
 <a href="https://github.com/keep-starknet-strange/broly/actions/workflows/contracts.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/keep-starknet-strange/broly/contracts.yml?style=for-the-badge" height=30></a>
