@@ -77,6 +77,8 @@ flowchart TB
 1. Run the app
 
 ```bash
+cp .env.example .env
+# Edit .env variables to match your environment
 docker compose up
 ```
 

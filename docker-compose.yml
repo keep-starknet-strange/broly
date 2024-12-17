@@ -55,7 +55,7 @@ services:
     links:
       - backend
     environment:
-      - BROLY_CONTRACT_ADDRESS=0x0
+      - BROLY_CONTRACT_ADDRESS=0x05a527197145ea9f40d683d1328e75b7f5bdf61d5ff9886f89ac7023873dcba9
       - AUTH_TOKEN=${APIBARA_AUTH_TOKEN}
       - CONSUMER_TARGET_URL=http://broly-consumer-1:8081/consume-indexer-msg
       - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
