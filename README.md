@@ -1,7 +1,7 @@
 <div align="center">
   <img src="apps/web/public/images/logo.png" alt="broly-logo" height="260"/>
 
-  # BROLY
+  ## BROLY
 
   ***Bitcoin Registry Orchestrates Like Yesterday***
 
