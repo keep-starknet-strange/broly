@@ -68,7 +68,8 @@ broly/
 │   └── backend/           # REST API service
 ├── packages/
 │   ├── inscribor/         # Bitcoin inscription service
-│   └── onchain/           # Starknet smart contracts
+│   ├── onchain/           # Starknet smart contracts
+│   └── indexer/           # Starknet contract indexing
 ├── package.json
 └── turbo.json
 ```
@@ -82,8 +83,8 @@ broly/
   - Starknet.js
   - BitcoinJS-lib
 - Backend:
-  - Node.js
-  - Express
+  - Golang
+  - Postgres DB
   - REST API
 - Smart Contracts:
   - Cairo (Starknet)
@@ -95,26 +96,29 @@ broly/
 
 ## Getting Started
 
-1. Install dependencies:
+1. Run the app
 
 ```bash
-pnpm install
+docker compose up
 ```
 
-1. Start development environment:
+1. Restart your app ( after changes to backend(s), indexer, ... )
 
 ```bash
-pnpm dev
+docker compose down --volumes
+docker compose build
+docker compose up
 ```
 
 ## Components
 
 ### Frontend (web)
 
-- Dashboard view for pending inscriptions
 - New inscription order form
+- Dashboard view for pending inscriptions
 - Wallet connections (Bitcoin + Starknet)
 - Order status tracking
+- Exploring inscriptions
 
 ### Backend (backend)
 
