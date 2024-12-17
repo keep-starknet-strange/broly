@@ -41,6 +41,36 @@ mod Orderbook {
         self.initializer(:strk_token, :relay_address);
     }
 
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    pub enum Event {
+        RequestCreated: RequestCreated,
+        RequestCanceled: RequestCanceled,
+        RequestLocked: RequestLocked,
+        RequestCompleted: RequestCompleted,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCreated {
+        pub id: u32,
+        pub data: ByteArray,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCanceled {
+        pub id: u32,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestLocked {
+        pub id: u32,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCompleted {
+        pub id: u32,
+    }
+
     #[abi(embed_v0)]
     impl OrderbookImpl of super::IOrderbook<ContractState> {
         /// Called by a user.
@@ -76,8 +106,9 @@ mod Orderbook {
                     );
             }
             let id = self.new_inscription_id.read();
-            self.inscriptions.write(id, (inscription_data, submitter_fee));
+            self.inscriptions.write(id, (inscription_data.clone(), submitter_fee));
             self.inscription_statuses.write(id, Status::Open);
+            self.emit(RequestCreated { id: id, data: inscription_data });
             id
         }
 
@@ -122,6 +153,7 @@ mod Orderbook {
             let (inscription_data, _) = self.inscriptions.read(inscription_id);
             self.inscriptions.write(inscription_id, (inscription_data, 0));
             self.inscription_statuses.write(inscription_id, Status::Canceled);
+            self.emit(RequestCanceled { id: inscription_id });
         }
 
         /// Called by a submitter. Multiple submitters are allowed to lock the
@@ -151,6 +183,7 @@ mod Orderbook {
             submitters.write(submitter, submitter);
 
             self.inscription_statuses.write(inscription_id, Status::Locked);
+            self.emit(RequestLocked { id: inscription_id });
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
@@ -174,6 +207,7 @@ mod Orderbook {
             // TODO: assert that the witness data contains the requested inscription
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
+            self.emit(RequestCompleted { id: inscription_id });
         }
 
         /// Helper function that checks if the inscription has already been locked.
