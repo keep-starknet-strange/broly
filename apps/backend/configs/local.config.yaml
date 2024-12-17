@@ -12,6 +12,8 @@ Api:
     - Content-Type
   Production: false
   Admin: true
+Consumer:
+  Port: 8081
 Postgres:
   Host: localhost
   Port: 5432

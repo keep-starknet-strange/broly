@@ -16,6 +16,10 @@ type ApiConfig struct {
 	Admin        bool     `yaml:"Admin"`
 }
 
+type ConsumerConfig struct {
+  Port int `yaml:"Port"`
+}
+
 type PostgresConfig struct {
 	Host string `yaml:"Host"`
 	Port int    `yaml:"Port"`
@@ -25,6 +29,7 @@ type PostgresConfig struct {
 
 type Config struct {
 	Api      ApiConfig      `yaml:"Api"`
+  Consumer ConsumerConfig `yaml:"Consumer"`
 	Postgres PostgresConfig `yaml:"Postgres"`
 }
 
