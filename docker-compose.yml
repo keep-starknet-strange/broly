@@ -72,6 +72,8 @@ services:
       - 5173:5173
     links:
       - backend
+    environment:
+      - VITE_BROLY_CONTRACT_ADDRESS=0x05a527197145ea9f40d683d1328e75b7f5bdf61d5ff9886f89ac7023873dcba9
     volumes:
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml

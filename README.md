@@ -100,6 +100,7 @@ broly/
 ├── packages/
 │   ├── inscribor/         # Bitcoin inscription service
 │   ├── onchain/           # Starknet smart contracts
+│   ├── scripts/           # Deployment & Testing scripts
 │   └── indexer/           # Starknet contract indexing
 ├── package.json
 └── turbo.json

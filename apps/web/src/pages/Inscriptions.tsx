@@ -5,7 +5,7 @@ import InscriptionRequestView from "../components/inscription/RequestView";
 import { getHotInscriptions, getNewInscriptions, getInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
-function Inscritpions() {
+function Inscritpions(props: any) {
   const filters = ["Hot", "New", "Rare"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 

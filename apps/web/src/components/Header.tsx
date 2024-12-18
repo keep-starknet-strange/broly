@@ -16,7 +16,15 @@ function Header(props: any) {
             {tab.name}
           </NavLink>
         ))}
-        <button className="button--gradient button__primary">Login</button>
+        {props.address ? (
+          <button className="button--gradient button__primary" onClick={props.disconnectWallet}>
+            Logout
+          </button>
+        ) : (
+          <button className="button--gradient button__primary" onClick={props.connectWallet}>
+            Login
+          </button>
+        )}
       </nav>
     </header>
   );

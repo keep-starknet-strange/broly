@@ -6,7 +6,7 @@ import InscriptionStatus from "../components/inscription/Status";
 import { Pagination } from "../components/Pagination";
 import { getNewInscriptions } from "../api/inscriptions";
 
-function Home() {
+function Home(props: any) {
   const [isInscribing, setIsInscribing] = useState(false);
 
   const defaultInscription: any[] = [];
@@ -42,7 +42,7 @@ function Home() {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
-        <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} />
+        <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} requestInscriptionCall={props.requestInscriptionCall} />
         {isInscribing && <InscriptionStatus />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">

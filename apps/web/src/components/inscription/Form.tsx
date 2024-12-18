@@ -8,12 +8,13 @@ function InscriptionForm(props: any) {
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!uploadedImage) {
       setErrorMessage("Please upload an image");
       return;
     }
+    await props.requestInscriptionCall();
     props.setIsInscribing(true);
   };
 

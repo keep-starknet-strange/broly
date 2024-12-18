@@ -13,7 +13,9 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router": "^7.0.1"
+    "react-router": "^7.0.1",
+    "starknet": "^6.11.0",
+    "starknetkit": "^2.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

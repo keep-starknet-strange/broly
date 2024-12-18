@@ -4,7 +4,7 @@ import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";
 import { getInscription } from "../api/inscriptions";
 
-function Inscription() {
+function Inscription(props: any) {
   let { id } = useParams<{ id: any }>();
 
   const [inscription, setInscription] = useState<any>();

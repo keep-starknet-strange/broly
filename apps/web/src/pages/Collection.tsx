@@ -6,7 +6,7 @@ import { mockAddress } from "../api/mock";
 import { getMyNewInscriptions, getMyTopInscriptions, getMyInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
-function Collection() {
+function Collection(props: any) {
   const filters = ["New", "Top", "Rare", "Requests"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
