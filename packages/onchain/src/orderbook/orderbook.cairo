@@ -52,7 +52,9 @@ mod Orderbook {
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestCreated {
+        #[key]
         pub id: u32,
+        #[key]
         pub caller: ContractAddress,
         pub inscription_data: ByteArray,
         pub receiving_address: ByteArray,
@@ -62,12 +64,14 @@ mod Orderbook {
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestCanceled {
+        #[key]
         pub id: u32,
         pub currency_fee: felt252,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestLocked {
+        #[key]
         pub id: u32,
         pub submitter: ContractAddress,
         pub tx_hash: ByteArray,
@@ -75,6 +79,7 @@ mod Orderbook {
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestCompleted {
+        #[key]
         pub id: u32,
         pub submitter: ContractAddress,
         pub tx_hash: ByteArray,
