@@ -77,7 +77,6 @@ mod Orderbook {
         /// Inputs:
         /// - `inscription_data: ByteArray`, the data to be inscribed on Bitcoin.
         /// - `receiving_address: ByteArray`, the taproot address that will own the inscription.
-        /// - `satoshi: felt252`, the Sat where the user wants to inscribe data.
         /// - `currency_fee: felt252`, 'STRK' tokens.
         /// - `submitter_fee: u256`, fee to be paid to the submitter for the inscription.
         /// Returns:
@@ -86,14 +85,9 @@ mod Orderbook {
             ref self: ContractState,
             inscription_data: ByteArray,
             receiving_address: ByteArray,
-            satoshi: felt252,
             currency_fee: felt252,
             submitter_fee: u256,
         ) -> u32 {
-            assert(
-                self.is_valid_bitcoin_address(receiving_address) == true,
-                'Not a valid bitcoin address',
-            );
             assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
             let caller = get_caller_address();
             let escrow_address = get_contract_address();
@@ -110,16 +104,6 @@ mod Orderbook {
             self.inscription_statuses.write(id, Status::Open);
             self.emit(RequestCreated { id: id, data: inscription_data });
             id
-        }
-
-        /// Helper function that checks the format of the taproot address.
-        /// Inputs:
-        /// - `receiving_address: ByteArray`, the ID of the inscription.
-        /// Returns:
-        /// - `bool`
-        fn is_valid_bitcoin_address(self: @ContractState, receiving_address: ByteArray) -> bool {
-            // TODO: implement the check that the receiving address is in valid format.
-            true
         }
 
         /// Inputs:
@@ -208,19 +192,6 @@ mod Orderbook {
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
             self.emit(RequestCompleted { id: inscription_id });
-        }
-
-        /// Helper function that checks if the inscription has already been locked.
-        /// Inputs:
-        /// - `tx_hash: ByteArray`, the precomputed transaction hash for the inscription
-        /// being locked.
-        /// Returns:
-        /// - `(bool, ContractAddress)`
-        fn is_locked(self: @ContractState, tx_hash: ByteArray) -> (bool, ContractAddress) {
-            // TODO: fetch the relevant lock made with the precomputed tx hash
-
-            let caller = get_caller_address();
-            (true, caller)
         }
     }
 

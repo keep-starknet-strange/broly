@@ -64,7 +64,7 @@ fn test_request_inscription_stored_and_retrieved() {
 
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
-    orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+    orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     let expected = ("data", 10); // the inscription data and the submitter fee
     let actual = orderbook_dispatcher.query_inscription(0);
@@ -90,7 +90,7 @@ fn test_request_inscription_fails_wrong_currency() {
 
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
-    orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 1, 'BTC'.into(), 10);
+    orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 'BTC'.into(), 10);
 }
 
 #[test]
@@ -103,8 +103,7 @@ fn test_request_inscription_fails_insufficient_balance() {
 
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 2000);
 
-    orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 2000);
+    orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 'STRK'.into(), 2000);
 }
 
 #[test]
@@ -117,7 +116,7 @@ fn test_lock_inscription_works() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     start_cheat_block_number_global(1000);
     orderbook_dispatcher.lock_inscription(id, "hash");
@@ -135,7 +134,7 @@ fn test_lock_inscription_fails_prior_lock_not_expired() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     orderbook_dispatcher.lock_inscription(id, "hash");
     orderbook_dispatcher.lock_inscription(id, "other_hash");
@@ -152,7 +151,7 @@ fn test_lock_inscription_fails_inscription_not_found() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let _ = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     orderbook_dispatcher.lock_inscription(42, "hash");
 }
@@ -171,7 +170,7 @@ fn test_cancel_inscription_works() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     start_cheat_caller_address_global(orderbook_dispatcher.contract_address);
     // TODO: is this the correct way to set permissions?
@@ -192,7 +191,7 @@ fn test_cancel_inscription_fails_locked() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     orderbook_dispatcher.lock_inscription(id, "hash");
     orderbook_dispatcher.cancel_inscription(id, 'STRK'.into())
@@ -213,7 +212,7 @@ fn test_cancel_inscription_fails_canceled() {
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
-        .request_inscription(test_data, test_taproot_address, 1, 'STRK'.into(), 10);
+        .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     start_cheat_caller_address_global(orderbook_dispatcher.contract_address);
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
