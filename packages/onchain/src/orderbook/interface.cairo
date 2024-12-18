@@ -22,7 +22,9 @@ pub trait IOrderbook<TContractState> {
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
-    fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
+    fn query_inscription(
+        self: @TContractState, inscription_id: u32,
+    ) -> (ContractAddress, ByteArray, u256);
 }
 
 #[starknet::interface]
@@ -37,7 +39,9 @@ pub trait OrderbookABI<TContractState> {
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
-    fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
+    fn query_inscription(
+        self: @TContractState, inscription_id: u32,
+    ) -> (ContractAddress, ByteArray, u256);
 
     // ERC20 functions
     fn balance_of(self: @TContractState, account: ContractAddress) -> felt252;

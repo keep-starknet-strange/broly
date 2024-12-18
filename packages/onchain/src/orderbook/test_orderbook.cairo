@@ -66,7 +66,7 @@ fn test_request_inscription_stored_and_retrieved() {
 
     orderbook_dispatcher.request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
-    let expected = ("data", 10); // the inscription data and the submitter fee
+    let expected = (test_address(), "data", 10); // the inscription data and the submitter fee
     let actual = orderbook_dispatcher.query_inscription(0);
     assert_eq!(expected, actual);
 
