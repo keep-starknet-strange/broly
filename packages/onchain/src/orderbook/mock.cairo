@@ -17,7 +17,7 @@ mod OrderbookMock {
         new_inscription_id: u32,
         // A map from the inscription ID to a tuple with the inscribed
         // data and submitter fee.
-        inscriptions: Map<u32, (ByteArray, u256)>,
+        inscriptions: Map<u32, (ContractAddress, ByteArray, u256)>,
         // A map from the inscription ID to status. Possible values:
         // 'Open', 'Locked', 'Canceled', 'Closed'.
         inscription_statuses: Map<u32, Status>,
@@ -47,7 +47,6 @@ mod OrderbookMock {
         caller: ContractAddress,
         inscription_data: ByteArray,
         receiving_address: ByteArray,
-        satoshi: felt252,
         currency_fee: felt252,
         submitter_fee: u256,
     }
@@ -85,7 +84,6 @@ mod OrderbookMock {
         /// Inputs:
         /// - `inscription_data: ByteArray`, the data to be inscribed on Bitcoin.
         /// - `receiving_address: ByteArray`, the taproot address that will own the inscription.
-        /// - `satoshi: felt252`, the Sat where the user wants to inscribe data.
         /// - `currency_fee: felt252`, 'STRK' tokens.
         /// - `submitter_fee: u256`, fee to be paid to the submitter for the inscription.
         /// Returns:
@@ -94,12 +92,13 @@ mod OrderbookMock {
             ref self: ContractState,
             inscription_data: ByteArray,
             receiving_address: ByteArray,
-            satoshi: felt252,
             currency_fee: felt252,
             submitter_fee: u256,
         ) -> u32 {
+            assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
+            let caller = get_caller_address();
             let id = self.new_inscription_id.read();
-            self.inscriptions.write(id, (inscription_data.clone(), submitter_fee));
+            self.inscriptions.write(id, (caller, inscription_data.clone(), submitter_fee));
             self.inscription_statuses.write(id, Status::Open);
             self.new_inscription_id.write(id + 1);
             self
@@ -109,7 +108,6 @@ mod OrderbookMock {
                         caller: get_caller_address(),
                         inscription_data: inscription_data,
                         receiving_address: receiving_address,
-                        satoshi: satoshi,
                         currency_fee: currency_fee,
                         submitter_fee: submitter_fee,
                     },
@@ -123,8 +121,25 @@ mod OrderbookMock {
         /// cancel.
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
-            let (inscription_data, _) = self.inscriptions.read(inscription_id);
-            self.inscriptions.write(inscription_id, (inscription_data, 0));
+            let caller = get_caller_address();
+            let (request_creator, inscription_data, amount) = self
+                .inscriptions
+                .read(inscription_id);
+            assert(caller == request_creator, 'Caller cannot cancel this id');
+
+            let status = self.inscription_statuses.read(inscription_id);
+            assert(status != Status::Undefined, 'Inscription does not exist');
+            assert(status != Status::Locked, 'The inscription is locked');
+            assert(status != Status::Canceled, 'The inscription is canceled');
+            assert(status != Status::Closed, 'The inscription has been closed');
+
+            // TODO: change the address to the actual escrow contract once it's implemented.
+            let escrow_address = get_contract_address();
+            if (currency_fee == 'STRK'.into()) {
+                let strk_token = self.strk_token.read();
+                strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
+            }
+            self.inscriptions.write(inscription_id, (caller, inscription_data, 0));
             self.inscription_statuses.write(inscription_id, Status::Canceled);
             self
                 .emit(
@@ -165,17 +180,10 @@ mod OrderbookMock {
             self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
 
-        fn query_inscription(self: @ContractState, inscription_id: u32) -> (ByteArray, u256) {
+        fn query_inscription(
+            self: @ContractState, inscription_id: u32,
+        ) -> (ContractAddress, ByteArray, u256) {
             return self.inscriptions.read(inscription_id);
-        }
-
-
-        fn is_valid_bitcoin_address(self: @ContractState, receiving_address: ByteArray) -> bool {
-            return true;
-        }
-
-        fn is_locked(self: @ContractState, tx_hash: ByteArray) -> (bool, ContractAddress) {
-            return (true, get_contract_address());
         }
     }
 

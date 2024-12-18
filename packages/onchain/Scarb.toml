@@ -5,6 +5,9 @@ edition = "2024_07"
 
 # See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
 
+[patch.crates-io]
+openzeppelin = "0.19.0"
+
 [dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.33.0" }
 openzeppelin = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v0.19.0" }
@@ -12,11 +15,19 @@ starknet = "2.9.1"
 alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria" }
 openzeppelin_token = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v0.19.0" }
 openzeppelin_utils = { git = "https://github.com/openzeppelin/cairo-contracts", tag = "v0.19.0" }
+utils = { git = "https://github.com/keep-starknet-strange/raito.git", rev = "02a13045b7074ae2b3247431cd91f1ad76263fb2" }
+consensus = { git = "https://github.com/keep-starknet-strange/raito.git", rev = "02a13045b7074ae2b3247431cd91f1ad76263fb2" }
+utu_relay = { git = "https://github.com/lana-shanghai/utu_relay.git" }
 
 [[target.starknet-contract]]
 casm = true
 sierra = true
-build-external-contracts = ["openzeppelin_presets::erc20::ERC20Upgradeable"]
+build-external-contracts = [
+    "openzeppelin_presets::erc20::ERC20Upgradeable",
+    "utu_relay::utu_relay::UtuRelay"
+]
+allowed-libfuncs-list.name = "experimental"
+casm-add-pythonic-hints = true
 
 [dev-dependencies]
 assert_macros = "2.9.1"

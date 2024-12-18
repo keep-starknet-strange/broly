@@ -16,16 +16,15 @@ pub trait IOrderbook<TContractState> {
         ref self: TContractState,
         inscription_data: ByteArray,
         receiving_address: ByteArray,
-        satoshi: felt252,
         currency_fee: felt252,
         submitter_fee: u256,
     ) -> u32;
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
-    fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
-    fn is_valid_bitcoin_address(self: @TContractState, receiving_address: ByteArray) -> bool;
-    fn is_locked(self: @TContractState, tx_hash: ByteArray) -> (bool, ContractAddress);
+    fn query_inscription(
+        self: @TContractState, inscription_id: u32,
+    ) -> (ContractAddress, ByteArray, u256);
 }
 
 #[starknet::interface]
@@ -34,16 +33,15 @@ pub trait OrderbookABI<TContractState> {
         ref self: TContractState,
         inscription_data: ByteArray,
         receiving_address: ByteArray,
-        satoshi: felt252,
         currency_fee: felt252,
         submitter_fee: u256,
     ) -> u32;
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
     fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
     fn submit_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
-    fn query_inscription(self: @TContractState, inscription_id: u32) -> (ByteArray, u256);
-    fn is_valid_bitcoin_address(self: @TContractState, receiving_address: ByteArray) -> bool;
-    fn is_locked(self: @TContractState, tx_hash: ByteArray) -> (bool, ContractAddress);
+    fn query_inscription(
+        self: @TContractState, inscription_id: u32,
+    ) -> (ContractAddress, ByteArray, u256);
 
     // ERC20 functions
     fn balance_of(self: @TContractState, account: ContractAddress) -> felt252;
