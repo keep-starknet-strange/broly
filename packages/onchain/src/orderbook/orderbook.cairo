@@ -107,7 +107,6 @@ mod Orderbook {
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                // TODO: change the transfer to the escrow contract once it's implemented.
                 strk_token
                     .transfer_from(
                         sender: caller, recipient: escrow_address, amount: submitter_fee,
@@ -158,7 +157,6 @@ mod Orderbook {
             assert(status != Status::Canceled, 'The inscription is canceled');
             assert(status != Status::Closed, 'The inscription has been closed');
 
-            // TODO: change the address to the actual escrow contract once it's implemented.
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();

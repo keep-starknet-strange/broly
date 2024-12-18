@@ -7,7 +7,7 @@
 
 > Order on Starknet, write on Bitcoin, get money trustlessly, repeat
 
-Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management and escrow. It enables trustless Bitcoin inscriptions with guaranteed payments through smart contracts.
+Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management. It enables trustless Bitcoin inscriptions with guaranteed payments through smart contracts.
 
 <div align="center">
 <a href="https://github.com/keep-starknet-strange/broly/actions/workflows/contracts.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/keep-starknet-strange/broly/contracts.yml?style=for-the-badge" height=30></a>
@@ -34,7 +34,6 @@ flowchart TB
 
     subgraph Starknet
         OB[Orderbook Contract]
-        ES[Escrow Contract]
     end
 
     subgraph Bitcoin
@@ -51,10 +50,8 @@ flowchart TB
     UI <--> SW
     API --> DB
     SW <--> OB
-    SW <--> ES
     IS --> BTC
     OM --> OB
-    OM --> ES
     API --> IS
     IS --> API
 ```
@@ -65,11 +62,11 @@ flowchart TB
 2. User creates an inscription order:
    - Specifies inscription content and reward amount
    - Order is created on Starknet orderbook
-   - Funds are locked in escrow contract
+   - Funds are locked in the contract
 3. Inscribor service:
    - Monitors pending orders
    - Creates Bitcoin inscriptions
-   - Triggers escrow release on successful inscription
+   - Triggers reward release on successful inscription
 4. User receives inscription, inscribor receives reward
 
 ## Getting Started
@@ -144,7 +141,6 @@ broly/
 ### Smart Contracts (onchain)
 
 - Orderbook contract
-- Escrow contract
 - Payment handling
 
 ### Inscribor Service
@@ -152,7 +148,7 @@ broly/
 - Order monitoring
 - Bitcoin inscription creation
 - Transaction verification
-- Starknet interaction for escrow release
+- Starknet interaction for reward release
 
 ## License
 
