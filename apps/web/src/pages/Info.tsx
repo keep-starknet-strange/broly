@@ -1,4 +1,4 @@
-function Info(props: any) {
+function Info(_props: any) {
   // TODO: Diagrams
   return (
     <div className="w-full flex flex-col items-center h-max bg__color--primary border-t-2 border-[var(--color-primary-light)]">

@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";
 
-function Request(props: any) {
+function Request(_props: any) {
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
   let { id } = useParams<{ id: string }>();
 

@@ -26,7 +26,7 @@ export const provider = new RpcProvider({
 function App() {
   // TODO: Move to seperate module ( starknet stuff )
   const { connect, connectors } = useConnect()
-  const { disconnect, error } = useDisconnect()
+  const { disconnect } = useDisconnect()
   const { address, status } = useAccount()
   const { starknetkitConnectModal } = useStarknetkitConnectModal({
     connectors: connectors as StarknetkitConnector[]
