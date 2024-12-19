@@ -8,12 +8,13 @@ function InscriptionForm(props: any) {
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!uploadedImage) {
       setErrorMessage("Please upload an image");
       return;
     }
+    await props.requestInscriptionCall();
     props.setIsInscribing(true);
   };
 
@@ -34,7 +35,7 @@ function InscriptionForm(props: any) {
 
   // TODO: disabled button b4 input
   return (
-    <form className="flex flex-row items-center w-[40%]" onSubmit={handleSubmit}>
+    <form className="flex flex-row items-center justify-center w-full md:w-[80%] lg:w-[60%] xl:w-[40%] px-8" onSubmit={handleSubmit}>
       <div className="flex-grow Form__input">
         {selectedOption === "Image" ? (
           <div>

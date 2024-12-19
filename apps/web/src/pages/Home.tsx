@@ -6,7 +6,7 @@ import InscriptionStatus from "../components/inscription/Status";
 import { Pagination } from "../components/Pagination";
 import { getNewInscriptions } from "../api/inscriptions";
 
-function Home() {
+function Home(props: any) {
   const [isInscribing, setIsInscribing] = useState(false);
 
   const defaultInscription: any[] = [];
@@ -42,17 +42,17 @@ function Home() {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
-        <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} />
+        <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} requestInscriptionCall={props.requestInscriptionCall} />
         {isInscribing && <InscriptionStatus />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
           <h1 className="text-xl font-bold px-4">Recent Inscriptions</h1>
           <NavLink to="/inscriptions" className="flex flex-row items-center">
-            <p className="text-sm font-bold px-4 tab__nav">Explore &rarr;</p>
+            <p className="text-sm font-bold px-4 tab__nav text-xl">Explore &rarr;</p>
           </NavLink>
         </div>
-        <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-8">
           {recentInscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}

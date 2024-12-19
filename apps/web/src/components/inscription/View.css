@@ -6,10 +6,9 @@
   background-image: linear-gradient(
     to bottom right,
     var(--color-tertiary) 60%,
-    var(--color-tertiary-dark)
+    var(--color-tertiary-ldark)
   );
   box-shadow: 0 2px 4px var(--color-tertiary-dark);
-  overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
 }

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="apps/web/public/images/logo.png" alt="broly-logo" height="220"/>
+  <img src="apps/web/public/images/logo-high.png" alt="broly-logo" height="220"/>
 
   # B.R.O.L.Y.
   ***Bitcoin Registry Orchestrates Like Yesterday***
@@ -97,6 +97,7 @@ broly/
 ├── packages/
 │   ├── inscribor/         # Bitcoin inscription service
 │   ├── onchain/           # Starknet smart contracts
+│   ├── scripts/           # Deployment & Testing scripts
 │   └── indexer/           # Starknet contract indexing
 ├── package.json
 └── turbo.json
