@@ -1,28 +1,5 @@
 import React from 'react';
 
-/*
-import { sepolia, mainnet } from "@starknet-react/chains";
-import {
-  StarknetConfig,
-  publicProvider,
-  voyager
-} from "@starknet-react/core";
-import { getL2Connections } from "../connections";
-
-export function StarknetProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <StarknetConfig
-      chains={[mainnet, sepolia]}
-      provider={publicProvider()}
-      connectors={getL2Connections() as any}
-      explorer={voyager}
-    >
-      {children}
-    </StarknetConfig>
-  );
-}
-*/
-
 import { InjectedConnector } from "starknetkit/injected";
 import { ArgentMobileConnector, isInArgentMobileAppBrowser } from "starknetkit/argentMobile";
 import { WebWalletConnector } from "starknetkit/webwallet";
