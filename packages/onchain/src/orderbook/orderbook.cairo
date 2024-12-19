@@ -10,14 +10,15 @@ mod Orderbook {
         StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
+    use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
 
     #[storage]
     struct Storage {
         // ID of the next inscription.
         new_inscription_id: u32,
-        // A map from the inscription ID to a tuple with the inscribed
-        // data and submitter fee.
-        inscriptions: Map<u32, (ByteArray, u256)>,
+        // A map from the inscription ID to a tuple with the caller, the
+        // inscribed data, and submitter fee.
+        inscriptions: Map<u32, (ContractAddress, ByteArray, u256)>,
         // A map from the inscription ID to status. Possible values:
         // 'Open', 'Locked', 'Canceled', 'Closed'.
         inscription_statuses: Map<u32, Status>,
@@ -28,12 +29,60 @@ mod Orderbook {
         inscription_locks: Map<u32, (ContractAddress, ByteArray, u64)>,
         // STRK fee token.
         strk_token: ERC20ABIDispatcher,
+        // Address of the contract checking transaction inclusion.
+        relay_address: ContractAddress,
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, strk_token: ContractAddress) {
+    fn constructor(
+        ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+    ) {
         // initialize contract
-        self.initializer(:strk_token);
+        self.initializer(:strk_token, :relay_address);
+    }
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    pub enum Event {
+        RequestCreated: RequestCreated,
+        RequestCanceled: RequestCanceled,
+        RequestLocked: RequestLocked,
+        RequestCompleted: RequestCompleted,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCreated {
+        #[key]
+        pub id: u32,
+        #[key]
+        pub caller: ContractAddress,
+        pub inscription_data: ByteArray,
+        pub receiving_address: ByteArray,
+        pub currency_fee: felt252,
+        pub submitter_fee: u256,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCanceled {
+        #[key]
+        pub id: u32,
+        pub currency_fee: felt252,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestLocked {
+        #[key]
+        pub id: u32,
+        pub submitter: ContractAddress,
+        pub tx_hash: ByteArray,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct RequestCompleted {
+        #[key]
+        pub id: u32,
+        pub submitter: ContractAddress,
+        pub tx_hash: ByteArray,
     }
 
     #[abi(embed_v0)]
@@ -42,7 +91,6 @@ mod Orderbook {
         /// Inputs:
         /// - `inscription_data: ByteArray`, the data to be inscribed on Bitcoin.
         /// - `receiving_address: ByteArray`, the taproot address that will own the inscription.
-        /// - `satoshi: felt252`, the Sat where the user wants to inscribe data.
         /// - `currency_fee: felt252`, 'STRK' tokens.
         /// - `submitter_fee: u256`, fee to be paid to the submitter for the inscription.
         /// Returns:
@@ -51,46 +99,43 @@ mod Orderbook {
             ref self: ContractState,
             inscription_data: ByteArray,
             receiving_address: ByteArray,
-            satoshi: felt252,
             currency_fee: felt252,
             submitter_fee: u256,
         ) -> u32 {
-            assert(
-                self.is_valid_bitcoin_address(receiving_address) == true,
-                'Not a valid bitcoin address',
-            );
             assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
             let caller = get_caller_address();
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                // TODO: change the transfer to the escrow contract once it's implemented.
                 strk_token
                     .transfer_from(
                         sender: caller, recipient: escrow_address, amount: submitter_fee,
                     );
             }
             let id = self.new_inscription_id.read();
-            self.inscriptions.write(id, (inscription_data, submitter_fee));
+            self.inscriptions.write(id, (caller, inscription_data.clone(), submitter_fee));
             self.inscription_statuses.write(id, Status::Open);
+            self
+                .emit(
+                    RequestCreated {
+                        id: id,
+                        caller: caller,
+                        inscription_data: inscription_data,
+                        receiving_address: receiving_address,
+                        currency_fee: currency_fee,
+                        submitter_fee: submitter_fee,
+                    },
+                );
             id
-        }
-
-        /// Helper function that checks the format of the taproot address.
-        /// Inputs:
-        /// - `receiving_address: ByteArray`, the ID of the inscription.
-        /// Returns:
-        /// - `bool`
-        fn is_valid_bitcoin_address(self: @ContractState, receiving_address: ByteArray) -> bool {
-            // TODO: implement the check that the receiving address is in valid format.
-            true
         }
 
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
         /// - `(ByteArray, felt252)`, the tuple with the inscribed data and the fee.
-        fn query_inscription(self: @ContractState, inscription_id: u32) -> (ByteArray, u256) {
+        fn query_inscription(
+            self: @ContractState, inscription_id: u32,
+        ) -> (ContractAddress, ByteArray, u256) {
             self.inscriptions.read(inscription_id)
         }
 
@@ -100,23 +145,26 @@ mod Orderbook {
         /// cancel.
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
+            let caller = get_caller_address();
+            let (request_creator, inscription_data, amount) = self
+                .inscriptions
+                .read(inscription_id);
+            assert(caller == request_creator, 'Caller cannot cancel this id');
+
             let status = self.inscription_statuses.read(inscription_id);
             assert(status != Status::Undefined, 'Inscription does not exist');
             assert(status != Status::Locked, 'The inscription is locked');
             assert(status != Status::Canceled, 'The inscription is canceled');
             assert(status != Status::Closed, 'The inscription has been closed');
 
-            let caller = get_caller_address();
-            // TODO: change the address to the actual escrow contract once it's implemented.
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                let (_, amount) = self.inscriptions.read(inscription_id);
                 strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
             }
-            let (inscription_data, _) = self.inscriptions.read(inscription_id);
-            self.inscriptions.write(inscription_id, (inscription_data, 0));
+            self.inscriptions.write(inscription_id, (caller, inscription_data, 0));
             self.inscription_statuses.write(inscription_id, Status::Canceled);
+            self.emit(RequestCanceled { id: inscription_id, currency_fee: currency_fee });
         }
 
         /// Called by a submitter. Multiple submitters are allowed to lock the
@@ -146,6 +194,7 @@ mod Orderbook {
             submitters.write(submitter, submitter);
 
             self.inscription_statuses.write(inscription_id, Status::Locked);
+            self.emit(RequestLocked { id: inscription_id, submitter: submitter, tx_hash: tx_hash });
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
@@ -156,25 +205,28 @@ mod Orderbook {
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
         /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
         fn submit_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+            let caller = get_caller_address();
+            let submitters = self.submitters.entry(inscription_id);
+            let submitter = submitters.read(caller);
+            assert(caller == submitter, 'Caller does not match submitter');
+
             let (_, precomputed_tx_hash, _) = self.inscription_locks.read(inscription_id);
             assert(precomputed_tx_hash == tx_hash, 'Precomputed hash != submitted');
 
-            // TODO: process the submitted transaction hash, verify that it is on Bitcoin
+            const selector: felt252 = selector!("prove_inclusion");
+            let to = self.relay_address.read();
+            let calldata: Array<felt252> = array![];
+
+            // TODO: assert successful inclusion call
+            call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
+
+            // TODO: assert that the witness data contains the requested inscription
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
-        }
-
-        /// Helper function that checks if the inscription has already been locked.
-        /// Inputs:
-        /// - `tx_hash: ByteArray`, the precomputed transaction hash for the inscription
-        /// being locked.
-        /// Returns:
-        /// - `(bool, ContractAddress)`
-        fn is_locked(self: @ContractState, tx_hash: ByteArray) -> (bool, ContractAddress) {
-            // TODO: fetch the relevant lock made with the precomputed tx hash
-
-            let caller = get_caller_address();
-            (true, caller)
+            self
+                .emit(
+                    RequestCompleted { id: inscription_id, submitter: submitter, tx_hash: tx_hash },
+                );
         }
     }
 
@@ -182,8 +234,11 @@ mod Orderbook {
     pub impl InternalImpl of InternalTrait {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
-        fn initializer(ref self: ContractState, strk_token: ContractAddress) {
+        fn initializer(
+            ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+        ) {
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token });
+            self.relay_address.write(relay_address);
         }
     }
 }

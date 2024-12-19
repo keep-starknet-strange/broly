@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { useAccount } from "@starknet-react/core";
 import "./Header.css";
 
 function Header(props: any) {
