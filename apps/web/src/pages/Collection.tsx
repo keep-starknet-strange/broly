@@ -67,19 +67,19 @@ function Collection(props: any) {
 
   // TODO: Button to create new request if no requests are open
   // TODO: Button to view requests if requests are open
+  // <input type="text" placeholder="Search..." className="input__search w-40 sm:w-64 mr-1 relative"/>
   return (
     <div className="w-full flex flex-col h-max bg__color--primary border-t-2 border-[var(--color-primary-light)]">
       <div className="w-full flex flex-row items-center justify-between py-2">
-        <h1 className="text-xl font-bold px-4">My Collection</h1>
-        <div className="flex flex-row items-center mr-6 gap-4">
-          <input type="text" placeholder="Search..." className="input__search w-64 mr-4 relative"/>
+        <h1 className="text-lg sm:text-xl font-bold px-2 sm:px-4">My Collection</h1>
+        <div className="flex flex-row items-center mr-2 sm:mr-6 gap-1 sm:gap-3 md:gap-4">
           {filters.map((filter) => (
             <button key={filter} className={`button__secondary w-fit w-16 text-center ${activeFilter === filter ? "button__secondary--active" : "button__secondary--gradient"}`} onClick={() => setActiveFilter(filter)}>{filter}</button>
           ))}
         </div>
       </div>
       <div className="w-full flex flex-col items-center">
-        <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
           {activeFilter === "Requests" ? myRequests.map((inscription) => (
             <InscriptionRequestView key={inscription.id} inscription={inscription} />
           )) : collection.map((inscription) => (

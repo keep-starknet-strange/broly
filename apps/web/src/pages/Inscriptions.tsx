@@ -87,7 +87,7 @@ function Inscritpions(props: any) {
   return (
     <div className="w-full flex flex-col h-max">
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
-        <h1 className="text-4xl font-bold">Open Inscription Requests</h1>
+        <h1 className="text-2xl sm:text-4xl font-bold">Open Inscription Requests</h1>
         <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
           {requests.map((request) => {
             return (
@@ -103,9 +103,9 @@ function Inscritpions(props: any) {
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
-          <h1 className="text-xl font-bold px-4">All Inscriptions</h1>
-          <div className="flex flex-row items-center mr-6 gap-4">
-            <input type="text" placeholder="Search..." className="input__search w-64 mr-4 relative"/>
+          <h1 className="text-md sm:text-xl font-bold px-2 sm:px-4">All Inscriptions</h1>
+          <div className="flex flex-row items-center mr-2 sm:mr-6 gap-1 sm:gap-3 md:gap-4">
+            <input type="text" placeholder="Search..." className="input__search w-40 sm:w-64 mr-1 relative"/>
             {filters.map((filter) => (
               <button
                 key={filter}
@@ -119,7 +119,7 @@ function Inscritpions(props: any) {
             ))}
           </div>
         </div>
-        <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
           {inscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}

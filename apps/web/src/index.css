@@ -6,11 +6,17 @@
 :root {
   --color-primary: rgb(22, 19, 16);
   --color-primary-light: rgb(30, 28, 27);
+  --color-primary-xlight: rgb(100, 98, 97);
   --color-secondary: rgb(42, 220, 145);
   --color-secondary-dark: rgba(22, 160, 90, 1);
-  --color-tertiary: rgb(19, 16, 22);
+  --color-tertiary: rgb(24, 18, 26);
+  --color-tertiary-ldark: rgba(17, 12, 19);
   --color-tertiary-dark: rgba(8, 8, 10);
 }
+/*
+  --color-tertiary: rgb(19, 16, 22);
+  --color-tertiary-dark: rgba(8, 8, 10);
+  */
 
 :root {
   font-family: Helvetica, Arial, sans-serif;
@@ -19,7 +25,7 @@
 
   color-scheme: light dark;
   color: #f9f9f9;
-  background-color: #242424;
+  background-color: var(--color-tertiary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -127,11 +133,10 @@ body {
 }
 
 .bg__color--tertiary {
-  background-image: linear-gradient(to bottom, var(--color-tertiary) 80%, var(--color-tertiary-dark));
+  background-image: linear-gradient(to bottom, var(--color-tertiary) 80%, var(--color-tertiary-ldark));
 }
 
 .button__secondary {
-  background-color: var(--color-secondary);
   color: #f9f9f9;
   border: 1px solid var(--dropbutton-primary-dark);
   border-radius: 0.5rem;

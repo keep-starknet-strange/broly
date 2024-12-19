@@ -49,10 +49,10 @@ function Home(props: any) {
         <div className="w-full flex flex-row items-center justify-between">
           <h1 className="text-xl font-bold px-4">Recent Inscriptions</h1>
           <NavLink to="/inscriptions" className="flex flex-row items-center">
-            <p className="text-sm font-bold px-4 tab__nav">Explore &rarr;</p>
+            <p className="text-sm font-bold px-4 tab__nav text-xl">Explore &rarr;</p>
           </NavLink>
         </div>
-        <div className="w-full grid grid-cols-4 gap-4 px-4 py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-8">
           {recentInscriptions.map((inscription) => (
             <InscriptionView key={inscription.id} inscription={inscription} />
           ))}

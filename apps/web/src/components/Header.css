@@ -1,8 +1,6 @@
 .tab__nav {
-  font-size: 1.2rem;
   font-weight: 500;
   color: #fff;
-  padding: 0.5rem 1rem;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: all 0.2s;

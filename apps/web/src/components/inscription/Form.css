@@ -2,9 +2,9 @@
   height: 6rem;
   background-color: var(--color-tertiary);
   margin-right: 2rem;
-  border: 1px solid var(--color-primary-light);
+  border: 1px solid var(--color-primary-xlight);
   border-radius: 1rem;
-  box-shadow: 0 0 0.5rem var(--color-tertiary-dark);
+  box-shadow: 0 0 0.5rem var(--color-tertiary-ldark);
   position: relative;
 }
 
@@ -41,7 +41,7 @@
   height: 5.5rem;
   border: 1px solid var(--color-primary-light);
   border-radius: 1rem;
-  box-shadow: 0 0 2px var(--color-tertiary-dark);
+  box-shadow: 0 0 2px var(--color-tertiary-ldark);
   background-color: var(--color-primary);
 }
 

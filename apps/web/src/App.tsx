@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router'
-import { connect, disconnect } from "starknetkit";
-import { CallData, Contract, RpcProvider, constants, byteArray } from 'starknet';
+import { CallData, RpcProvider, constants, byteArray, uint256 } from 'starknet';
+import { useConnect, useDisconnect, useAccount, useContract, useSendTransaction } from '@starknet-react/core'
+import { useStarknetkitConnectModal, StarknetkitConnector } from "starknetkit";
 import './App.css'
 import Header from './components/Header'
 import orderbook_abi from './abi/orderbook.abi.json';
@@ -24,40 +25,59 @@ export const provider = new RpcProvider({
 
 function App() {
   // TODO: Move to seperate module ( starknet stuff )
-  const [starkWallet, setWallet] = useState(null as any)
-  const [starkConnector, setConnector] = useState(null as any)
-  const [starkConnectorData, setConnectorData] = useState(null as any)
-  const [starkAddress, setAddress] = useState(null as any)
-  const [starkAccount, setStarkAccount] = useState(null as any)
+  const { connect, connectors } = useConnect()
+  const { disconnect, error } = useDisconnect()
+  const { address, status } = useAccount()
+  const { starknetkitConnectModal } = useStarknetkitConnectModal({
+    connectors: connectors as StarknetkitConnector[]
+  })
+  const [isConnected, setIsConnected] = useState(false)
+  const [connector, setConnector] = useState(null as StarknetkitConnector | null)
 
   const connectWallet = async () => {
     // TODO: If no wallet/connectors?
     // TODO: Auto-reconnect on page refresh?
-    const { wallet, connector, connectorData } = await connect({
-      modalMode: "alwaysAsk",
-      modalTheme: "dark"
-    })
-    if (!wallet || !connector || !connectorData) {
+    const { connector } = await starknetkitConnectModal()
+    if (!connector) {
       return
     }
-
-    setWallet(wallet)
+    connect({ connector })
     setConnector(connector)
-    setConnectorData(connectorData)
-    setAddress(connectorData.account)
-    let new_account = await connector.account(provider);
-    setStarkAccount(new_account);
   }
 
-  const disconnectWallet = async () => {
-    if (starkConnector) {
-      await disconnect()
-    }
+  useEffect(() => {
+    if (!connectors) return;
+    if (connectors.length === 0) return;
+    if (isConnected) return;
 
-    setWallet(null)
+    const connectIfReady = async () => {
+      for (let i = 0; i < connectors.length; i++) {
+        let ready = await connectors[i].ready();
+        if (ready) {
+          connect({ connector: connectors[i] })
+          //setConnector(connectors[i])
+          break;
+        }
+      }
+    };
+    connectIfReady();
+  }, [connectors]);
+
+  useEffect(() => {
+    if (status === 'connected') {
+      setIsConnected(true)
+    } else if (status === 'disconnected') {
+      setIsConnected(false)
+    }
+  }, [address, status])
+
+  const disconnectWallet = async () => {
+    if (!isConnected || !connector) {
+      return
+    }
+    disconnect()
     setConnector(null)
-    setConnectorData(null)
-    setAddress(null)
+    setIsConnected(false)
   }
 
   const toHex = (str: string) => {
@@ -68,45 +88,14 @@ function App() {
     return hex;
   };
 
-  const estimateInvokeFee = async ({
-    contractAddress,
-    entrypoint,
-    calldata
-  }: {
-    contractAddress: any;
-    entrypoint: any;
-    calldata: any;
-  }) => {
-    try {
-      const { suggestedMaxFee } = await starkAccount.estimateInvokeFee({
-        contractAddress: contractAddress,
-        entrypoint: entrypoint,
-        calldata: calldata
-      });
-      return { suggestedMaxFee };
-    } catch (error) {
-      console.error(error);
-      return { suggestedMaxFee: BigInt(1000000000000000) };
-    }
-  };
+  const { contract: orderbookContract } = useContract({
+    address: import.meta.env.VITE_BROLY_CONTRACT_ADDRESS,
+    abi: orderbook_abi as any
+  });
 
-  const [orderbookContract, setOrderbookContract] = useState(null as any)
-  useEffect(() => {
-    if (!starkConnector || !starkAccount) {
-      return
-    }
-
-    const newOrderbookContract = new Contract(
-      orderbook_abi,
-      import.meta.env.VITE_ORDERBOOK_CONTRACT_ADDRESS,
-      starkAccount
-    )
-
-    setOrderbookContract(newOrderbookContract)
-  }, [starkConnector, starkAccount])
-
+  const [calls, setCalls] = useState([] as any[])
   const requestInscriptionCall = async () => {
-    if (!starkAddress || !orderbookContract) {
+    if (!address || !orderbookContract) {
       return
     }
     const calldata = CallData.compile([
@@ -114,35 +103,24 @@ function App() {
       byteArray.byteArrayFromString("tb1234567890123456789012345678901234567890"),
       Number(100),
       toHex("STRK"),
-      Number(2000)
+      uint256.bnToUint256(2000)
     ]);
-    console.log(calldata);
-    const requestCalldata = orderbookContract.populate(
-      "request_inscription",
-      calldata,
-      //{
-      //  inscription_data: byteArray.byteArrayFromString("message:Hello, Starknet!"),
-      //  receiving_address: toHex("tb1234567890123456789012345678901234567890"),
-      //  satoshi: Number(100),
-      //  currency_fee: toHex("STRK"),
-      //  submitter_fee: Number(2000),
-      //}
-    );
-    const { suggestedMaxFee } = await estimateInvokeFee({
-      contractAddress: orderbookContract.address,
-      entrypoint: "request_inscription",
-      calldata: requestCalldata.calldata
-    });
-    /* global BigInt */
-    const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
-    const result = await orderbookContract.request_inscription(
-      requestCalldata.calldata,
-      {
-        maxFee
-      }
-    );
-    console.log(result);
+    setCalls(
+      [orderbookContract.populate('request_inscription', calldata)]
+    )
   }
+  const { send, data, isPending } = useSendTransaction({
+    calls
+  });
+  useEffect(() => {
+    const requestCall = async () => {
+      if (calls.length === 0) return;
+      send();
+      console.log('Call successful:', data, isPending);
+      // TODO: Update the UI with the new vote count
+    };
+    requestCall();
+  }, [calls]);
 
   const cancelInscriptionCall = async () => {
     // TODO
@@ -157,14 +135,13 @@ function App() {
   const tabProps = {
     requestInscriptionCall,
     cancelInscriptionCall,
-    orderbookContract,
-    starkAddress
+    orderbookContract
   }
 
   // TODO: <Route path="*" element={<NotFound />} />
   return (
     <div className="h-screen relative">
-      <Header tabs={tabs} connectWallet={connectWallet} address={starkAddress} disconnectWallet={disconnectWallet} />
+      <Header tabs={tabs} connectWallet={connectWallet} isConnected={isConnected} disconnectWallet={disconnectWallet} />
       <div className="h-[4.5rem]" />
       <Routes>
         {tabs.map((tab) => (
