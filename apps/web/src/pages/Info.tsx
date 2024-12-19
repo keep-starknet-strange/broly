@@ -3,7 +3,7 @@ function Info(props: any) {
   return (
     <div className="w-full flex flex-col items-center h-max bg__color--primary border-t-2 border-[var(--color-primary-light)]">
       <div className="w-full flex flex-col items-center justify-center py-2">
-        <img src="/images/logo.png" alt="logo" className="w-26 h-26" />
+        <img src="/images/logo-high.png" alt="logo" className="w-26 h-26" />
         <h1 className="text__color--primary text-6xl font-bold px-4 mt-4">B.R.O.L.Y.</h1>
         <h2 className="text__color--primary text-xl px-4">Bitcoin Registry Orchestrates Like Yesterday</h2>
         <div className="flex flex-row items-center justify-center gap-2 py-1">
