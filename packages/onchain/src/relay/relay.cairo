@@ -1,3 +1,4 @@
+use consensus::{types::transaction::{Transaction}};
 use utils::hash::Digest;
 use utu_relay::bitcoin::block::BlockHeader;
 
@@ -5,20 +6,21 @@ use utu_relay::bitcoin::block::BlockHeader;
 pub trait ITransactionInclusion<TContractState> {
     fn prove_inclusion(
         ref self: TContractState,
-        tx_id: Digest,
+        tx: Transaction,
         block_height: u64,
         block_header: BlockHeader,
-        tx_inclusion: Array<(Digest, bool)>,
+        inclusion_proof: Array<(Digest, bool)>,
     );
 }
 
 #[starknet::contract]
 mod TransactionInclusion {
+    use consensus::{codec::Encode, types::transaction::Transaction};
     use onchain::utils::utils::compute_merkle_root;
     use utu_relay::bitcoin::block::BlockHashTrait;
     use starknet::{ContractAddress, get_block_timestamp};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use utils::{hash::Digest, numeric::u32_byte_reverse};
+    use utils::{hash::Digest, double_sha256::double_sha256_byte_array, numeric::u32_byte_reverse};
     use utu_relay::{
         interfaces::{IUtuRelayDispatcher, IUtuRelayDispatcherTrait}, bitcoin::block::BlockHeader,
     };
@@ -37,13 +39,16 @@ mod TransactionInclusion {
     impl TransactionInclusionImpl of super::ITransactionInclusion<ContractState> {
         fn prove_inclusion(
             ref self: ContractState,
-            tx_id: Digest,
+            tx: Transaction,
             block_height: u64,
             block_header: BlockHeader,
-            tx_inclusion: Array<(Digest, bool)>,
+            inclusion_proof: Array<(Digest, bool)>,
         ) {
+            let tx_bytes_legacy = @tx.encode();
+            let tx_id = double_sha256_byte_array(tx_bytes_legacy);
+
             // we verify this tx is included in the provided block
-            let merkle_root = compute_merkle_root(tx_id, tx_inclusion);
+            let merkle_root = compute_merkle_root(tx_id, inclusion_proof);
             assert(
                 block_header.merkle_root_hash.value == merkle_root.value,
                 'Invalid inclusion proof.',

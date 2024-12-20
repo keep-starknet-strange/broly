@@ -3,7 +3,9 @@ use onchain::orderbook::interface::IOrderbook;
 #[starknet::contract]
 mod Orderbook {
     use core::byte_array::ByteArray;
+    use consensus::{types::transaction::{Transaction}};
     use onchain::orderbook::interface::Status;
+    use openzeppelin::utils::serde::SerializedAppend;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePathEntry,
@@ -11,6 +13,8 @@ mod Orderbook {
     };
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
     use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
+    use utils::hash::Digest;
+    use utu_relay::bitcoin::block::BlockHeader;
 
     #[storage]
     struct Storage {
@@ -20,7 +24,7 @@ mod Orderbook {
         // inscribed data, and submitter fee.
         inscriptions: Map<u32, (ContractAddress, ByteArray, u256)>,
         // A map from the inscription ID to status. Possible values:
-        // 'Open', 'Locked', 'Canceled', 'Closed'.
+        // 'Open', 'Locked', 'Canceled', 'Closed', 'Undefined'.
         inscription_statuses: Map<u32, Status>,
         // A map from the inscription ID to the potential submitters.
         submitters: Map<u32, Map<ContractAddress, ContractAddress>>,
@@ -132,11 +136,23 @@ mod Orderbook {
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
-        /// - `(ByteArray, felt252)`, the tuple with the inscribed data and the fee.
+        /// - `(ContractAddress, ByteArray, felt252)`, the tuple with the requestor,
+        /// inscribed data and the fee.
         fn query_inscription(
             self: @ContractState, inscription_id: u32,
         ) -> (ContractAddress, ByteArray, u256) {
             self.inscriptions.read(inscription_id)
+        }
+
+        /// Inputs:
+        /// - `inscription_id: felt252`, the ID of the inscription.
+        /// Returns:
+        /// - `(ContractAddress, ByteArray, felt252)`, the tuple with submitter address,
+        /// the precomputed tx, and the block number.
+        fn query_inscription_lock(
+            self: @ContractState, inscription_id: u32,
+        ) -> (ContractAddress, ByteArray, u64) {
+            self.inscription_locks.read(inscription_id)
         }
 
         /// Called by a user.
@@ -185,8 +201,8 @@ mod Orderbook {
 
             if (status == Status::Locked) {
                 let (_, _, blocknumber) = self.inscription_locks.read(inscription_id);
-                // TODO: replace block time delta
-                assert(get_block_number() - blocknumber < 100, 'Prior lock has not expired');
+                // TODO: replace hardcoded block time delta
+                assert(get_block_number() - blocknumber > 100, 'Prior lock has not expired');
             }
 
             let submitter = get_caller_address();
@@ -194,6 +210,9 @@ mod Orderbook {
             submitters.write(submitter, submitter);
 
             self.inscription_statuses.write(inscription_id, Status::Locked);
+            self
+                .inscription_locks
+                .write(inscription_id, (submitter, tx_hash.clone(), get_block_number()));
             self.emit(RequestLocked { id: inscription_id, submitter: submitter, tx_hash: tx_hash });
         }
 
@@ -204,7 +223,15 @@ mod Orderbook {
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
         /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
-        fn submit_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+        fn submit_inscription(
+            ref self: ContractState,
+            inscription_id: u32,
+            tx_hash: ByteArray,
+            tx: Transaction,
+            block_height: u64,
+            block_header: BlockHeader,
+            inclusion_proof: Array<(Digest, bool)>,
+        ) {
             let caller = get_caller_address();
             let submitters = self.submitters.entry(inscription_id);
             let submitter = submitters.read(caller);
@@ -215,9 +242,12 @@ mod Orderbook {
 
             const selector: felt252 = selector!("prove_inclusion");
             let to = self.relay_address.read();
-            let calldata: Array<felt252> = array![];
+            let mut calldata = array![];
+            calldata.append_serde(tx);
+            calldata.append_serde(block_height);
+            calldata.append_serde(block_header);
+            calldata.append_serde(inclusion_proof);
 
-            // TODO: assert successful inclusion call
             call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
 
             // TODO: assert that the witness data contains the requested inscription
