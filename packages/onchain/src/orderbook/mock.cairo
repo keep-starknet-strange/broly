@@ -3,6 +3,7 @@ use onchain::orderbook::interface::IOrderbook;
 #[starknet::contract]
 mod OrderbookMock {
     use core::byte_array::ByteArray;
+    use consensus::{types::transaction::{Transaction}};
     use onchain::orderbook::interface::Status;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
@@ -10,6 +11,8 @@ mod OrderbookMock {
         StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
+    use utils::hash::Digest;
+    use utu_relay::bitcoin::block::BlockHeader;
 
     #[storage]
     struct Storage {
@@ -172,7 +175,15 @@ mod OrderbookMock {
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
         /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
-        fn submit_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+        fn submit_inscription(
+            ref self: ContractState,
+            inscription_id: u32,
+            tx_hash: ByteArray,
+            tx: Transaction,
+            block_height: u64,
+            block_header: BlockHeader,
+            inclusion_proof: Array<(Digest, bool)>,
+        ) {
             // TODO: process the submitted transaction hash, verify that it is on Bitcoin
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
@@ -183,6 +194,12 @@ mod OrderbookMock {
             self: @ContractState, inscription_id: u32,
         ) -> (ContractAddress, ByteArray, u256) {
             return self.inscriptions.read(inscription_id);
+        }
+
+        fn query_inscription_lock(
+            self: @ContractState, inscription_id: u32,
+        ) -> (ContractAddress, ByteArray, u64) {
+            self.inscription_locks.read(inscription_id)
         }
     }
 
