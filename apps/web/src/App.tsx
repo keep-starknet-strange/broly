@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router'
 import { CallData, RpcProvider, constants, byteArray, uint256 } from 'starknet';
 import { useConnect, useDisconnect, useAccount, useContract, useSendTransaction } from '@starknet-react/core'
 import { useStarknetkitConnectModal, StarknetkitConnector } from "starknetkit";
+import { connectBitcoinWallet } from './connections/satsConnect';
 import './App.css'
 import Header from './components/Header'
 import orderbook_abi from './abi/orderbook.abi.json';
@@ -31,10 +32,17 @@ function App() {
   const { starknetkitConnectModal } = useStarknetkitConnectModal({
     connectors: connectors as StarknetkitConnector[]
   })
-  const [isConnected, setIsConnected] = useState(false)
-  const [connector, setConnector] = useState(null as StarknetkitConnector | null)
+  const [isStarknetConnected, setIsStarknetConnected] = useState(false)
+  const [starknetConnector, setStarknetConnector] = useState(null as StarknetkitConnector | null)
 
-  const connectWallet = async () => {
+  // Bitcoin Wallet State
+  const [bitcoinWallet, setBitcoinWallet] = useState<{
+    paymentAddress: string | null
+    ordinalsAddress: string | null
+    stacksAddress: string | null
+  }>({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
+
+  const connectStarknetWallet = async () => {
     // TODO: If no wallet/connectors?
     // TODO: Auto-reconnect on page refresh?
     const { connector } = await starknetkitConnectModal()
@@ -42,13 +50,13 @@ function App() {
       return
     }
     connect({ connector })
-    setConnector(connector)
+    setStarknetConnector(connector)
   }
 
   useEffect(() => {
     if (!connectors) return;
     if (connectors.length === 0) return;
-    if (isConnected) return;
+    if (isStarknetConnected) return;
 
     const connectIfReady = async () => {
       for (let i = 0; i < connectors.length; i++) {
@@ -65,19 +73,30 @@ function App() {
 
   useEffect(() => {
     if (status === 'connected') {
-      setIsConnected(true)
+      setIsStarknetConnected(true)
     } else if (status === 'disconnected') {
-      setIsConnected(false)
+      setIsStarknetConnected(false)
     }
   }, [address, status])
 
-  const disconnectWallet = async () => {
-    if (!isConnected || !connector) {
+  const disconnectStarknetWallet = async () => {
+    if (!isStarknetConnected || !starknetConnector) {
       return
     }
     disconnect()
-    setConnector(null)
-    setIsConnected(false)
+    setStarknetConnector(null)
+    setIsStarknetConnected(false)
+  }
+
+  // Bitcoin Wallet Connect
+  const connectBitcoinWalletHandler = async () => {
+    const addresses = await connectBitcoinWallet()
+    setBitcoinWallet(addresses)
+  }
+
+  // Bitcoin Wallet Disconnect
+  const disconnectBitcoinWallet = () => {
+    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
   }
 
   const toHex = (str: string) => {
@@ -141,8 +160,21 @@ function App() {
   // TODO: <Route path="*" element={<NotFound />} />
   return (
     <div className="h-screen relative">
-      <Header tabs={tabs} connectWallet={connectWallet} isConnected={isConnected} disconnectWallet={disconnectWallet} />
-      <div className="h-[4.5rem]" />
+      <Header
+        tabs={tabs}
+        starknetWallet={{
+          isConnected: isStarknetConnected,
+          connectWallet: connectStarknetWallet,
+          disconnectWallet: disconnectStarknetWallet
+        }}
+        bitcoinWallet={{
+          paymentAddress: bitcoinWallet.paymentAddress,
+          ordinalsAddress: bitcoinWallet.ordinalsAddress,
+          stacksAddress: bitcoinWallet.stacksAddress,
+          connectWallet: connectBitcoinWalletHandler,
+          disconnectWallet: disconnectBitcoinWallet
+        }}
+      />      <div className="h-[4.5rem]" />
       <Routes>
         {tabs.map((tab) => (
           <Route key={tab.path} path={tab.path} element={<tab.component {...tabProps} />} />
