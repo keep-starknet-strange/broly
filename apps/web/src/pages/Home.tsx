@@ -6,18 +6,25 @@ import InscriptionStatus from "../components/inscription/Status";
 import { Pagination } from "../components/Pagination";
 import { getNewInscriptions } from "../api/inscriptions";
 
-function Home(props: any) {
+function Home(props: {
+  requestInscriptionCall: (dataToInscribe: string, taprootAddress: string) => Promise<void>;
+  taprootAddress: string | null;
+  connectBitcoinWalletHandler: () => Promise<void>;
+  disconnectBitcoinWallet: () => void;
+  isBitcoinWalletConnected: boolean;
+}) {
   const [isInscribing, setIsInscribing] = useState(false);
 
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
   const [recentsPagination, setRecentsPagination] = useState({
     pageLength: 16,
-    page: 1
+    page: 1,
   });
 
   useEffect(() => {
     const fetchInscriptions = async () => {
+      // TODO fetch real new inscriptions from smart contract
       let result = await getNewInscriptions(recentsPagination.pageLength, recentsPagination.page);
       if (result.data) {
         if (recentsPagination.page === 1) {
@@ -29,20 +36,35 @@ function Home(props: any) {
           setRecentInscriptions([...recentInscriptions, ...newInscriptions]);
         }
       }
-    }
+    };
     try {
       fetchInscriptions();
     } catch (error) {
       console.error(error);
     }
-  }, [recentsPagination]);
+  }, [recentsPagination, isInscribing]);
 
   return (
     <div className="w-full flex flex-col h-max">
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
-        <InscriptionForm isInscribing={isInscribing} setIsInscribing={setIsInscribing} requestInscriptionCall={props.requestInscriptionCall} />
+        {!props.isBitcoinWalletConnected && (
+          <button
+            className="button--gradient button__primary"
+            onClick={props.connectBitcoinWalletHandler}
+          >
+            Connect Bitcoin Wallet
+          </button>
+        )}
+        {props.isBitcoinWalletConnected && (
+          <InscriptionForm
+            isInscribing={isInscribing}
+            setIsInscribing={setIsInscribing}
+            requestInscriptionCall={props.requestInscriptionCall}
+            taprootAddress={props.taprootAddress}
+          />
+        )}
         {isInscribing && <InscriptionStatus />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
