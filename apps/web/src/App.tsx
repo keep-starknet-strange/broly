@@ -88,13 +88,24 @@ function App() {
     setIsStarknetConnected(false)
   }
 
-  // Bitcoin Wallet Connect
+  const [taprootAddress, setTaprootAddress] = useState<string | null>(null)
+
   const connectBitcoinWalletHandler = async () => {
     const addresses = await connectBitcoinWallet()
-    setBitcoinWallet(addresses)
+    // TODO: replace with the Ordinals address.
+    // Currently the sats connect lib fetches 
+    // only the Payments address from Xverse.
+    if (addresses.paymentAddress) {
+      setTaprootAddress(addresses.paymentAddress)
+      setBitcoinWallet((prev) => ({
+        ...prev,
+        paymentAddress: addresses.paymentAddress,
+      }))
+    } else {
+      console.error('Ordinals address not found in wallet connection')
+    }
   }
-
-  // Bitcoin Wallet Disconnect
+    
   const disconnectBitcoinWallet = () => {
     setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
   }
@@ -113,21 +124,23 @@ function App() {
   });
 
   const [calls, setCalls] = useState([] as any[])
-  const requestInscriptionCall = async () => {
+  
+  const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string) => {
     if (!address || !orderbookContract) {
       return
     }
+  
     const calldata = CallData.compile([
-      byteArray.byteArrayFromString("message:Hello, Starknet!"),
-      byteArray.byteArrayFromString("tb1234567890123456789012345678901234567890"),
-      Number(100),
+      byteArray.byteArrayFromString(dataToInscribe),
+      byteArray.byteArrayFromString(taprootAddress),
+      Number(100), // TODO remove when contract is re-deployed
       toHex("STRK"),
-      uint256.bnToUint256(2000)
-    ]);
-    setCalls(
-      [orderbookContract.populate('request_inscription', calldata)]
-    )
+      uint256.bnToUint256(2000),
+    ])
+  
+    setCalls([await orderbookContract.populate('request_inscription', calldata)])
   }
+  
   const { send, data, isPending } = useSendTransaction({
     calls
   });
@@ -174,14 +187,28 @@ function App() {
           connectWallet: connectBitcoinWalletHandler,
           disconnectWallet: disconnectBitcoinWallet
         }}
-      />      <div className="h-[4.5rem]" />
+      />      
+      <div className="h-[4.5rem]" />
       <Routes>
         {tabs.map((tab) => (
-          <Route key={tab.path} path={tab.path} element={<tab.component {...tabProps} />} />
+          <Route
+            key={tab.path}
+            path={tab.path}
+            element={
+              <tab.component
+                taprootAddress={taprootAddress}
+                connectBitcoinWalletHandler={connectBitcoinWalletHandler}
+                disconnectBitcoinWallet={disconnectBitcoinWallet}
+                isBitcoinWalletConnected={!!taprootAddress}
+                {...tabProps}
+              />
+            }
+          />
         ))}
         <Route path="/inscription/:id" element={<Inscription {...tabProps} />} />
         <Route path="/request/:id" element={<Request {...tabProps} />} />
       </Routes>
+
     </div>
   )
 }
