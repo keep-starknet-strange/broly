@@ -49,14 +49,6 @@ function Home(props: {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
-        {!props.isBitcoinWalletConnected && (
-          <button
-            className="button--gradient button__primary"
-            onClick={props.connectBitcoinWalletHandler}
-          >
-            Connect Bitcoin Wallet
-          </button>
-        )}
         {props.isBitcoinWalletConnected && (
           <InscriptionForm
             isInscribing={isInscribing}
