@@ -73,20 +73,18 @@ function App() {
 
   useEffect(() => {
     if (status === 'connected') {
-      setIsStarknetConnected(true)
-    } else if (status === 'disconnected') {
-      setIsStarknetConnected(false)
+      setIsStarknetConnected(true);
+    } else {
+      setIsStarknetConnected(false);
+      setStarknetConnector(null);
     }
-  }, [address, status])
+  }, [status]);
 
   const disconnectStarknetWallet = async () => {
-    if (!isStarknetConnected || !starknetConnector) {
-      return
-    }
-    disconnect()
-    setStarknetConnector(null)
-    setIsStarknetConnected(false)
-  }
+    await disconnect();
+    setStarknetConnector(null);
+    setIsStarknetConnected(false);
+  };
 
   const [taprootAddress, setTaprootAddress] = useState<string | null>(null)
 
@@ -107,7 +105,8 @@ function App() {
   }
     
   const disconnectBitcoinWallet = () => {
-    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
+    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null });
+    setTaprootAddress(null);
   }
 
   const toHex = (str: string) => {
