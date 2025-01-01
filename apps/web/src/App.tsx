@@ -33,7 +33,6 @@ function App() {
     connectors: connectors as StarknetkitConnector[]
   })
   const [isStarknetConnected, setIsStarknetConnected] = useState(false)
-  const [starknetConnector, setStarknetConnector] = useState(null as StarknetkitConnector | null)
 
   // Bitcoin Wallet State
   const [bitcoinWallet, setBitcoinWallet] = useState<{
@@ -50,7 +49,6 @@ function App() {
       return
     }
     connect({ connector })
-    setStarknetConnector(connector)
   }
 
   useEffect(() => {
@@ -76,13 +74,11 @@ function App() {
       setIsStarknetConnected(true);
     } else {
       setIsStarknetConnected(false);
-      setStarknetConnector(null);
     }
   }, [status]);
 
   const disconnectStarknetWallet = async () => {
     await disconnect();
-    setStarknetConnector(null);
     setIsStarknetConnected(false);
   };
 
