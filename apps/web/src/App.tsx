@@ -200,6 +200,7 @@ function App() {
                 connectBitcoinWalletHandler={connectBitcoinWalletHandler}
                 disconnectBitcoinWallet={disconnectBitcoinWallet}
                 isBitcoinWalletConnected={!!taprootAddress}
+                isStarknetConnected={isStarknetConnected}
                 {...tabProps}
               />
             }
