@@ -12,6 +12,7 @@ function Home(props: {
   connectBitcoinWalletHandler: () => Promise<void>;
   disconnectBitcoinWallet: () => void;
   isBitcoinWalletConnected: boolean;
+  isStarknetConnected: boolean;
 }) {
   const [isInscribing, setIsInscribing] = useState(false);
 
@@ -49,14 +50,13 @@ function Home(props: {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
-        {props.isBitcoinWalletConnected && (
-          <InscriptionForm
-            isInscribing={isInscribing}
-            setIsInscribing={setIsInscribing}
-            requestInscriptionCall={props.requestInscriptionCall}
-            taprootAddress={props.taprootAddress}
-          />
-        )}
+        <InscriptionForm
+          isInscribing={isInscribing}
+          setIsInscribing={setIsInscribing}
+          requestInscriptionCall={props.requestInscriptionCall}
+          taprootAddress={props.taprootAddress}
+          isStarknetConnected={props.isStarknetConnected}
+        />
         {isInscribing && <InscriptionStatus />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">

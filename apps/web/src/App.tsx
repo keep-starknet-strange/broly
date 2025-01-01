@@ -33,7 +33,6 @@ function App() {
     connectors: connectors as StarknetkitConnector[]
   })
   const [isStarknetConnected, setIsStarknetConnected] = useState(false)
-  const [starknetConnector, setStarknetConnector] = useState(null as StarknetkitConnector | null)
 
   // Bitcoin Wallet State
   const [bitcoinWallet, setBitcoinWallet] = useState<{
@@ -50,7 +49,6 @@ function App() {
       return
     }
     connect({ connector })
-    setStarknetConnector(connector)
   }
 
   useEffect(() => {
@@ -73,20 +71,16 @@ function App() {
 
   useEffect(() => {
     if (status === 'connected') {
-      setIsStarknetConnected(true)
-    } else if (status === 'disconnected') {
-      setIsStarknetConnected(false)
+      setIsStarknetConnected(true);
+    } else {
+      setIsStarknetConnected(false);
     }
-  }, [address, status])
+  }, [status]);
 
   const disconnectStarknetWallet = async () => {
-    if (!isStarknetConnected || !starknetConnector) {
-      return
-    }
-    disconnect()
-    setStarknetConnector(null)
-    setIsStarknetConnected(false)
-  }
+    await disconnect();
+    setIsStarknetConnected(false);
+  };
 
   const [taprootAddress, setTaprootAddress] = useState<string | null>(null)
 
@@ -107,7 +101,8 @@ function App() {
   }
     
   const disconnectBitcoinWallet = () => {
-    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
+    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null });
+    setTaprootAddress(null);
   }
 
   const toHex = (str: string) => {
@@ -200,6 +195,7 @@ function App() {
                 connectBitcoinWalletHandler={connectBitcoinWalletHandler}
                 disconnectBitcoinWallet={disconnectBitcoinWallet}
                 isBitcoinWalletConnected={!!taprootAddress}
+                isStarknetConnected={isStarknetConnected}
                 {...tabProps}
               />
             }

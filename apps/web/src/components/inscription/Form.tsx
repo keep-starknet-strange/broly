@@ -63,6 +63,13 @@ function InscriptionForm(props: any) {
     e.preventDefault();
   }
 
+  console.log({
+    taprootAddress: props.taprootAddress,
+    isStarknetConnected: props.isStarknetConnected,
+    selectedOption,
+    uploadedImage
+  });
+
   // TODO: disabled button b4 input
   return (
     <form className="flex flex-row items-center justify-center w-full md:w-[80%] lg:w-[60%] xl:w-[40%] px-8" onSubmit={handleSubmit}>
@@ -103,12 +110,16 @@ function InscriptionForm(props: any) {
         <button
           type="submit"
           disabled={
-            (selectedOption === "Image" && !uploadedImage) || !props.taprootAddress
+            !props.taprootAddress || 
+            !props.isStarknetConnected || 
+            (selectedOption === "Image" && !uploadedImage)
           }
           className={`button--gradient button__primary ml-4 ${
-            (selectedOption === "Image" && uploadedImage) || selectedOption === "Message"
-              ? "button__primary--pinging"
-              : "button__primary--disabled"
+            !props.taprootAddress || !props.isStarknetConnected
+              ? "button__primary--disabled"
+              : (selectedOption === "Image" && uploadedImage) || selectedOption === "Message"
+                ? "button__primary--pinging"
+                : "button__primary--disabled"
           }`}
         >
           Request Inscription

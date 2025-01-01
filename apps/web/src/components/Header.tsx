@@ -23,37 +23,19 @@ function Header(props: any) {
           </NavLink>
         ))}
         {/* Starknet Connect */}
-        {starknetWallet.isConnected ? (
-          <button
-            className="button--gradient button__primary"
-            onClick={starknetWallet.disconnectWallet}
-          >
-            Disconnect Starknet
-          </button>
-        ) : (
-          <button
-            className="button--gradient button__primary"
-            onClick={starknetWallet.connectWallet}
-          >
-            Connect Starknet
-          </button>
-        )}
+        <button
+          className="button--gradient button__primary"
+          onClick={starknetWallet.isConnected ? starknetWallet.disconnectWallet : starknetWallet.connectWallet}
+        >
+          {starknetWallet.isConnected ? "Disconnect Starknet" : "Connect Starknet"}
+        </button>
         {/* Bitcoin Connect */}
-        {bitcoinWallet.paymentAddress ? (
-          <button
-            className="button--gradient button__primary"
-            onClick={bitcoinWallet.disconnectWallet}
-          >
-            Disconnect Bitcoin
-          </button>
-        ) : (
-          <button
-            className="button--gradient button__primary"
-            onClick={bitcoinWallet.connectWallet}
-          >
-            Connect Bitcoin
-          </button>
-        )}
+        <button
+          className="button--gradient button__primary"
+          onClick={bitcoinWallet.paymentAddress ? bitcoinWallet.disconnectWallet : bitcoinWallet.connectWallet}
+        >
+          {bitcoinWallet.paymentAddress ? "Disconnect Bitcoin" : "Connect Bitcoin"}
+        </button>
       </nav>
     </header>
   )
