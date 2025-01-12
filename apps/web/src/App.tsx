@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router'
 import { CallData, RpcProvider, constants, byteArray, uint256 } from 'starknet';
 import { useConnect, useDisconnect, useAccount, useContract, useSendTransaction } from '@starknet-react/core'
 import { useStarknetkitConnectModal, StarknetkitConnector } from "starknetkit";
+import { connectBitcoinWallet } from './connections/satsConnect';
 import './App.css'
 import Header from './components/Header'
 import orderbook_abi from './abi/orderbook.abi.json';
@@ -31,10 +32,16 @@ function App() {
   const { starknetkitConnectModal } = useStarknetkitConnectModal({
     connectors: connectors as StarknetkitConnector[]
   })
-  const [isConnected, setIsConnected] = useState(false)
-  const [connector, setConnector] = useState(null as StarknetkitConnector | null)
+  const [isStarknetConnected, setIsStarknetConnected] = useState(false)
 
-  const connectWallet = async () => {
+  // Bitcoin Wallet State
+  const [bitcoinWallet, setBitcoinWallet] = useState<{
+    paymentAddress: string | null
+    ordinalsAddress: string | null
+    stacksAddress: string | null
+  }>({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null })
+
+  const connectStarknetWallet = async () => {
     // TODO: If no wallet/connectors?
     // TODO: Auto-reconnect on page refresh?
     const { connector } = await starknetkitConnectModal()
@@ -42,13 +49,12 @@ function App() {
       return
     }
     connect({ connector })
-    setConnector(connector)
   }
 
   useEffect(() => {
     if (!connectors) return;
     if (connectors.length === 0) return;
-    if (isConnected) return;
+    if (isStarknetConnected) return;
 
     const connectIfReady = async () => {
       for (let i = 0; i < connectors.length; i++) {
@@ -65,19 +71,38 @@ function App() {
 
   useEffect(() => {
     if (status === 'connected') {
-      setIsConnected(true)
-    } else if (status === 'disconnected') {
-      setIsConnected(false)
+      setIsStarknetConnected(true);
+    } else {
+      setIsStarknetConnected(false);
     }
-  }, [address, status])
+  }, [status]);
 
-  const disconnectWallet = async () => {
-    if (!isConnected || !connector) {
-      return
+  const disconnectStarknetWallet = async () => {
+    await disconnect();
+    setIsStarknetConnected(false);
+  };
+
+  const [taprootAddress, setTaprootAddress] = useState<string | null>(null)
+
+  const connectBitcoinWalletHandler = async () => {
+    const addresses = await connectBitcoinWallet()
+    // TODO: replace with the Ordinals address.
+    // Currently the sats connect lib fetches 
+    // only the Payments address from Xverse.
+    if (addresses.paymentAddress) {
+      setTaprootAddress(addresses.paymentAddress)
+      setBitcoinWallet((prev) => ({
+        ...prev,
+        paymentAddress: addresses.paymentAddress,
+      }))
+    } else {
+      console.error('Ordinals address not found in wallet connection')
     }
-    disconnect()
-    setConnector(null)
-    setIsConnected(false)
+  }
+    
+  const disconnectBitcoinWallet = () => {
+    setBitcoinWallet({ paymentAddress: null, ordinalsAddress: null, stacksAddress: null });
+    setTaprootAddress(null);
   }
 
   const toHex = (str: string) => {
@@ -94,22 +119,21 @@ function App() {
   });
 
   const [calls, setCalls] = useState([] as any[])
-  const requestInscriptionCall = async ({type, inscription_data, bitcoin_address, fee_token, fee}:
-  {type: string, inscription_data: string, bitcoin_address: string, fee_token: string, fee: number}) => {
+  const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string, feeToken: string, fee: number) => {
     if (!address || !orderbookContract) {
       return
     }
-
+  
     const calldata = CallData.compile([
-      byteArray.byteArrayFromString(type + ":" + inscription_data),
-      byteArray.byteArrayFromString(bitcoin_address),
-      toHex(fee_token),
+      byteArray.byteArrayFromString(dataToInscribe),
+      byteArray.byteArrayFromString(taprootAddress),
+      toHex(feeToken),
       uint256.bnToUint256(fee)
-    ]);
-    setCalls(
-      [orderbookContract.populate('request_inscription', calldata)]
-    )
+    ])
+  
+    setCalls([orderbookContract.populate('request_inscription', calldata)])
   }
+  
   const { send, data, isPending } = useSendTransaction({
     calls
   });
@@ -142,15 +166,43 @@ function App() {
   // TODO: <Route path="*" element={<NotFound />} />
   return (
     <div className="h-screen relative">
-      <Header tabs={tabs} connectWallet={connectWallet} isConnected={isConnected} disconnectWallet={disconnectWallet} />
+      <Header
+        tabs={tabs}
+        starknetWallet={{
+          isConnected: isStarknetConnected,
+          connectWallet: connectStarknetWallet,
+          disconnectWallet: disconnectStarknetWallet
+        }}
+        bitcoinWallet={{
+          paymentAddress: bitcoinWallet.paymentAddress,
+          ordinalsAddress: bitcoinWallet.ordinalsAddress,
+          stacksAddress: bitcoinWallet.stacksAddress,
+          connectWallet: connectBitcoinWalletHandler,
+          disconnectWallet: disconnectBitcoinWallet
+        }}
+      />      
       <div className="h-[4.5rem]" />
       <Routes>
         {tabs.map((tab) => (
-          <Route key={tab.path} path={tab.path} element={<tab.component {...tabProps} />} />
+          <Route
+            key={tab.path}
+            path={tab.path}
+            element={
+              <tab.component
+                taprootAddress={taprootAddress}
+                connectBitcoinWalletHandler={connectBitcoinWalletHandler}
+                disconnectBitcoinWallet={disconnectBitcoinWallet}
+                isBitcoinWalletConnected={!!taprootAddress}
+                isStarknetConnected={isStarknetConnected}
+                {...tabProps}
+              />
+            }
+          />
         ))}
         <Route path="/inscription/:id" element={<Inscription {...tabProps} />} />
         <Route path="/request/:id" element={<Request {...tabProps} />} />
       </Routes>
+
     </div>
   )
 }
