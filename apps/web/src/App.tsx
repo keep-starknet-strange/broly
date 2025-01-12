@@ -94,16 +94,17 @@ function App() {
   });
 
   const [calls, setCalls] = useState([] as any[])
-  const requestInscriptionCall = async () => {
+  const requestInscriptionCall = async ({type, inscription_data, bitcoin_address, fee_token, fee}:
+  {type: string, inscription_data: string, bitcoin_address: string, fee_token: string, fee: number}) => {
     if (!address || !orderbookContract) {
       return
     }
+
     const calldata = CallData.compile([
-      byteArray.byteArrayFromString("message:Hello, Starknet!"),
-      byteArray.byteArrayFromString("tb1234567890123456789012345678901234567890"),
-      Number(100),
-      toHex("STRK"),
-      uint256.bnToUint256(2000)
+      byteArray.byteArrayFromString(type + ":" + inscription_data),
+      byteArray.byteArrayFromString(bitcoin_address),
+      toHex(fee_token),
+      uint256.bnToUint256(fee)
     ]);
     setCalls(
       [orderbookContract.populate('request_inscription', calldata)]

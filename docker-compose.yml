@@ -48,6 +48,7 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=password
+      - CONFIG_PATH=/configs/config.yaml
   indexer:
     build:
       dockerfile: packages/indexer/Dockerfile
@@ -55,7 +56,7 @@ services:
     links:
       - backend
     environment:
-      - BROLY_CONTRACT_ADDRESS=0x05a527197145ea9f40d683d1328e75b7f5bdf61d5ff9886f89ac7023873dcba9
+      - BROLY_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
       - AUTH_TOKEN=${APIBARA_AUTH_TOKEN}
       - CONSUMER_TARGET_URL=http://broly-consumer-1:8081/consume-indexer-msg
       - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
@@ -73,7 +74,7 @@ services:
     links:
       - backend
     environment:
-      - VITE_BROLY_CONTRACT_ADDRESS=0x05a527197145ea9f40d683d1328e75b7f5bdf61d5ff9886f89ac7023873dcba9
+      - VITE_BROLY_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
     volumes:
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml

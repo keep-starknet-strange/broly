@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAccount } from '@starknet-react/core'
 import DropButton from "../DropButton";
 import "./Form.css";
 
 function InscriptionForm(props: any) {
-  const dropOptions = ["Image", "Message"];
+  const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const { address } = useAccount()
+
+  useEffect(() => {
+    setErrorMessage("");
+  }, [uploadedImage, address]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -14,7 +21,31 @@ function InscriptionForm(props: any) {
       setErrorMessage("Please upload an image");
       return;
     }
-    await props.requestInscriptionCall();
+    if (!address) {
+      setErrorMessage("Please login with your wallet");
+      return;
+    }
+    const imagePath = "1234.jpg";
+    let inscriptionType = "";
+    let inscriptionData = "";
+    if (selectedOption === "Image") {
+      inscriptionType = "image";
+      inscriptionData = window.location.origin + "/inscriptions/" + imagePath;
+    } else if (selectedOption === "Gif") {
+      inscriptionType = "gif";
+      inscriptionData = window.location.origin + "/inscriptions/" + imagePath;
+    } else if (selectedOption === "Message") {
+      inscriptionType = "message";
+      inscriptionData = e.target[0].value;
+    }
+    const inscription = {
+      type: inscriptionType,
+      inscription_data: inscriptionData,
+      bitcoin_address: "tb1q9xk6m7v0v3v5e5vqzv6v5vqzv6v5vqzv6v5vqz", // TODO
+      fee_token: "STRK", // TODO
+      fee: 500000
+    };
+    await props.requestInscriptionCall(inscription)
     props.setIsInscribing(true);
   };
 
@@ -50,7 +81,7 @@ function InscriptionForm(props: any) {
       </div>
       <div className="flex flex-row items-center justify-center relative">
         <DropButton options={dropOptions} selectedOption={selectedOption} setSelectedOption={setSelectedOption} />
-        <button type="submit" className={`button--gradient button__primary ml-4 ${uploadedImage ? "button__primary--pinging": "button__primary--disabled"}`}>
+        <button type="submit" className={`button--gradient button__primary ml-4 ${uploadedImage && address ? "button__primary--pinging": "button__primary--disabled"}`}>
           Inscribe
         </button>
         {errorMessage &&

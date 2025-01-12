@@ -1,4 +1,4 @@
-const STARTING_BLOCK = 300000;
+const STARTING_BLOCK = 390000;
 
 export const config = {
   streamUrl: Deno.env.get("APIBARA_STREAM_URL"),
@@ -10,7 +10,7 @@ export const config = {
       {
         fromAddress: Deno.env.get("BROLY_CONTRACT_ADDRESS"),
         keys: [
-          "0x494a72a742b7880725a965ee487d937fa6d08a94ba4eb9e29dd0663bc653a2",
+          "0x02206f1373fa5f0c53a9546d291d8e7389cdbee50a22dca64f02545611a91cc2",
         ],
         includeReverted: false,
         includeTransaction: false,

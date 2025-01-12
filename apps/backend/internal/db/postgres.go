@@ -19,7 +19,7 @@ import (
 //	  error - Error if the query fails.
 func PostgresQuery[RowType any](query string, args ...interface{}) ([]RowType, error) {
 	var result []RowType
-	err := pgxscan.Select(context.Background(), db.Postgres, &result, query, args...)
+	err := pgxscan.Select(context.Background(), Db.Postgres, &result, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func PostgresQuery[RowType any](query string, args ...interface{}) ([]RowType, e
 // Same as PostgresQuery, but only returns the first row.
 func PostgresQueryOne[RowType any](query string, args ...interface{}) (*RowType, error) {
 	var result RowType
-	err := pgxscan.Get(context.Background(), db.Postgres, &result, query, args...)
+	err := pgxscan.Get(context.Background(), Db.Postgres, &result, query, args...)
 	if err != nil {
 		return nil, err
 	}
