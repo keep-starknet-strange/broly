@@ -75,13 +75,6 @@ function InscriptionForm(props: any) {
     e.preventDefault();
   }
 
-  console.log({
-    taprootAddress: props.taprootAddress,
-    isStarknetConnected: props.isStarknetConnected,
-    selectedOption,
-    uploadedImage
-  });
-
   // TODO: disabled button b4 input
   return (
     <form className="flex flex-row items-center justify-center w-full md:w-[80%] lg:w-[60%] xl:w-[40%] px-8" onSubmit={handleSubmit}>

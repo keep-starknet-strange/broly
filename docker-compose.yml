@@ -49,6 +49,21 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - CONFIG_PATH=/configs/config.yaml
+  inscriber:
+    build:
+      dockerfile: apps/backend/Dockerfile.inscriber
+      context: .
+    links:
+      - backend
+    restart: always
+    environment:
+      - CONFIG_PATH=/configs/config.yaml
+      - SCRIPT_CONFIG_PATH=/configs/script-config.yaml
+      - KEYSTORE_PATH=/app/account/test.key
+      - ACCOUNT_FILE=/app/account/account.json
+      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
+    volumes:
+      - ./account:/app/account
   indexer:
     build:
       dockerfile: packages/indexer/Dockerfile
@@ -75,6 +90,7 @@ services:
       - backend
     environment:
       - VITE_BROLY_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
+      - VITE_USE_MOCK=true
     volumes:
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml

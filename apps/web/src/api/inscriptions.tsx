@@ -39,14 +39,14 @@ export const getMyTopInscriptions = async (address: string, pageLength: number, 
 export const getInscriptionRequests = async (pageLength: number, page: number) => {
   if (useMock) return mockResponse(mockRequestViews);
   return await fetchWrapper(
-    `get-inscription-requests?pageLength=${pageLength}&page=${page}`
+    `inscriptions/get-requests?pageLength=${pageLength}&page=${page}`
   );
 }
 
 export const getMyInscriptionRequests = async (address: string, pageLength: number, page: number) => {
   if (useMock) return mockResponse(mockRequestViews);
   return await fetchWrapper(
-    `get-my-inscription-requests?address=${address}&pageLength=${pageLength}&page=${page}`
+    `inscriptions/get-my-requests?address=${address}&pageLength=${pageLength}&page=${page}`
   );
 }
 

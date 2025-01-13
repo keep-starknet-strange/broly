@@ -1,4 +1,5 @@
 Api:
+  Host: localhost
   Port: 8080
   AllowOrigins:
     - '*'
@@ -13,6 +14,7 @@ Api:
   Production: false
   Admin: true
 Consumer:
+  Host: localhost
   Port: 8081
 Postgres:
   Host: localhost

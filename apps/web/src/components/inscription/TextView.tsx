@@ -6,7 +6,7 @@ function InscriptionTextView(props: any) {
       <h3 className="text-lg View__header">Message</h3>
       <div className="flex flex-row justify-center h-full w-full h-60 overflow-y-scroll">
         <p className="whitespace-pre-line px-4 py-2 flex-grow">
-          {props.content}
+          {props.inscription.inscription_data}
         </p>
         {false && (
           <div className="flex flex-col items-center justify-around h-full px-4">

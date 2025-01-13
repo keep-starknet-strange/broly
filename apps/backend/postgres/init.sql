@@ -15,17 +15,21 @@ CREATE INDEX IF NOT EXISTS Inscriptions_minted_block ON Inscriptions(minted_bloc
 CREATE TABLE IF NOT EXISTS InscriptionRequests (
   inscription_id integer NOT NULL PRIMARY KEY,
   requester char(64) NOT NULL,
-  type string NOT NULL,
-  inscription_data text NOT NULL,
   bitcoin_address text NOT NULL,
   fee_token text NOT NULL,
   fee_amount integer NOT NULL
 );
 CREATE INDEX IF NOT EXISTS InscriptionRequests_requester ON InscriptionRequests(requester);
 CREATE INDEX IF NOT EXISTS InscriptionRequests_inscription_id ON InscriptionRequests(inscription_id);
-CREATE INDEX IF NOT EXISTS InscriptionRequests_type ON InscriptionRequests(type);
 CREATE INDEX IF NOT EXISTS InscriptionRequests_bitcoin_address ON InscriptionRequests(bitcoin_address);
 CREATE INDEX IF NOT EXISTS InscriptionRequests_fee_token ON InscriptionRequests(fee_token);
+
+CREATE TABLE IF NOT EXISTS InscriptionRequestsData (
+  inscription_id integer NOT NULL PRIMARY KEY,
+  type text NOT NULL,
+  inscription_data text NOT NULL
+);
+CREATE INDEX IF NOT EXISTS InscriptionRequestsData_type ON InscriptionRequestsData(type);
 
 CREATE TABLE IF NOT EXISTS InscriptionRequestsStatus (
   inscription_id integer NOT NULL PRIMARY KEY,

@@ -17,18 +17,22 @@ import (
 type InscriptionRequest struct {
   InscriptionId int `json:"inscription_id"`
   Requester string `json:"requester"`
-  Type string `json:"type"`
-  InscriptionData string `json:"inscription_data"`
   BitcoinAddress string `json:"bitcoin_address"`
   FeeToken string `json:"fee_token"`
   FeeAmount int `json:"fee_amount"`
+  Type string `json:"type"`
+  InscriptionData string `json:"inscription_data"`
+  Status string `json:"status"`
 }
 
 func InitInscriptionsRoutes() {
   http.HandleFunc("/inscriptions/get-my-requests", getMyInscriptionRequests)
   http.HandleFunc("/inscriptions/get-requests", getInscriptionRequests)
+  http.HandleFunc("/inscriptions/get-open-requests", getOpenInscriptionRequests)
   http.HandleFunc("/inscriptions/get-request", getInscriptionRequest)
   http.HandleFunc("/inscriptions/upload-image", uploadInsciptionImage)
+
+  http.Handle("/inscriptions/", http.StripPrefix("/inscriptions/", http.FileServer(http.Dir("./inscriptions/images"))))
 }
 
 func getMyInscriptionRequests(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +50,7 @@ func getMyInscriptionRequests(w http.ResponseWriter, r *http.Request) {
   }
   offset := (page - 1) * pageLength
 
-  query := "SELECT * FROM InscriptionRequests WHERE requester = $1 ORDER BY inscription_id ASC LIMIT $2 OFFSET $3"
+  query := "SELECT r.*, d.type, d.inscription_data, s.status FROM InscriptionRequests r LEFT JOIN InscriptionRequestsData d ON r.inscription_id = d.inscription_id LEFT JOIN InscriptionRequestsStatus s ON r.inscription_id = s.inscription_id WHERE requester = $1 ORDER BY r.inscription_id ASC LIMIT $2 OFFSET $3"
   requests, err := db.PostgresQueryJson[InscriptionRequest](query, address, pageLength, offset)
   if err != nil {
     routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error getting inscription requests")
@@ -69,7 +73,30 @@ func getInscriptionRequests(w http.ResponseWriter, r *http.Request) {
   }
   offset := (page - 1) * pageLength
 
-  query := "SELECT * FROM InscriptionRequests ORDER BY inscription_id ASC LIMIT $1 OFFSET $2"
+  query := "SELECT r.*, d.type, d.inscription_data, s.status FROM InscriptionRequests r LEFT JOIN InscriptionRequestsData d ON r.inscription_id = d.inscription_id LEFT JOIN InscriptionRequestsStatus s ON r.inscription_id = s.inscription_id ORDER BY r.inscription_id ASC LIMIT $1 OFFSET $2"
+  requests, err := db.PostgresQueryJson[InscriptionRequest](query, pageLength, offset)
+  if err != nil {
+    routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error getting inscription requests")
+    return
+  }
+  routeutils.WriteDataJson(w, string(requests))
+}
+
+func getOpenInscriptionRequests(w http.ResponseWriter, r *http.Request) {
+  pageLength, err := strconv.Atoi(r.URL.Query().Get("pageLength"))
+  if err != nil || pageLength <= 0 {
+    pageLength = 10
+  }
+  if pageLength > 30 {
+    pageLength = 30
+  }
+  page, err := strconv.Atoi(r.URL.Query().Get("page"))
+  if err != nil || page <= 0 {
+    page = 1
+  }
+  offset := (page - 1) * pageLength
+
+  query := "SELECT r.*, d.type, d.inscription_data, s.status FROM InscriptionRequests r LEFT JOIN InscriptionRequestsData d ON r.inscription_id = d.inscription_id LEFT JOIN InscriptionRequestsStatus s ON r.inscription_id = s.inscription_id WHERE s.status = 0 ORDER BY r.inscription_id ASC LIMIT $1 OFFSET $2"
   requests, err := db.PostgresQueryJson[InscriptionRequest](query, pageLength, offset)
   if err != nil {
     routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error getting inscription requests")
@@ -85,7 +112,7 @@ func getInscriptionRequest(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  query := "SELECT * FROM InscriptionRequests WHERE inscription_id = $1"
+  query := "SELECT r.*, d.type, d.inscription_data, s.status FROM InscriptionRequests r LEFT JOIN InscriptionRequestsData d ON r.inscription_id = d.inscription_id LEFT JOIN InscriptionRequestsStatus s ON r.inscription_id = s.inscription_id WHERE r.inscription_id = $1"
   requests, err := db.PostgresQueryJson[InscriptionRequest](query, id)
   if err != nil {
     routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error getting inscription request")
@@ -123,11 +150,17 @@ func uploadInsciptionImage(w http.ResponseWriter, r *http.Request) {
       routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error creating inscriptions folder")
       return
     }
+
+    err = os.Mkdir("inscriptions/images", os.ModePerm)
+    if err != nil {
+      routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error creating inscriptions/images folder")
+      return
+    }
   }
 
   // TODO: Validate file extension
   fileExt := fHeader.Filename[strings.LastIndex(fHeader.Filename, "."):]
-  filename := fmt.Sprintf("inscriptions/%x%s", hash, fileExt)
+  filename := fmt.Sprintf("inscriptions/images/%x%s", hash, fileExt)
   newFile, err := os.Create(filename)
   if err != nil {
     routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error creating image file")

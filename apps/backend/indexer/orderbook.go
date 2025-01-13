@@ -105,7 +105,13 @@ func processRequestCreatedEvent(event IndexerEvent) {
   }
 
   // Insert into Postgres
-  _, err = db.Db.Postgres.Exec(context.Background(),  "INSERT INTO InscriptionRequests (inscription_id, requester, type, inscription_data, bitcoin_address, fee_token, fee_amount) VALUES ($1, $2, $3, $4, $5, $6, $7)", inscriptionId, caller, inscriptionType, inscriptionData, bitcoinAddress, feeToken, feeAmount)
+  _, err = db.Db.Postgres.Exec(context.Background(),  "INSERT INTO InscriptionRequests (inscription_id, requester, bitcoin_address, fee_token, fee_amount) VALUES ($1, $2, $3, $4, $5)", inscriptionId, caller, bitcoinAddress, feeToken, feeAmount)
+  if err != nil {
+    PrintIndexerEventError("processRequestCreatedEvent", event, err)
+    return
+  }
+
+  _, err = db.Db.Postgres.Exec(context.Background(),  "INSERT INTO InscriptionRequestsData (inscription_id, type, inscription_data) VALUES ($1, $2, $3)", inscriptionId, inscriptionType, inscriptionData)
   if err != nil {
     PrintIndexerEventError("processRequestCreatedEvent", event, err)
     return
@@ -133,9 +139,49 @@ func revertRequestCreatedEvent(event IndexerEvent) {
     return
   }
 
+  _, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM InscriptionRequestsData WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCreatedEvent", event, err)
+    return
+  }
+
   _, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM InscriptionRequestsStatus WHERE inscription_id = $1", inscriptionId)
   if err != nil {
     PrintIndexerEventError("revertRequestCreatedEvent", event, err)
+    return
+  }
+}
+
+func processRequestLockedEvent(event IndexerEvent) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("processRequestLockedEvent", event, err)
+    return
+  }
+
+  // TODO: Interpret tx_hash data
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 1 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("processRequestLockedEvent", event, err)
+    return
+  }
+}
+
+func revertRequestLockedEvent(event IndexerEvent) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("revertRequestLockedEvent", event, err)
+    return
+  }
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 0 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("revertRequestLockedEvent", event, err)
     return
   }
 }

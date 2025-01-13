@@ -8,6 +8,7 @@ import (
 )
 
 type ApiConfig struct {
+  Host         string   `yaml:"Host"`
 	Port         int      `yaml:"Port"`
 	AllowOrigins []string `yaml:"AllowOrigins"`
 	AllowMethods []string `yaml:"AllowMethods"`
@@ -17,6 +18,7 @@ type ApiConfig struct {
 }
 
 type ConsumerConfig struct {
+  Host string `yaml:"Host"`
   Port int `yaml:"Port"`
 }
 

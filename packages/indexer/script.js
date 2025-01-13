@@ -16,6 +16,15 @@ export const config = {
         includeTransaction: false,
         includeReceipt: false
       },
+      {
+        fromAddress: Deno.env.get("BROLY_CONTRACT_ADDRESS"),
+        keys: [
+          "0x00cb8cf3a8b98da361712b27e7be452a22ec254dfa7c0b59a74dd7d111bcbe9d",
+        ],
+        includeReverted: false,
+        includeTransaction: false,
+        includeReceipt: false
+      }
     ]
   },
   sinkType: "webhook",

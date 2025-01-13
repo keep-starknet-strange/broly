@@ -1,0 +1,30 @@
+FROM golang:1.23.1-alpine
+
+RUN apk add --no-cache bash curl git jq yq ncurses
+
+SHELL ["/bin/bash", "-c"]
+# RUN curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | bash -s -- -v 2.9.1
+RUN curl https://get.starkli.sh | sh && \
+    source /root/.starkli/env && \
+    starkliup
+ENV PATH="$PATH:/root/.local/bin:/root/.starkli/bin"
+
+# Copy over the configs
+WORKDIR /configs
+COPY ./apps/backend/configs/docker.config.yaml /configs/config.yaml
+COPY ./apps/backend/configs/docker.script-config.yaml /configs/script-config.yaml
+
+# Copy over the scripts
+WORKDIR /scripts
+COPY ./packages/scripts /scripts
+
+# Copy over the app
+WORKDIR /app
+COPY ./apps/backend/go.mod ./apps/backend/go.sum ./
+RUN go mod download
+COPY ./apps/backend .
+
+# Build the app & run it
+RUN go build -o inscriber ./cmd/inscriber/main.go
+
+CMD ["./inscriber"]
