@@ -49,15 +49,23 @@ var FinalizedMessageQueue []IndexerMessage
 var FinalizedMessageLock = &sync.Mutex{}
 
 const (
+  requestCreatedEvent = "0x02206f1373fa5f0c53a9546d291d8e7389cdbee50a22dca64f02545611a91cc2"
+  requestLockedEvent  = "0x00cb8cf3a8b98da361712b27e7be452a22ec254dfa7c0b59a74dd7d111bcbe9d"
 )
 
 var eventProcessors = map[string](func(IndexerEvent)){
+  requestCreatedEvent: processRequestCreatedEvent,
+  requestLockedEvent:  processRequestLockedEvent,
 }
 
 var eventReverters = map[string](func(IndexerEvent)){
+  requestCreatedEvent: revertRequestCreatedEvent,
+  requestLockedEvent:  revertRequestLockedEvent,
 }
 
 var eventRequiresOrdering = map[string]bool{
+  requestCreatedEvent: true,
+  requestLockedEvent:  true,
 }
 
 const (
@@ -66,9 +74,22 @@ const (
 	DATA_STATUS_PENDING   = "DATA_STATUS_PENDING"
 )
 
-// TODO: Change to take event
-func PrintIndexerError(funcName string, errMsg string, args ...interface{}) {
-	fmt.Println("Error indexing in "+funcName+": "+errMsg+" -- ", args)
+func PrintIndexerEventError(funcName string, event IndexerEvent, err error) {
+  fmt.Println("Error in", funcName, " error: ( ", err, " ) from event: ")
+  fmt.Println("    ", event.Event.FromAddress)
+  fmt.Println("    Keys:")
+  for _, key := range event.Event.Keys {
+    fmt.Println("        ", key)
+  }
+  fmt.Println("    Data:")
+  for _, data := range event.Event.Data {
+    fmt.Println("        ", data)
+  }
+}
+
+func PrintIndexerError(funcName string, err string, data interface{}) {
+  fmt.Println("Error in", funcName, " error: ( ", err, " ) from data: ")
+  fmt.Println("    ", data)
 }
 
 func consumeIndexerMsg(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,7 @@
 package routeutils
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -54,4 +55,15 @@ func WriteDataJson(w http.ResponseWriter, data string) {
 	SetupHeaders(w)
 	w.WriteHeader(http.StatusOK)
 	w.Write(BasicDataJson(data))
+}
+
+func ReadJsonDataResponse[targetType any](r *http.Response) (struct{Data targetType}, error) {
+  var target struct {
+    Data targetType `json:"data"`
+  }
+  err := json.NewDecoder(r.Body).Decode(&target)
+  if err != nil {
+    return struct{Data targetType}{}, err
+  }
+  return struct{Data targetType}{Data: target.Data}, nil
 }

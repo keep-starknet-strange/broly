@@ -13,13 +13,26 @@ CREATE INDEX IF NOT EXISTS Inscriptions_sat_number ON Inscriptions(sat_number);
 CREATE INDEX IF NOT EXISTS Inscriptions_minted_block ON Inscriptions(minted_block);
 
 CREATE TABLE IF NOT EXISTS InscriptionRequests (
-  request_id integer NOT NULL PRIMARY KEY,
-  owner char(64) NOT NULL
+  inscription_id integer NOT NULL PRIMARY KEY,
+  requester char(64) NOT NULL,
+  bitcoin_address text NOT NULL,
+  fee_token text NOT NULL,
+  fee_amount integer NOT NULL
 );
+CREATE INDEX IF NOT EXISTS InscriptionRequests_requester ON InscriptionRequests(requester);
+CREATE INDEX IF NOT EXISTS InscriptionRequests_inscription_id ON InscriptionRequests(inscription_id);
+CREATE INDEX IF NOT EXISTS InscriptionRequests_bitcoin_address ON InscriptionRequests(bitcoin_address);
+CREATE INDEX IF NOT EXISTS InscriptionRequests_fee_token ON InscriptionRequests(fee_token);
 
--- TODO: Merge this with InscriptionRequests?
+CREATE TABLE IF NOT EXISTS InscriptionRequestsData (
+  inscription_id integer NOT NULL PRIMARY KEY,
+  type text NOT NULL,
+  inscription_data text NOT NULL
+);
+CREATE INDEX IF NOT EXISTS InscriptionRequestsData_type ON InscriptionRequestsData(type);
+
 CREATE TABLE IF NOT EXISTS InscriptionRequestsStatus (
-  request_id integer NOT NULL PRIMARY KEY,
+  inscription_id integer NOT NULL PRIMARY KEY,
   status integer NOT NULL
 );
 CREATE INDEX IF NOT EXISTS InscriptionRequestsStatus_status ON InscriptionRequestsStatus(status);

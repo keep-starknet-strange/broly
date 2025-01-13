@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import "./Header.css"
+import "./Header.css";
 
 function Header(props: any) {
   const { tabs, starknetWallet, bitcoinWallet } = props

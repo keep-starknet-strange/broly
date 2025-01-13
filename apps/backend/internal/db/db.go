@@ -14,10 +14,10 @@ type Databases struct {
 	Postgres *pgxpool.Pool
 }
 
-var db *Databases
+var Db *Databases
 
 func InitDB() {
-	db = &Databases{}
+	Db = &Databases{}
 
 	postgresConnString := "postgresql://" + config.Conf.Postgres.User + ":" + os.Getenv("POSTGRES_PASSWORD") + "@" + config.Conf.Postgres.Host + ":" + strconv.Itoa(config.Conf.Postgres.Port) + "/" + config.Conf.Postgres.Name
 	pgPool, err := pgxpool.New(context.Background(), postgresConnString)
@@ -25,9 +25,9 @@ func InitDB() {
 		fmt.Println("Error connecting to database: ", err)
 		os.Exit(1)
 	}
-	db.Postgres = pgPool
+	Db.Postgres = pgPool
 }
 
 func CloseDB() {
-	db.Postgres.Close()
+	Db.Postgres.Close()
 }

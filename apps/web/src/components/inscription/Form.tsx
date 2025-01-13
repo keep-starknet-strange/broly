@@ -1,18 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAccount } from '@starknet-react/core'
 import DropButton from "../DropButton";
 import "./Form.css";
 
 function InscriptionForm(props: any) {
-  const dropOptions = ["Image", "Message"];
+  const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const { address } = useAccount()
+
+  useEffect(() => {
+    setErrorMessage("");
+  }, [uploadedImage, address]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
   
     let dataToInscribe = "";
+    if (!address) {
+      setErrorMessage("Please login with your wallet");
+      return;
+    }
   
+    const taprootAddress = props.taprootAddress;
+    if (!taprootAddress) {
+      setErrorMessage("Taproot address not found. Please connect Bitcoin wallet.");
+      return;
+    }
+
     if (selectedOption === "Image") {
       if (!uploadedImage) {
         setErrorMessage("Please upload an image");
@@ -36,15 +53,10 @@ function InscriptionForm(props: any) {
       }
     }
   
-    const taprootAddress = props.taprootAddress;
-    if (!taprootAddress) {
-      setErrorMessage("Taproot address not found. Please connect Bitcoin wallet.");
-      return;
-    }
+    // inscriptionData = window.location.origin + "/inscriptions/" + imagePath;
   
     setErrorMessage("");
-  
-    await props.requestInscriptionCall(dataToInscribe, taprootAddress);
+    await props.requestInscriptionCall(dataToInscribe, taprootAddress, "STRK", 20000);
     props.setIsInscribing(true);
   }
   
@@ -62,13 +74,6 @@ function InscriptionForm(props: any) {
   const handleImgDrag = (e: any) => {
     e.preventDefault();
   }
-
-  console.log({
-    taprootAddress: props.taprootAddress,
-    isStarknetConnected: props.isStarknetConnected,
-    selectedOption,
-    uploadedImage
-  });
 
   // TODO: disabled button b4 input
   return (
@@ -122,7 +127,7 @@ function InscriptionForm(props: any) {
                 : "button__primary--disabled"
           }`}
         >
-          Request Inscription
+          Inscribe
         </button>
         {errorMessage && (
           <p className="absolute right-0 translate-x-[110%] text-red-500 text-xs">

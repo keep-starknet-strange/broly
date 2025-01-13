@@ -17,6 +17,7 @@ function Inscritpions(_props: any) {
   });
   const defaultRequests: any[] = [];
   const [requests, setRequests] = useState(defaultRequests);
+  // TODO: Pagination for requests
   const [requestPagination, _] = useState({
     pageLength: 10,
     page: 1
@@ -89,9 +90,9 @@ function Inscritpions(_props: any) {
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
         <h1 className="text-2xl sm:text-4xl font-bold">Open Inscription Requests</h1>
         <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
-          {requests.map((request) => {
+          {requests.map((request, index) => {
             return (
-              <div className="">
+              <div className="" key={index}>
                 <InscriptionRequestView key={request.id} inscription={request} />
               </div>
             );

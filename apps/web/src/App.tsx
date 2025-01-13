@@ -119,8 +119,7 @@ function App() {
   });
 
   const [calls, setCalls] = useState([] as any[])
-  
-  const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string) => {
+  const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string, feeToken: string, fee: number) => {
     if (!address || !orderbookContract) {
       return
     }
@@ -128,12 +127,11 @@ function App() {
     const calldata = CallData.compile([
       byteArray.byteArrayFromString(dataToInscribe),
       byteArray.byteArrayFromString(taprootAddress),
-      Number(100), // TODO remove when contract is re-deployed
-      toHex("STRK"),
-      uint256.bnToUint256(2000),
+      toHex(feeToken),
+      uint256.bnToUint256(fee)
     ])
   
-    setCalls([await orderbookContract.populate('request_inscription', calldata)])
+    setCalls([orderbookContract.populate('request_inscription', calldata)])
   }
   
   const { send, data, isPending } = useSendTransaction({

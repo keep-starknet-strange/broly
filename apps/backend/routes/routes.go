@@ -12,4 +12,5 @@ func InitRoutes() {
 		routeutils.SetupHeaders(w)
 		w.WriteHeader(http.StatusOK)
 	})
+  InitInscriptionsRoutes()
 }

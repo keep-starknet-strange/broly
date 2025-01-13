@@ -6,11 +6,11 @@ import "./View.css";
 function InscriptionRequestView(props: any) {
   return (
     <div className="View__container">
-      <NavLink to={`/request/${props.inscription.id}`}>
+      <NavLink to={`/request/${props.inscription.inscription_id}`}>
         {props.inscription.type === "text" ? (
-          <InscriptionTextView content={props.inscription.content} />
+          <InscriptionTextView inscription={props.inscription} />
         ) : (
-          <InscriptionImageView content={props.inscription.content} />
+          <InscriptionImageView inscription={props.inscription} />
         )}
       </NavLink>
     </div>

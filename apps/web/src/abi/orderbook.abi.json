@@ -37,20 +37,6 @@
     ]
   },
   {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
-  },
-  {
     "type": "interface",
     "name": "onchain::orderbook::interface::IOrderbook",
     "items": [
@@ -65,10 +51,6 @@
           {
             "name": "receiving_address",
             "type": "core::byte_array::ByteArray"
-          },
-          {
-            "name": "satoshi",
-            "type": "core::felt252"
           },
           {
             "name": "currency_fee",
@@ -145,39 +127,7 @@
         ],
         "outputs": [
           {
-            "type": "(core::byte_array::ByteArray, core::integer::u256)"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "is_valid_bitcoin_address",
-        "inputs": [
-          {
-            "name": "receiving_address",
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::bool"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "is_locked",
-        "inputs": [
-          {
-            "name": "tx_hash",
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "(core::bool, core::starknet::contract_address::ContractAddress)"
+            "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u256)"
           }
         ],
         "state_mutability": "view"
@@ -217,11 +167,6 @@
       {
         "name": "receiving_address",
         "type": "core::byte_array::ByteArray",
-        "kind": "data"
-      },
-      {
-        "name": "satoshi",
-        "type": "core::felt252",
         "kind": "data"
       },
       {

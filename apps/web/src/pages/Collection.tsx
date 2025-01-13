@@ -31,9 +31,9 @@ function Collection(_props: any) {
       } else if (activeFilter === "Requests") {
         result = await getMyInscriptionRequests(mockAddress, collectionPagination.pageLength, collectionPagination.page);
         if (collectionPagination.page === 1) {
-          setMyRequests(result.data);
+          if (result.data && result.data.length > 0) setMyRequests(result.data);
         } else {
-          const newRequests = result.data.filter((inscription: any) => !myRequests.find((existingInscription: any) => existingInscription.id === inscription.id));
+          const newRequests = result.data.filter((inscription: any) => !myRequests.find((existingInscription: any) => existingInscription.inscription_id === inscription.inscription_id));
           setMyRequests([...myRequests, ...newRequests]);
         }
         return;
@@ -42,7 +42,7 @@ function Collection(_props: any) {
         if (collectionPagination.page === 1) {
           setCollection(result.data);
         } else {
-          const newCollection = result.data.filter((inscription: any) => !collection.find((existingInscription: any) => existingInscription.id === inscription.id));
+          const newCollection = result.data.filter((inscription: any) => !collection.find((existingInscription: any) => existingInscription.inscription_id === inscription.inscription_id));
           setCollection([...collection, ...newCollection]);
         }
       }
@@ -81,9 +81,9 @@ function Collection(_props: any) {
       <div className="w-full flex flex-col items-center">
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
           {activeFilter === "Requests" ? myRequests.map((inscription) => (
-            <InscriptionRequestView key={inscription.id} inscription={inscription} />
+            <InscriptionRequestView key={inscription.inscription_id} inscription={inscription} />
           )) : collection.map((inscription) => (
-            <InscriptionView key={inscription.id} inscription={inscription} />
+            <InscriptionView key={inscription.inscription_id} inscription={inscription} />
           ))}
         </div>
         <div className="w-full flex flex-row items-center justify-center gap-4 mb-4">
