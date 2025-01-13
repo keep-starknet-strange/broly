@@ -4,9 +4,7 @@ use onchain::orderbook::interface::IOrderbook;
 mod OrderbookMock {
     use core::byte_array::ByteArray;
     use consensus::{types::transaction::{Transaction}};
-    use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess,
-    };
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
@@ -162,7 +160,6 @@ mod OrderbookMock {
     pub impl InternalImpl of InternalTrait {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
-        fn initializer(ref self: ContractState, strk_token: ContractAddress) {
-        }
+        fn initializer(ref self: ContractState, strk_token: ContractAddress) {}
     }
 }
