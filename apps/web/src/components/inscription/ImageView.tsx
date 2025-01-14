@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function InscriptionImageView(props: any) {
   const [image, setImage] = useState<string>("");

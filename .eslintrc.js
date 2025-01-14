@@ -1,5 +1,5 @@
-/** @type {import("eslint").Linter.Config} */
-module.exports = {
-  root: true,
-  extends: ["@repo/eslint-config/index.js"],
-};
+export default tseslint.config({
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+  }
+});

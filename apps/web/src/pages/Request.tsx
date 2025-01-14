@@ -7,12 +7,12 @@ import { getInscriptionRequest } from "../api/inscriptions";
 
 function Request(_props: any) {
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
-  let { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const [inscription, setInscription] = useState<any>();
   useEffect(() => {
     const fetchRequest = async () => {
-      let result = await getInscriptionRequest(id as string);
+      const result = await getInscriptionRequest(id as string);
       if (result && result.data) {
         setInscription(result.data);
       }

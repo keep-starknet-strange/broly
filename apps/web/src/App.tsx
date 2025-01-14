@@ -58,7 +58,7 @@ function App() {
 
     const connectIfReady = async () => {
       for (let i = 0; i < connectors.length; i++) {
-        let ready = await connectors[i].ready();
+        const ready = await connectors[i].ready();
         if (ready) {
           connect({ connector: connectors[i] })
           //setConnector(connectors[i])
