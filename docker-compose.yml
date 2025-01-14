@@ -55,6 +55,7 @@ services:
       context: .
     links:
       - backend
+      - indexer
     restart: always
     environment:
       - CONFIG_PATH=/configs/config.yaml

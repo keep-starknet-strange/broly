@@ -15,6 +15,7 @@ function Home(props: {
   isStarknetConnected: boolean;
 }) {
   const [isInscribing, setIsInscribing] = useState(false);
+  const [inscribingStatus, setInscribingStatus] = useState(0);
 
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
@@ -57,7 +58,7 @@ function Home(props: {
           taprootAddress={props.taprootAddress}
           isStarknetConnected={props.isStarknetConnected}
         />
-        {isInscribing && <InscriptionStatus />}
+        {isInscribing && <InscriptionStatus status={inscribingStatus} />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
@@ -67,8 +68,8 @@ function Home(props: {
           </NavLink>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-8">
-          {recentInscriptions.map((inscription) => (
-            <InscriptionView key={inscription.id} inscription={inscription} />
+          {recentInscriptions.map((inscription, index) => (
+            <InscriptionView key={index} inscription={inscription} />
           ))}
         </div>
         <Pagination

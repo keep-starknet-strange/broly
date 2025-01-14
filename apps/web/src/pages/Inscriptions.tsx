@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionRequestView from "../components/inscription/RequestView";
-import { getHotInscriptions, getNewInscriptions, getInscriptionRequests } from "../api/inscriptions";
+import { getHotInscriptions, getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
 function Inscritpions(_props: any) {
@@ -27,7 +27,8 @@ function Inscritpions(_props: any) {
     const fetchInscriptions = async () => {
       let result;
       if (activeFilter === "Hot") {
-        result = await getHotInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
+        result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
+        // TODO: result = await getHotInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
       } else if (activeFilter === "New") {
         result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
       } else if (activeFilter === "Rare") {
@@ -64,7 +65,7 @@ function Inscritpions(_props: any) {
 
   useEffect(() => {
     const fetchRequests = async () => {
-      let result = await getInscriptionRequests(requestPagination.pageLength, requestPagination.page);
+      let result = await getOpenInscriptionRequests(requestPagination.pageLength, requestPagination.page);
       if (result && result.data) {
         if (requestPagination.page === 1) {
           setRequests(result.data);
@@ -87,21 +88,23 @@ function Inscritpions(_props: any) {
   // TODO: shadow and arrow on rhs of scrollable div
   return (
     <div className="w-full flex flex-col h-max">
-      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
-        <h1 className="text-2xl sm:text-4xl font-bold">Open Inscription Requests</h1>
-        <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
-          {requests.map((request, index) => {
-            return (
-              <div className="" key={index}>
-                <InscriptionRequestView key={request.id} inscription={request} />
-              </div>
-            );
-          })}
-          <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center">
-            <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
-          </NavLink>
+      {requests && requests.length > 0 && (
+        <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
+          <h1 className="text-2xl sm:text-4xl font-bold">Open Inscription Requests</h1>
+          <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
+            {requests.map((request, index) => {
+              return (
+                <div className="" key={index}>
+                  <InscriptionRequestView key={request.id} inscription={request} />
+                </div>
+              );
+            })}
+            <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center">
+              <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
+            </NavLink>
+          </div>
         </div>
-      </div>
+      )}
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
           <h1 className="text-md sm:text-xl font-bold px-2 sm:px-4">All Inscriptions</h1>
@@ -121,8 +124,8 @@ function Inscritpions(_props: any) {
           </div>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
-          {inscriptions.map((inscription) => (
-            <InscriptionView key={inscription.id} inscription={inscription} />
+          {inscriptions.map((inscription, index) => (
+            <InscriptionView key={index} inscription={inscription} />
           ))}
         </div>
         <Pagination

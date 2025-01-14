@@ -185,3 +185,56 @@ func revertRequestLockedEvent(event IndexerEvent) {
     return
   }
 }
+
+func processRequestCompletedEvent(event IndexerEvent) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("processRequestCompletedEvent", event, err)
+    return
+  }
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 2 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("processRequestCompletedEvent", event, err)
+    return
+  }
+
+  owner, err := db.PostgresQueryOne[string]("SELECT requester FROM InscriptionRequests WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("processRequestCompletedEvent", event, err)
+    return
+  }
+
+  satNumber := 1000 // TODO
+  mintedBlock := 1000 // TODO
+  mintedTime := 1000 // TODO
+  _, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO Inscriptions (inscription_id, owner, sat_number, minted_block, minted) VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5))", inscriptionId, *owner, satNumber, mintedBlock, mintedTime)
+  if err != nil {
+    PrintIndexerEventError("processRequestCompletedEvent", event, err)
+    return
+  }
+}
+
+func revertRequestCompletedEvent(event IndexerEvent) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCompletedEvent", event, err)
+    return
+  }
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 1 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCompletedEvent", event, err)
+    return
+  }
+
+  _, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM Inscriptions WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCompletedEvent", event, err)
+    return
+  }
+}

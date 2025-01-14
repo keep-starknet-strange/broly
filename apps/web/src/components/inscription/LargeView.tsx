@@ -6,9 +6,9 @@ function InscriptionLargeView(props: any) {
   return (
     <div className="LargeView__container">
       {props.inscription.type === "text" ? (
-        <InscriptionTextLargeView content={props.inscription.content} />
+        <InscriptionTextLargeView inscription={props.inscription} />
       ) : (
-        <InscriptionImageLargeView content={props.inscription.content} />
+        <InscriptionImageLargeView inscription={props.inscription} />
       )}
     </div>
   );

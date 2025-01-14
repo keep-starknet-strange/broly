@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
+import InscriptionStatus from "../components/inscription/Status";
 import InscriptionProperty from "../components/inscription/Property";
+import { getInscriptionRequest } from "../api/inscriptions";
 
 function Request(_props: any) {
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
@@ -9,8 +11,18 @@ function Request(_props: any) {
 
   const [inscription, setInscription] = useState<any>();
   useEffect(() => {
-    // TODO: Fetch inscription by id
-    setInscription(inscription);
+    const fetchRequest = async () => {
+      let result = await getInscriptionRequest(id as string);
+      if (result && result.data) {
+        setInscription(result.data);
+      }
+    }
+
+    try {
+      fetchRequest();
+    } catch (error) {
+      console.error(error);
+    }
   }, [id]);
 
   // TODO: Move inscription query up to parent component
@@ -40,28 +52,30 @@ function Request(_props: any) {
                 </div>
               </div>
             )}
+            <h3 className="text-2xl font-bold underline">Request</h3>
+            <div className="pb-12">
+              <InscriptionStatus status={Number(inscription.status)} />
+            </div>
             <h3 className="text-2xl font-bold underline">Info</h3>
             <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
-                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Owner</h4>
-                <p className="text-lg text__color--primary">{inscription.owner}</p>
+                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">From</h4>
+                <p className="text-lg text__color--primary">0x{inscription.requester}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
-                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Sat #</h4>
-                <p className="text-lg text__color--primary">{inscription.sat_number}</p>
+                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">To</h4>
+                <p className="text-lg text__color--primary">{inscription.bitcoin_address}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
-                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Minted</h4>
-                <p className="text-lg text__color--primary mr-4">{inscription.minted_block}</p>
-                <p className="text-sm text__color--primary">{inscription.minted.toString()}</p>
+                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Fee</h4>
+                <p className="text-lg text__color--primary">{inscription.fee_amount} {inscription.fee_token}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">ID</h4>
-                <p className="text-lg text__color--primary">{inscription.id}</p>
+                <p className="text-lg text__color--primary">{inscription.inscription_id}</p>
               </div>
             </div>
             <div className="flex flex-row mx-2 mr-8 px-2 h-12 items-center justify-between">
-              <button className="button--gradient button__primary w-fit">Ordiscan</button>
               <div className="flex flex-row h-full items-center justify-center gap-2">
                 <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
                   <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>

@@ -4,13 +4,17 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 CREATE TABLE IF NOT EXISTS Inscriptions (
-  inscription_id integer NOT NULL PRIMARY KEY,
+  inscription_id integer NOT NULL,
   owner char(64) NOT NULL,
   sat_number integer NOT NULL,
-  minted_block integer NOT NULL
+  minted_block integer NOT NULL,
+  minted timestamp NOT NULL
 );
+CREATE INDEX IF NOT EXISTS Inscriptions_inscription_id ON Inscriptions(inscription_id);
+CREATE INDEX IF NOT EXISTS Inscriptions_owner ON Inscriptions(owner);
 CREATE INDEX IF NOT EXISTS Inscriptions_sat_number ON Inscriptions(sat_number);
 CREATE INDEX IF NOT EXISTS Inscriptions_minted_block ON Inscriptions(minted_block);
+CREATE INDEX IF NOT EXISTS Inscriptions_minted ON Inscriptions(minted);
 
 CREATE TABLE IF NOT EXISTS InscriptionRequests (
   inscription_id integer NOT NULL PRIMARY KEY,
