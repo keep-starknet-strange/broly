@@ -14,7 +14,3 @@ inscriptions/
 *.key
 account/
 bin/
-main
-broly-api
-consumer
-inscriber

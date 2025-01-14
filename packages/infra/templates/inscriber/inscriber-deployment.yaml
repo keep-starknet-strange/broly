@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.inscriber.name }}
+spec:
+  replicas: {{ .Values.deployments.inscriber.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.inscriber.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.inscriber.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.inscriber.name }}
+          image: {{ .Values.deployments.inscriber.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          command: ["./inscriber"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.inscriber }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.inscriber.name }}-secret

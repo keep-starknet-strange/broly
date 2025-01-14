@@ -29,6 +29,7 @@ volumes:
     storage: 50Gi
   inscriptions:
     name: inscription-data
+    claim: inscription-volume-claim
     class: standard-rwo
     storage: 50Gi
 
