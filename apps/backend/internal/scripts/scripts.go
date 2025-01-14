@@ -10,8 +10,8 @@ import (
 )
 
 type ScriptConfig struct {
-	LockInscriptionScript string `yaml:"LockInscriptionScript"`
-  SubmitInscriptionScript string `yaml:"SubmitInscriptionScript"`
+	LockInscriptionScript   string `yaml:"LockInscriptionScript"`
+	SubmitInscriptionScript string `yaml:"SubmitInscriptionScript"`
 }
 
 var Conf *ScriptConfig
@@ -37,25 +37,25 @@ func InitScriptConfig() {
 }
 
 func LockInscriptionInvokeScript(inscriptionId int, txHash string) error {
-  shellCmd := Conf.LockInscriptionScript
+	shellCmd := Conf.LockInscriptionScript
 
-  cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
-  _, err := cmd.Output()
-  if err != nil {
-    return err
-  }
+	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
+	_, err := cmd.Output()
+	if err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func SubmitInscriptionInvokeScript(inscriptionId int, txHash string) error {
-  shellCmd := Conf.SubmitInscriptionScript
+	shellCmd := Conf.SubmitInscriptionScript
 
-  cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
-  _, err := cmd.Output()
-  if err != nil {
-    return err
-  }
+	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
+	_, err := cmd.Output()
+	if err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }

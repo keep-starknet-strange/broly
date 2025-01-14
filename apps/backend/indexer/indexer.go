@@ -49,27 +49,27 @@ var FinalizedMessageQueue []IndexerMessage
 var FinalizedMessageLock = &sync.Mutex{}
 
 const (
-  requestCreatedEvent = "0x02206f1373fa5f0c53a9546d291d8e7389cdbee50a22dca64f02545611a91cc2"
-  requestLockedEvent  = "0x00cb8cf3a8b98da361712b27e7be452a22ec254dfa7c0b59a74dd7d111bcbe9d"
-  requestCompletedEvent = "0x0158f34f5ba2bc3f4b4aac16b288b8ea46dd0e884b0c8030a9e7313b259d8b98"
+	requestCreatedEvent   = "0x02206f1373fa5f0c53a9546d291d8e7389cdbee50a22dca64f02545611a91cc2"
+	requestLockedEvent    = "0x00cb8cf3a8b98da361712b27e7be452a22ec254dfa7c0b59a74dd7d111bcbe9d"
+	requestCompletedEvent = "0x0158f34f5ba2bc3f4b4aac16b288b8ea46dd0e884b0c8030a9e7313b259d8b98"
 )
 
 var eventProcessors = map[string](func(IndexerEvent)){
-  requestCreatedEvent: processRequestCreatedEvent,
-  requestLockedEvent:  processRequestLockedEvent,
-  requestCompletedEvent: processRequestCompletedEvent,
+	requestCreatedEvent:   processRequestCreatedEvent,
+	requestLockedEvent:    processRequestLockedEvent,
+	requestCompletedEvent: processRequestCompletedEvent,
 }
 
 var eventReverters = map[string](func(IndexerEvent)){
-  requestCreatedEvent: revertRequestCreatedEvent,
-  requestLockedEvent:  revertRequestLockedEvent,
-  requestCompletedEvent: revertRequestCompletedEvent,
+	requestCreatedEvent:   revertRequestCreatedEvent,
+	requestLockedEvent:    revertRequestLockedEvent,
+	requestCompletedEvent: revertRequestCompletedEvent,
 }
 
 var eventRequiresOrdering = map[string]bool{
-  requestCreatedEvent: true,
-  requestLockedEvent:  true,
-  requestCompletedEvent: true,
+	requestCreatedEvent:   true,
+	requestLockedEvent:    true,
+	requestCompletedEvent: true,
 }
 
 const (
@@ -79,21 +79,21 @@ const (
 )
 
 func PrintIndexerEventError(funcName string, event IndexerEvent, err error) {
-  fmt.Println("Error in", funcName, " error: ( ", err, " ) from event: ")
-  fmt.Println("    ", event.Event.FromAddress)
-  fmt.Println("    Keys:")
-  for _, key := range event.Event.Keys {
-    fmt.Println("        ", key)
-  }
-  fmt.Println("    Data:")
-  for _, data := range event.Event.Data {
-    fmt.Println("        ", data)
-  }
+	fmt.Println("Error in", funcName, " error: ( ", err, " ) from event: ")
+	fmt.Println("    ", event.Event.FromAddress)
+	fmt.Println("    Keys:")
+	for _, key := range event.Event.Keys {
+		fmt.Println("        ", key)
+	}
+	fmt.Println("    Data:")
+	for _, data := range event.Event.Data {
+		fmt.Println("        ", data)
+	}
 }
 
 func PrintIndexerError(funcName string, err string, data interface{}) {
-  fmt.Println("Error in", funcName, " error: ( ", err, " ) from data: ")
-  fmt.Println("    ", data)
+	fmt.Println("Error in", funcName, " error: ( ", err, " ) from data: ")
+	fmt.Println("    ", data)
 }
 
 func consumeIndexerMsg(w http.ResponseWriter, r *http.Request) {
@@ -323,4 +323,3 @@ func StartMessageProcessor() {
 
 // TODO: User might miss some messages between loading canvas and connecting to websocket?
 // TODO: Check thread safety of these things
-
