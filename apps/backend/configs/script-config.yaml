@@ -1,2 +1,5 @@
 LockInscriptionScript: ../../packages/scripts/lock_request.sh
+<<<<<<< HEAD
 SubmitInscriptionScript: ../../packages/scripts/submit_request.sh
+=======
+>>>>>>> main
