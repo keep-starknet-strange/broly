@@ -36,7 +36,7 @@ function Info(_props: any) {
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Specifies inscription content and reward amount</p>
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Order is created on Starknet orderbook</p>
         <p className="text__color--primary sm:text-lg px-16 mt-1">Funds are locked in the contract</p>
-        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">3. Inscribor service</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">3. Inscriber service</p>
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Monitors pending orders & locks any orders taken</p>
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Creates Bitcoin inscriptions</p>
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Triggers reward release on successful inscription</p>

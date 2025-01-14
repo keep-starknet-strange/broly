@@ -8,7 +8,7 @@ import (
 )
 
 type ApiConfig struct {
-  Host         string   `yaml:"Host"`
+	Host         string   `yaml:"Host"`
 	Port         int      `yaml:"Port"`
 	AllowOrigins []string `yaml:"AllowOrigins"`
 	AllowMethods []string `yaml:"AllowMethods"`
@@ -18,8 +18,8 @@ type ApiConfig struct {
 }
 
 type ConsumerConfig struct {
-  Host string `yaml:"Host"`
-  Port int `yaml:"Port"`
+	Host string `yaml:"Host"`
+	Port int    `yaml:"Port"`
 }
 
 type PostgresConfig struct {
@@ -31,7 +31,7 @@ type PostgresConfig struct {
 
 type Config struct {
 	Api      ApiConfig      `yaml:"Api"`
-  Consumer ConsumerConfig `yaml:"Consumer"`
+	Consumer ConsumerConfig `yaml:"Consumer"`
 	Postgres PostgresConfig `yaml:"Postgres"`
 }
 

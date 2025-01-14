@@ -16,7 +16,7 @@ func main() {
 	defer db.CloseDB()
 
 	indexer.InitIndexerRoutes()
-  indexer.StartMessageProcessor()
+	indexer.StartMessageProcessor()
 
 	fmt.Println("Listening on port:", config.Conf.Consumer.Port)
 	http.ListenAndServe(fmt.Sprintf(":%d", config.Conf.Consumer.Port), nil)

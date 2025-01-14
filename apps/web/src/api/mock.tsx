@@ -3,81 +3,129 @@ export const mockAddress = '1234567890abcdef1234567890abcde';
 export const mockInscriptionViews = [
   {
     inscription_id: 1,
+    owner: "Brandon",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "Hello, Bitcoin!",
     type: "text"
   },
   {
     inscription_id: 2,
+    owner: "07c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/c17dd02a7f216f4b438ab1a303f518abfc4d4d01dcff8f023cf87c4403cb54cai0",
     type: "image"
   },
   {
     inscription_id: 3,
+    owner: "07c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "Hello, World 2!\nThis is multiline text.\nThis text is long.\nSo long that you will need to scroll\nif you want to see all of it.\nLorum\nIpsum\nYo yo yo!\nThis is multiline text.\nThis text is long.\nSo long that you will need to scroll\nif you want to see all of it.\nThis is multiline text.\nThis text is long.\n",
     type: "text"
   },
   {
     inscription_id: 4,
+    owner: "80c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/1008850869eb564cad900c316a02f65854f531b31a2ef96bacecd536be96b031i0",
     type: "image"
   },
   {
     inscription_id: 5,
+    owner: "07c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/79e63d4fd4f98d239394443798cabf6482821b94042fd299233ff93acb83bf63i0",
     type: "image"
   },
   {
     inscription_id: 6,
+    owner: "Brandon",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/406e019545eb6e31592ba3859261018f8391af889d2791c2a0c1182964f1339ei0",
     type: "image"
   },
   {
     inscription_id: 7,
+    owner: "Test Owner",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "Bitcoin Message sent from Starknet!",
     type: "text"
   },
   {
     inscription_id: 8,
+    owner: "90c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://www.quantumcats.xyz/collection/vwoieaperz/cat0000.png",
     type: "image"
   },
   {
     inscription_id: 9,
+    owner: "90c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "0x62000100\nOP_CAT\n0x62000100",
     type: "text"
   },
   {
     inscription_id: 10,
+    owner: "Brandon",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799i0",
     type: "image"
   },
   {
     inscription_id: 11,
+    owner: "78c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.",
     type: "text"
   },
   {
     inscription_id: 12,
+    owner: "Test Owner",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "100K BTC",
     type: "text"
   },
   {
     inscription_id: 13,
+    owner: "Test Owner",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/e3e29332b269d0ae3fa28ac80427065d31b75f2c92baa729a3f8de363a0d66f6i0",
     type: "image"
   },
   {
     inscription_id: 14,
+    owner: "50c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://www.quantumcats.xyz/collection/vwoieaperz/cat0001.png",
     type: "image"
   },
   {
     inscription_id: 15,
+    owner: "Test Owner",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "https://ordiscan.com/content/31833061114c2ee53d63dba53ef0bc2af741c87463cf573a4e211196883a5f2di0",
     type: "gif"
   },
   {
     inscription_id: 16,
+    owner: "50c313ea8b45044c2272b77ec7332b65bdfef089c4de0fffab3de3fd6b85d124",
+    sat_number: 10000,
+    minted_block: 10000,
     inscription_data: "BIP-420 - https://github.com/bip420/bip420",
     type: "text"
   },

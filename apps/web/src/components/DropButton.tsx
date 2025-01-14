@@ -12,9 +12,10 @@ function DropButton(props: any) {
       </div>
       {isOpen && (
         <div className="DropButton__options">
-          {props.options.map((option: any) => (
+          {props.options.map((option: any, index: number) => (
             <p
               className="DropButton__option"
+              key={index}
               onClick={() => {
                 props.setSelectedOption(option);
                 setIsOpen(false);

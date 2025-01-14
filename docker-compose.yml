@@ -55,6 +55,7 @@ services:
       context: .
     links:
       - backend
+      - indexer
     restart: always
     environment:
       - CONFIG_PATH=/configs/config.yaml
@@ -90,7 +91,7 @@ services:
       - backend
     environment:
       - VITE_BROLY_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
-      - VITE_USE_MOCK=true
+      - VITE_USE_MOCK=false
     volumes:
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml

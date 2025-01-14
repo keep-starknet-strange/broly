@@ -53,7 +53,7 @@ function Inscription(_props: any) {
             <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Owner</h4>
-                <p className="text-lg text__color--primary">{inscription.owner}</p>
+                <p className="text-lg text__color--primary">0x{inscription.owner}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Sat #</h4>
@@ -66,7 +66,7 @@ function Inscription(_props: any) {
               </div>
               <div className="flex flex-row w-full h-12 items-center px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">ID</h4>
-                <p className="text-lg text__color--primary">{inscription.id}</p>
+                <p className="text-lg text__color--primary">{inscription.inscription_id}</p>
               </div>
             </div>
             <div className="flex flex-row mx-2 mr-8 px-2 h-12 items-center justify-between">

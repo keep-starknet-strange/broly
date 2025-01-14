@@ -57,13 +57,13 @@ func WriteDataJson(w http.ResponseWriter, data string) {
 	w.Write(BasicDataJson(data))
 }
 
-func ReadJsonDataResponse[targetType any](r *http.Response) (struct{Data targetType}, error) {
-  var target struct {
-    Data targetType `json:"data"`
-  }
-  err := json.NewDecoder(r.Body).Decode(&target)
-  if err != nil {
-    return struct{Data targetType}{}, err
-  }
-  return struct{Data targetType}{Data: target.Data}, nil
+func ReadJsonDataResponse[targetType any](r *http.Response) (struct{ Data targetType }, error) {
+	var target struct {
+		Data targetType `json:"data"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&target)
+	if err != nil {
+		return struct{ Data targetType }{}, err
+	}
+	return struct{ Data targetType }{Data: target.Data}, nil
 }
