@@ -8,7 +8,7 @@ mod OrderbookMock {
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
-    use starknet::storage::{ Map, StorageMapReadAccess, StorageMapWriteAccess };
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
 
     const INSCRIPTION_CANCELED: i8 = -1;
     const INSCRIPTION_NULL: i8 = 0;
