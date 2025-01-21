@@ -5,6 +5,7 @@ metadata:
   labels:
     app: {{ .Values.labels.consumer.name }}
 data:
+  CONFIG_PATH: /configs/config.yaml
   BROLY_ORDERBOOK_CONTRACT_ADDRESS: {{ .Values.contracts.brolyOrderbookContract }}
   POSTGRES_PASSWORD: {{ .Values.postgres.password }}
 

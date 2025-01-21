@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: backend-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: broly-static-ip
+    kubernetes.io/ingress.global-static-ip-name: broly-btc-static-ip
     networking.gke.io/managed-certificates: managed-cert
     kubernetes.io/ingress.class: "gce"
 spec:
@@ -12,18 +12,18 @@ spec:
     pathType: Prefix
     backend:
       service:
-        name: {{ .Values.labels.consumer.name }}
+        name: {{ .Values.labels.backend.name }}
         port:
-          number: {{ .Values.ports.consumer }}
+          number: {{ .Values.ports.backend }}
   - http:
       paths:
       - path: /inscriptions
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.labels.consumer.name }}
+            name: {{ .Values.labels.backend.name }}
             port:
-              number: {{ .Values.ports.consumer }}
+              number: {{ .Values.ports.backend }}
       - path: /
         pathType: Prefix
         backend:

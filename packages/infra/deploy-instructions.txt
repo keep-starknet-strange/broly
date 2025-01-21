@@ -27,4 +27,12 @@ apply changes to cloud
   else
      POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-upgrade
 
+  kubectl cp apps/backend/postgres/init.sql pod:/home
+    kubectl exec -it pod/pod-name bash
+    psql -U broly-user -d broly-db -f /home/init.sql
+    kubectl delete pvc redis-volume-claim
+    kubectl delete deployment.apps/redis
+    kubectl delete deployment.apps/indexer
+    POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-upgrade
+
 change frontend contract addresses/configs in vercel

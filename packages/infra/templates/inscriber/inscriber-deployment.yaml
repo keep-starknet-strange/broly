@@ -17,8 +17,6 @@ spec:
           image: {{ .Values.deployments.inscriber.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
           command: ["./inscriber"]
           imagePullPolicy: Always
-          ports:
-            - containerPort: {{ .Values.ports.inscriber }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.labels.inscriber.name }}-secret
