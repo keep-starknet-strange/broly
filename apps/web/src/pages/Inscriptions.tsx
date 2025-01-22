@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionRequestView from "../components/inscription/RequestView";
-import { getHotInscriptions, getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
+import { getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
 function Inscritpions(_props: any) {
