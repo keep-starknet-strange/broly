@@ -50,7 +50,7 @@ func InitInscriptionsRoutes() {
 	http.HandleFunc("/inscriptions/get-locked-requests", getLockedInscriptionRequests)
 	http.HandleFunc("/inscriptions/upload-image", uploadInsciptionImage)
 
-	http.Handle("/inscriptions/", http.StripPrefix("/inscriptions/", http.FileServer(http.Dir("./inscriptions/images"))))
+	http.Handle("/inscriptions/images/", http.StripPrefix("/inscriptions/", http.FileServer(http.Dir("./inscriptions/images"))))
 }
 
 func getInscriptions(w http.ResponseWriter, r *http.Request) {

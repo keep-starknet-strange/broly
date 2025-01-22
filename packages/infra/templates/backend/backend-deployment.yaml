@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.backend.name }}
+spec:
+  replicas: {{ .Values.labels.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.backend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.backend.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.backend.name }}
+          image: {{ .Values.deployments.backend.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          command: ["./broly-api"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.backend }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.backend.name }}-secret
+          volumeMounts:
+            - mountPath: /app/inscriptions
+              name: {{ .Values.volumes.inscriptions.name }}
+      volumes:
+        - name: {{ .Values.volumes.inscriptions.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.inscriptions.claim }}
+

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.labels.inscriber.name }}-secret
+  labels:
+    app: {{ .Values.labels.inscriber.name }}
+data:
+  POSTGRES_PASSWORD: {{ .Values.postgres.password }}
+  CONFIG_PATH: /configs/config.yaml
+  SCRIPT_CONFIG_PATH: /configs/script-config.yaml
+  KEYSTORE_PATH: /app/account/test.key
+  ACCOUNT_FILE: /app/account/account.json
+  BROLY_ORDERBOOK_CONTRACT_ADDRESS: 0x0148b18fc0b2782e4097073ba1403c34285d6b53aa9e632f61d939277e5bd447

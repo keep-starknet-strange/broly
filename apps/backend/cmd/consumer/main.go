@@ -7,6 +7,7 @@ import (
 	"github.com/keep-starknet-strange/broly/backend/indexer"
 	"github.com/keep-starknet-strange/broly/backend/internal/config"
 	"github.com/keep-starknet-strange/broly/backend/internal/db"
+	"github.com/keep-starknet-strange/broly/backend/routes"
 )
 
 func main() {
@@ -15,6 +16,7 @@ func main() {
 	db.InitDB()
 	defer db.CloseDB()
 
+  routes.InitBaseRoutes()
 	indexer.InitIndexerRoutes()
 	indexer.StartMessageProcessor()
 

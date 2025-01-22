@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.volumes.inscriptions.claim }}
+  labels:
+    app: inscriptions
+spec:
+  storageClassName: {{ .Values.volumes.inscriptions.class }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.volumes.inscriptions.storage }}
+

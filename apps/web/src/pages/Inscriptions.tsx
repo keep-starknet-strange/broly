@@ -38,7 +38,7 @@ function Inscritpions(_props: any) {
         if (inscriptionsPagination.page === 1) {
           setInscriptions(result.data);
         } else {
-          let newInscriptios = result.data.filter((inscription: any) => {
+          const newInscriptios = result.data.filter((inscription: any) => {
             return !inscriptions.some((i: any) => i.id === inscription.id);
           });
           setInscriptions([...inscriptions, ...newInscriptios]);
@@ -65,12 +65,12 @@ function Inscritpions(_props: any) {
 
   useEffect(() => {
     const fetchRequests = async () => {
-      let result = await getOpenInscriptionRequests(requestPagination.pageLength, requestPagination.page);
+      const result = await getOpenInscriptionRequests(requestPagination.pageLength, requestPagination.page);
       if (result && result.data) {
         if (requestPagination.page === 1) {
           setRequests(result.data);
         } else {
-          let newRequests = result.data.filter((request: any) => {
+          const newRequests = result.data.filter((request: any) => {
             return !requests.some((r: any) => r.id === request.id);
           });
           setRequests([...requests, ...newRequests]);

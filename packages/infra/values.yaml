@@ -1,0 +1,71 @@
+labels:
+  redis:
+    name: redis
+  postgres:
+    name: postgres
+  backend:
+    name: backend
+  consumer:
+    name: consumer
+  inscriber:
+    name: inscriber
+  indexer:
+    name: indexer
+
+ports:
+  redis: 6379
+  postgres: 5432
+  backend: 8080
+  consumer: 8081
+
+volumes:
+  redis:
+    name: redis-data
+    class: standard-rwo
+    storage: 10Gi
+  postgres:
+    name: postgres-data
+    class: standard-rwo
+    storage: 50Gi
+  inscriptions:
+    name: inscription-data
+    claim: inscription-volume-claim
+    class: standard-rwo
+    storage: 50Gi
+
+deployments:
+  sha: aabbccdd
+  redis:
+    replicas: 1
+    image: redis
+    tag: 7.2.4-alpine
+  postgres:
+    replicas: 1
+    image: postgres
+    tag: 14.11-alpine
+  backend:
+    replicas: 1
+    image: brandonjroberts/broly-backend
+  consumer:
+    replicas: 1
+    image: brandonjroberts/broly-consumer
+  inscriber:
+    replicas: 1
+    image: brandonjroberts/broly-inscriber
+  indexer:
+    replicas: 1
+    image: brandonjroberts/broly-indexer
+
+postgres:
+  db: broly-db
+  user: broly-user
+  password: BrolyPassword1234
+
+apibara:
+  #streamUrl: https://mainnet.starknet.a5a.ch
+  streamUrl: https://sepolia.starknet.a5a.ch
+  indexerId: broly-indexer-id
+  authToken: dna_aabbcc
+
+contracts:
+  brolyOrderbookContract: 0x0148b18fc0b2782e4097073ba1403c34285d6b53aa9e632f61d939277e5bd447

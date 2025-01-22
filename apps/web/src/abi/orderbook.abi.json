@@ -37,6 +37,186 @@
     ]
   },
   {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "utils::hash::Digest",
+    "members": [
+      {
+        "name": "value",
+        "type": "[core::integer::u32; 8]"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "consensus::types::transaction::TxOut",
+    "members": [
+      {
+        "name": "value",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "pk_script",
+        "type": "@core::byte_array::ByteArray"
+      },
+      {
+        "name": "cached",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "consensus::types::transaction::OutPoint",
+    "members": [
+      {
+        "name": "txid",
+        "type": "utils::hash::Digest"
+      },
+      {
+        "name": "vout",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "data",
+        "type": "consensus::types::transaction::TxOut"
+      },
+      {
+        "name": "block_height",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "median_time_past",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "is_coinbase",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<core::byte_array::ByteArray>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::byte_array::ByteArray>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "consensus::types::transaction::TxIn",
+    "members": [
+      {
+        "name": "script",
+        "type": "@core::byte_array::ByteArray"
+      },
+      {
+        "name": "sequence",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "previous_output",
+        "type": "consensus::types::transaction::OutPoint"
+      },
+      {
+        "name": "witness",
+        "type": "core::array::Span::<core::byte_array::ByteArray>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<consensus::types::transaction::TxIn>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<consensus::types::transaction::TxIn>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "core::array::Span::<consensus::types::transaction::TxOut>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<consensus::types::transaction::TxOut>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "consensus::types::transaction::Transaction",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "is_segwit",
+        "type": "core::bool"
+      },
+      {
+        "name": "inputs",
+        "type": "core::array::Span::<consensus::types::transaction::TxIn>"
+      },
+      {
+        "name": "outputs",
+        "type": "core::array::Span::<consensus::types::transaction::TxOut>"
+      },
+      {
+        "name": "lock_time",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "utu_relay::bitcoin::block::BlockHeader",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "prev_block_hash",
+        "type": "utils::hash::Digest"
+      },
+      {
+        "name": "merkle_root_hash",
+        "type": "utils::hash::Digest"
+      },
+      {
+        "name": "time",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "bits",
+        "type": "core::integer::u32"
+      },
+      {
+        "name": "nonce",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "onchain::orderbook::interface::IOrderbook",
     "items": [
@@ -111,6 +291,22 @@
           {
             "name": "tx_hash",
             "type": "core::byte_array::ByteArray"
+          },
+          {
+            "name": "tx",
+            "type": "consensus::types::transaction::Transaction"
+          },
+          {
+            "name": "block_height",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "block_header",
+            "type": "utu_relay::bitcoin::block::BlockHeader"
+          },
+          {
+            "name": "inclusion_proof",
+            "type": "core::array::Array::<(utils::hash::Digest, core::bool)>"
           }
         ],
         "outputs": [],
@@ -128,6 +324,22 @@
         "outputs": [
           {
             "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u256)"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "query_inscription_lock",
+        "inputs": [
+          {
+            "name": "inscription_id",
+            "type": "core::integer::u32"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u64)"
           }
         ],
         "state_mutability": "view"
