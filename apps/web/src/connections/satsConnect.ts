@@ -1,4 +1,4 @@
-import { request, AddressPurpose, RpcErrorCode } from "sats-connect";
+import Wallet, { AddressPurpose, RpcErrorCode } from "sats-connect";
 
 /**
  * Connect to a Bitcoin wallet using sats-connect.
@@ -11,7 +11,11 @@ export async function connectBitcoinWallet(): Promise<{
   stacksAddress: string | null;
 }> {
   try {
-    const response = await request('wallet_connect', null);
+    const response = await Wallet.request('wallet_connect', {
+      message: 'Fetch Bitcoin addresses',
+      addresses: [AddressPurpose.Payment, AddressPurpose.Ordinals, AddressPurpose.Stacks],    
+    });
+
 
     if (response.status === 'success') {
       const paymentAddressItem = response.result.addresses.find(
@@ -24,11 +28,12 @@ export async function connectBitcoinWallet(): Promise<{
         (address: any) => address.purpose === AddressPurpose.Stacks
       );
 
-      return {
+      const result = {
         paymentAddress: paymentAddressItem?.address || null,
         ordinalsAddress: ordinalsAddressItem?.address || null,
         stacksAddress: stacksAddressItem?.address || null,
       };
+      return result;
     } else {
       if (response.error.code === RpcErrorCode.USER_REJECTION) {
         console.error('User rejected the connection.');
