@@ -122,12 +122,14 @@ function App() {
       return
     }
   
+    console.log('Requesting inscription:', dataToInscribe, taprootAddress, feeToken, fee)
     const calldata = CallData.compile([
       byteArray.byteArrayFromString(dataToInscribe),
       byteArray.byteArrayFromString(taprootAddress),
       toHex(feeToken),
       uint256.bnToUint256(fee)
     ])
+    console.log('Calldata:', calldata)
   
     setCalls([orderbookContract.populate('request_inscription', calldata)])
   }
@@ -140,13 +142,21 @@ function App() {
       if (calls.length === 0) return;
       send();
       console.log('Call successful:', data, isPending);
-      // TODO: Update the UI with the new vote count
+      // TODO: Update the UI
     };
     requestCall();
   }, [calls]);
 
-  const cancelInscriptionCall = async () => {
-    // TODO
+  const cancelInscriptionCall = async (inscriptionId: number) => {
+    if (!address || !orderbookContract) {
+      return
+    }
+  
+    const calldata = CallData.compile([
+      inscriptionId
+    ])
+  
+    setCalls([orderbookContract.populate('cancel_inscription', calldata)])
   }
 
   const [tabs, _setTabs] = useState([
