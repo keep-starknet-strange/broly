@@ -1,7 +1,7 @@
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: managed-cert
+  name: broly-managed-cert
 spec:
   domains:
     - api.broly-btc.com

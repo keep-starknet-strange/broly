@@ -4,7 +4,7 @@ metadata:
   name: backend-ingress
   annotations:
     kubernetes.io/ingress.global-static-ip-name: broly-btc-static-ip
-    networking.gke.io/managed-certificates: managed-cert
+    networking.gke.io/managed-certificates: broly-managed-cert
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
