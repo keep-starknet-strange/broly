@@ -86,15 +86,13 @@ function App() {
 
   const connectBitcoinWalletHandler = async () => {
     const addresses = await connectBitcoinWallet()
-    // TODO: replace with the Ordinals address.
-    // Currently the sats connect lib fetches 
-    // only the Payments address from Xverse.
-    if (addresses.paymentAddress) {
-      setTaprootAddress(addresses.paymentAddress)
-      setBitcoinWallet((prev) => ({
-        ...prev,
+    if (addresses.ordinalsAddress) {
+      setTaprootAddress(addresses.ordinalsAddress)
+      setBitcoinWallet({
         paymentAddress: addresses.paymentAddress,
-      }))
+        ordinalsAddress: addresses.ordinalsAddress,
+        stacksAddress: addresses.stacksAddress
+      })
     } else {
       console.error('Ordinals address not found in wallet connection')
     }
