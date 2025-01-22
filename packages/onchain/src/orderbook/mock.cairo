@@ -8,11 +8,20 @@ mod OrderbookMock {
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+
+    const INSCRIPTION_CANCELED: i8 = -1;
+    const INSCRIPTION_NULL: i8 = 0;
+    const INSCRIPTION_REQUESTED: i8 = 1;
+    const INSCRIPTION_LOCKED: i8 = 2;
+    const INSCRIPTION_COMPLETED: i8 = 3;
 
     #[storage]
     struct Storage {
         // ID of the next inscription.
         new_inscription_id: u32,
+        // Locks: Map inscription_id -> status.
+        inscription_status: Map<u32, i8>,
     }
 
     #[event]
@@ -82,6 +91,7 @@ mod OrderbookMock {
         ) -> u32 {
             let id = self.new_inscription_id.read();
             self.new_inscription_id.write(id + 1);
+            self.inscription_status.write(id, INSCRIPTION_REQUESTED);
             self
                 .emit(
                     RequestCreated {
@@ -102,6 +112,9 @@ mod OrderbookMock {
         /// cancel.
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
+            let status = self.inscription_status.read(inscription_id);
+            assert!(status == INSCRIPTION_REQUESTED);
+            self.inscription_status.write(inscription_id, INSCRIPTION_CANCELED);
             self
                 .emit(
                     RequestCanceled { inscription_id: inscription_id, currency_fee: currency_fee },
@@ -119,6 +132,9 @@ mod OrderbookMock {
         /// - `tx_hash: ByteArray`, the precomputed bitcoin transaction hash that will be
         /// submitted onchain by the submitter.
         fn lock_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+            let status = self.inscription_status.read(inscription_id);
+            assert!(status == INSCRIPTION_REQUESTED);
+            self.inscription_status.write(inscription_id, INSCRIPTION_LOCKED);
             self.emit(RequestLocked { inscription_id: inscription_id, tx_hash: tx_hash });
         }
 
@@ -139,7 +155,9 @@ mod OrderbookMock {
             inclusion_proof: Array<(Digest, bool)>,
         ) {
             // TODO: process the submitted transaction hash, verify that it is on Bitcoin
-
+            let status = self.inscription_status.read(inscription_id);
+            assert!(status == INSCRIPTION_LOCKED);
+            self.inscription_status.write(inscription_id, INSCRIPTION_COMPLETED);
             self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
 

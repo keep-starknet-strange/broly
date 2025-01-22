@@ -15,7 +15,7 @@ function Home(props: {
   isStarknetConnected: boolean;
 }) {
   const [isInscribing, setIsInscribing] = useState(false);
-  const [inscribingStatus, setInscribingStatus] = useState(0);
+  const [inscribingStatus, _setInscribingStatus] = useState(0);
 
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
@@ -27,7 +27,7 @@ function Home(props: {
   useEffect(() => {
     const fetchInscriptions = async () => {
       // TODO fetch real new inscriptions from smart contract
-      let result = await getNewInscriptions(recentsPagination.pageLength, recentsPagination.page);
+      const result = await getNewInscriptions(recentsPagination.pageLength, recentsPagination.page);
       if (result.data) {
         if (recentsPagination.page === 1) {
           setRecentInscriptions(result.data);

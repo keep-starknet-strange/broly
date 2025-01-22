@@ -26,5 +26,5 @@ INSCRIPTION_ID=$1
 TX_HASH=$($SCRIPT_DIR/text_to_byte_array.sh "$2")
 
 echo "Locking inscription request $INSCRIPTION_ID with transaction hash $TX_HASH" > $LOG_DIR/lock_request.log
-echo "starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password '' --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH" > $LOG_DIR/lock_request.log
-starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password "" --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH
+echo "starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password '' --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH" >> $LOG_DIR/lock_request.log
+starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password "" --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH >> $LOG_DIR/lock_request.log

@@ -1,0 +1,23 @@
+Api:
+  Host: backend.broly-sepolia.svc.cluster.local
+  Port: 8080
+  AllowOrigins:
+    - '*'
+  AllowMethods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  AllowHeaders:
+    - Content-Type
+  Production: true
+  Admin: true
+Consumer:
+  Host: consumer.broly-sepolia.svc.cluster.local
+  Port: 8081
+Postgres:
+  Host: postgres.broly-sepolia.svc.cluster.local
+  Port: 5432
+  User: broly-user
+  Name: broly-db

@@ -1,4 +1,4 @@
-const STARTING_BLOCK = 390000;
+const STARTING_BLOCK = 450000;
 
 export const config = {
   streamUrl: Deno.env.get("APIBARA_STREAM_URL"),

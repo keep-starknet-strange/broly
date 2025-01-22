@@ -15,13 +15,13 @@ export async function connectBitcoinWallet(): Promise<{
 
     if (response.status === 'success') {
       const paymentAddressItem = response.result.addresses.find(
-        (address) => address.purpose === AddressPurpose.Payment
+        (address: any) => address.purpose === AddressPurpose.Payment
       );
       const ordinalsAddressItem = response.result.addresses.find(
-        (address) => address.purpose === AddressPurpose.Ordinals
+        (address: any) => address.purpose === AddressPurpose.Ordinals
       );
       const stacksAddressItem = response.result.addresses.find(
-        (address) => address.purpose === AddressPurpose.Stacks
+        (address: any) => address.purpose === AddressPurpose.Stacks
       );
 
       return {

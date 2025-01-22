@@ -24,7 +24,17 @@ NETWORK=sepolia
 SUBMIT_FUNCTION=submit_inscription
 INSCRIPTION_ID=$1
 TX_HASH=$($SCRIPT_DIR/text_to_byte_array.sh "$2")
+# TODO: Encode transaction: https://github.com/keep-starknet-strange/raito/blob/main/packages/consensus/src/types/transaction.cairo
+TRANSACTION=$(echo 0 0 0 0 0 0 0)
+# TODO: Get block height
+BLOCK_HEIGHT=10000
+# TODO: Encode block header: 
+BLOCK_HEADER=$(echo 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+# TODO
+INSCLUSION_PROOF=$(echo 0 0 0)
+
+CALLDATA=$(echo $INSCRIPTION_ID $TX_HASH $TRANSACTION $BLOCK_HEIGHT $BLOCK_HEADER $INSCLUSION_PROOF)
 
 echo "Locking inscription request $INSCRIPTION_ID with transaction hash $TX_HASH" > $LOG_DIR/submit_request.log
-echo "starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password '' --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $SUBMIT_FUNCTION $INSCRIPTION_ID $TX_HASH" > $LOG_DIR/lock_request.log
-starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password "" --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $SUBMIT_FUNCTION $INSCRIPTION_ID $TX_HASH
+echo "starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password '' --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $SUBMIT_FUNCTION $CALLDATA" >> $LOG_DIR/submit_request.log
+starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password "" --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $SUBMIT_FUNCTION $CALLDATA >> $LOG_DIR/submit_request.log
