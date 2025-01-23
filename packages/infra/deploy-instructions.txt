@@ -36,3 +36,5 @@ apply changes to cloud
     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-upgrade
 
 change frontend contract addresses/configs in vercel
+  VITE_BROLY_CONTRACT_ADDRESS
+Redepoloy vercel FE

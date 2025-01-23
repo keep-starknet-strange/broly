@@ -44,3 +44,7 @@
   box-shadow: 0 2px 4px var(--color-tertiary-dark);
   overflow: hidden;
 }
+
+.View__pixelated {
+  image-rendering: pixelated;
+}
