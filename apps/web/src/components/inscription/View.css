@@ -1,4 +1,5 @@
 .View__container {
+  overflow: hidden;
   min-width: 15rem;
   height: 20rem;
   border: 6px solid var(--color-tertiary-dark);
