@@ -122,14 +122,12 @@ function App() {
       return
     }
   
-    console.log('Requesting inscription:', dataToInscribe, taprootAddress, feeToken, fee)
     const calldata = CallData.compile([
       byteArray.byteArrayFromString(dataToInscribe),
       byteArray.byteArrayFromString(taprootAddress),
       toHex(feeToken),
       uint256.bnToUint256(fee)
     ])
-    console.log('Calldata:', calldata)
   
     setCalls([orderbookContract.populate('request_inscription', calldata)])
   }

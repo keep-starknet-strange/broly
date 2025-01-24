@@ -62,7 +62,7 @@ services:
       - SCRIPT_CONFIG_PATH=/configs/script-config.yaml
       - KEYSTORE_PATH=/app/account/test.key
       - ACCOUNT_FILE=/app/account/account.json
-      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x0148b18fc0b2782e4097073ba1403c34285d6b53aa9e632f61d939277e5bd447
+      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
     volumes:
       - ./account:/app/account
   indexer:
@@ -72,7 +72,7 @@ services:
     links:
       - backend
     environment:
-      - BROLY_CONTRACT_ADDRESS=0x0148b18fc0b2782e4097073ba1403c34285d6b53aa9e632f61d939277e5bd447
+      - BROLY_CONTRACT_ADDRESS=0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
       - AUTH_TOKEN=${APIBARA_AUTH_TOKEN}
       - CONSUMER_TARGET_URL=http://broly-consumer-1:8081/consume-indexer-msg
       - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
@@ -90,7 +90,7 @@ services:
     links:
       - backend
     environment:
-      - VITE_BROLY_CONTRACT_ADDRESS=0x0148b18fc0b2782e4097073ba1403c34285d6b53aa9e632f61d939277e5bd447
+      - VITE_BROLY_CONTRACT_ADDRESS=0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
       - VITE_USE_MOCK=false
     volumes:
       - ./package.json:/app/package.json

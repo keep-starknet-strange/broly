@@ -63,7 +63,7 @@ func readFeltString(data string) (string, error) {
 	return feltString, nil
 }
 
-func processRequestCreatedEvent(event IndexerEvent) {
+func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {
@@ -72,8 +72,8 @@ func processRequestCreatedEvent(event IndexerEvent) {
 	}
 	caller := event.Event.Keys[2][2:] // remove 0x prefix
 
-	offset := 0
-	inscriptionData, offset, err := readByteArray(event.Event.Data, 0)
+  // TODO: InvokeV0 & V3?
+	inscriptionData, _, err := readByteArray(event.Transaction.InvokeV1.Calldata, 4)
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
@@ -87,6 +87,8 @@ func processRequestCreatedEvent(event IndexerEvent) {
 	} else {
 		inscriptionType = "unknown"
 	}
+
+	offset := 0
 	bitcoinAddress, offset, err := readByteArray(event.Event.Data, offset)
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
@@ -124,7 +126,7 @@ func processRequestCreatedEvent(event IndexerEvent) {
 	}
 }
 
-func revertRequestCreatedEvent(event IndexerEvent) {
+func revertRequestCreatedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {
@@ -152,7 +154,7 @@ func revertRequestCreatedEvent(event IndexerEvent) {
 	}
 }
 
-func processRequestLockedEvent(event IndexerEvent) {
+func processRequestLockedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {
@@ -170,7 +172,7 @@ func processRequestLockedEvent(event IndexerEvent) {
 	}
 }
 
-func revertRequestLockedEvent(event IndexerEvent) {
+func revertRequestLockedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {
@@ -186,7 +188,7 @@ func revertRequestLockedEvent(event IndexerEvent) {
 	}
 }
 
-func processRequestCompletedEvent(event IndexerEvent) {
+func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {
@@ -217,7 +219,7 @@ func processRequestCompletedEvent(event IndexerEvent) {
 	}
 }
 
-func revertRequestCompletedEvent(event IndexerEvent) {
+func revertRequestCompletedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
 	if err != nil {

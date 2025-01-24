@@ -13,7 +13,7 @@ function Collection(_props: any) {
   const defaultInscriptions: any[] = [];
   const [collection, setCollection] = useState(defaultInscriptions);
   const [collectionPagination, setCollectionPagination] = useState({
-    pageLength: 16,
+    pageLength: 25,
     page: 1
   });
   const defaultRequests: any[] = [];
@@ -79,7 +79,7 @@ function Collection(_props: any) {
         </div>
       </div>
       <div className="w-full flex flex-col items-center">
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 py-4 sm:py-8">
           {activeFilter === "Requests" ? myRequests.map((inscription) => (
             <InscriptionRequestView key={inscription.inscription_id} inscription={inscription} />
           )) : collection.map((inscription) => (

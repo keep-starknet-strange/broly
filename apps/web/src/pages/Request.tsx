@@ -25,6 +25,16 @@ function Request(_props: any) {
     }
   }, [id]);
 
+  const [requesterFormatted, setRequesterFormatted] = useState<string>("");
+  useEffect(() => {
+    if (inscription) {
+      const requester = inscription.requester;
+      if (requester) {
+        const formatted = `0x${requester.slice(0, 6)}...${requester.slice(-4)}`;
+        setRequesterFormatted(formatted);
+      }
+    }
+  }, [inscription]);
   // TODO: Move inscription query up to parent component
   // TODO: Links on owner, block#, id, ...
   return (
@@ -60,7 +70,7 @@ function Request(_props: any) {
             <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">From</h4>
-                <p className="text-lg text__color--primary">0x{inscription.requester}</p>
+                <p className="text-lg text__color--primary">{requesterFormatted}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">To</h4>

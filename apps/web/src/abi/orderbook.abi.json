@@ -372,11 +372,6 @@
         "kind": "key"
       },
       {
-        "name": "inscription_data",
-        "type": "core::byte_array::ByteArray",
-        "kind": "data"
-      },
-      {
         "name": "receiving_address",
         "type": "core::byte_array::ByteArray",
         "kind": "data"

@@ -4,7 +4,8 @@ import DropButton from "../DropButton";
 import "./Form.css";
 
 function InscriptionForm(props: any) {
-  const dropOptions = ["Image", "Gif", "Message"];
+  const dropOptions = ["Image", "Message"];
+  // const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -13,20 +14,20 @@ function InscriptionForm(props: any) {
 
   useEffect(() => {
     setErrorMessage("");
-  }, [uploadedImage, address]);
+  }, [address, props.taprootAddress]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
   
     let dataToInscribe = "";
     if (!address) {
-      setErrorMessage("Please login with your wallet");
+      setErrorMessage("Please login with your wallet(s)");
       return;
     }
   
     const taprootAddress = props.taprootAddress;
     if (!taprootAddress) {
-      setErrorMessage("Taproot address not found. Please connect Bitcoin wallet.");
+      setErrorMessage("Please login with Bitcoin Xverse.");
       return;
     }
 
@@ -64,9 +65,25 @@ function InscriptionForm(props: any) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
+      // Check image size
+      const imageObj = new Image();
+      imageObj.src = URL.createObjectURL(image);
+      imageObj.onload = () => {
+        const size = imageObj.width * imageObj.height;
+        const maxImageSize = 512 * 512;
+        if (size > maxImageSize) {
+          setErrorMessage("Image too large. Max 512x512");
+          setUploadedImage("");
+          return;
+        }
+        setErrorMessage("");
+        setUploadedImage(URL.createObjectURL(image));
+      };
+      setErrorMessage("");
       setUploadedImage(URL.createObjectURL(image));
     } else if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const image = e.dataTransfer.files[0];
+      setErrorMessage("");
       setUploadedImage(URL.createObjectURL(image));
     }
   }
@@ -114,11 +131,6 @@ function InscriptionForm(props: any) {
         />
         <button
           type="submit"
-          disabled={
-            !props.taprootAddress || 
-            !props.isStarknetConnected || 
-            (selectedOption === "Image" && !uploadedImage)
-          }
           className={`button--gradient button__primary ml-4 ${
             !props.taprootAddress || !props.isStarknetConnected
               ? "button__primary--disabled"

@@ -13,17 +13,55 @@ func InitIndexerRoutes() {
 	http.HandleFunc("/consume-indexer-msg", consumeIndexerMsg)
 }
 
+type IndexerTransaction struct {
+  Meta IndexerTransactionMeta `json:"meta"`
+  InvokeV0 IndexerInvokeV0 `json:"invokeV0"`
+  InvokeV1 IndexerInvokeV1 `json:"invokeV1"`
+  InvokeV3 IndexerInvokeV3 `json:"invokeV3"`
+}
+
+type IndexerTransactionMeta struct {
+  Meta struct {
+    Hash string `json:"hash"`
+    MaxFee string `json:"maxFee"`
+    Nonce string `json:"nonce"`
+    Version string `json:"version"`
+    TransactionIndex string `json:"transactionIndex"`
+  }
+}
+
+type IndexerInvokeV0 struct {
+  MaxFee string `json:"maxFee"`
+  ContractAddress string `json:"contractAddress"`
+  EntryPointSelector string `json:"entryPointSelector"`
+  Calldata []string `json:"calldata"`
+}
+
+type IndexerInvokeV1 struct {
+  SenderAddress string `json:"senderAddress"`
+  Calldata []string `json:"calldata"`
+  MaxFee string `json:"maxFee"`
+  Nonce string `json:"nonce"`
+}
+
+type IndexerInvokeV3 struct {
+  SenderAddress string `json:"senderAddress"`
+  Calldata []string `json:"calldata"`
+  Nonce string `json:"nonce"`
+}
+
 type IndexerCursor struct {
 	OrderKey  int    `json:"orderKey"`
 	UniqueKey string `json:"uniqueKey"`
 }
 
-type IndexerEvent struct {
+type IndexerEventWithTransaction struct {
 	Event struct {
 		FromAddress string   `json:"fromAddress"`
 		Keys        []string `json:"keys"`
 		Data        []string `json:"data"`
 	} `json:"event"`
+  Transaction IndexerTransaction `json:"transaction"`
 }
 
 type IndexerMessage struct {
@@ -33,7 +71,7 @@ type IndexerMessage struct {
 		Finality  string        `json:"finality"`
 		Batch     []struct {
 			Status string         `json:"status"`
-			Events []IndexerEvent `json:"events"`
+			Events []IndexerEventWithTransaction `json:"events"`
 		} `json:"batch"`
 	} `json:"data"`
 }
@@ -54,13 +92,13 @@ const (
 	requestCompletedEvent = "0x0158f34f5ba2bc3f4b4aac16b288b8ea46dd0e884b0c8030a9e7313b259d8b98"
 )
 
-var eventProcessors = map[string](func(IndexerEvent)){
+var eventProcessors = map[string](func(IndexerEventWithTransaction)){
 	requestCreatedEvent:   processRequestCreatedEvent,
 	requestLockedEvent:    processRequestLockedEvent,
 	requestCompletedEvent: processRequestCompletedEvent,
 }
 
-var eventReverters = map[string](func(IndexerEvent)){
+var eventReverters = map[string](func(IndexerEventWithTransaction)){
 	requestCreatedEvent:   revertRequestCreatedEvent,
 	requestLockedEvent:    revertRequestLockedEvent,
 	requestCompletedEvent: revertRequestCompletedEvent,
@@ -78,7 +116,7 @@ const (
 	DATA_STATUS_PENDING   = "DATA_STATUS_PENDING"
 )
 
-func PrintIndexerEventError(funcName string, event IndexerEvent, err error) {
+func PrintIndexerEventError(funcName string, event IndexerEventWithTransaction, err error) {
 	fmt.Println("Error in", funcName, " error: ( ", err, " ) from event: ")
 	fmt.Println("    ", event.Event.FromAddress)
 	fmt.Println("    Keys:")
@@ -89,6 +127,20 @@ func PrintIndexerEventError(funcName string, event IndexerEvent, err error) {
 	for _, data := range event.Event.Data {
 		fmt.Println("        ", data)
 	}
+  fmt.Println("    CallData:")
+  if event.Transaction.InvokeV0.Calldata != nil {
+    for _, calldata := range event.Transaction.InvokeV0.Calldata {
+      fmt.Println("        ", calldata)
+    }
+  } else if event.Transaction.InvokeV1.Calldata != nil {
+    for _, calldata := range event.Transaction.InvokeV1.Calldata {
+      fmt.Println("        ", calldata)
+    }
+  } else if event.Transaction.InvokeV3.Calldata != nil {
+    for _, calldata := range event.Transaction.InvokeV3.Calldata {
+      fmt.Println("        ", calldata)
+    }
+  }
 }
 
 func PrintIndexerError(funcName string, err string, data interface{}) {
@@ -140,7 +192,7 @@ func ProcessMessageEvents(message IndexerMessage) {
 	}
 }
 
-func EventComparator(event1 IndexerEvent, event2 IndexerEvent) bool {
+func EventComparator(event1 IndexerEventWithTransaction, event2 IndexerEventWithTransaction) bool {
 	if event1.Event.FromAddress != event2.Event.FromAddress {
 		return false
 	}
@@ -171,7 +223,7 @@ func EventComparator(event1 IndexerEvent, event2 IndexerEvent) bool {
 func processMessageEventsWithReverter(oldMessage IndexerMessage, newMessage IndexerMessage) {
 	var idx int
 	var latestEventIndex int
-	var unorderedEvents []IndexerEvent
+	var unorderedEvents []IndexerEventWithTransaction
 	for idx = 0; idx < len(oldMessage.Data.Batch[0].Events); idx++ {
 		oldEvent := oldMessage.Data.Batch[0].Events[idx]
 		newEvent := newMessage.Data.Batch[0].Events[idx]
