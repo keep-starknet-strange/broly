@@ -44,7 +44,7 @@ function Inscription(_props: any) {
         </div>
       </div>
     ) : (
-      <div className="flex flex-col w-full items-center justify-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
+      <div className="flex flex-col w-full items-center justify-center py-2 bg__color--primary h-fit lg:h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="flex flex-col w-full h-[70%] items-center justify-start lg:flex-row lg:items-start lg:justify-center">
           <div className="flex flex-row h-full items-center justify-center p-4">
             <InscriptionLargeView inscription={inscription} />

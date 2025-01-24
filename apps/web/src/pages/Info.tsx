@@ -29,6 +29,16 @@ function Info(_props: any) {
         <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management. It enables a trustless Bitcoin inscription network with guaranteed payments through smart contracts and escrows. This project demonstrates a method for L2s like Starknet to send messages to/from Bitcoin L1 through the use of an inventivized network of relays/inscriptors!</p>
       </div>
       <div className="w-full flex flex-col">
+        <h3 className="text__color--primary text-2xl sm:text-4xl font-bold px-8 mt-4">How To Use</h3>
+        <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-primary-light)] mb-1 rounded-lg"></div>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">1. Connect your Starknet wallet</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">2. Connect your Bitcoin xVerse wallet</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">3. On the home page, upload your image or write a message</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">4. Click Inscribe to create an Inscription Order</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">5. Wait for inscriptor to take your order & inscribe your message</p>
+        <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">6. Enjoy your inscription on the Bitcoin blockchain triggered from your Starknet wallet!</p>
+      </div>
+      <div className="w-full flex flex-col">
         <h3 className="text__color--primary text-2xl sm:text-4xl font-bold px-8 mt-4">How It Works</h3>
         <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-primary-light)] mb-1 rounded-lg"></div>
         <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">1. User connects both Bitcoin and Starknet wallets</p>

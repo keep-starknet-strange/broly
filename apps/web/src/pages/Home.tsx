@@ -15,7 +15,7 @@ function Home(props: {
   isStarknetConnected: boolean;
 }) {
   const [isInscribing, setIsInscribing] = useState(false);
-  const [inscribingStatus, _setInscribingStatus] = useState(0);
+  const [inscribingStatus, _setInscribingStatus] = useState(-2);
 
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);

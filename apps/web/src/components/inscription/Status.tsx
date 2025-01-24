@@ -8,7 +8,13 @@ function InscriptionStatus(props: any) {
   const [bitcoinClass, setBitcoinClass] = useState("");
   const [completeClass, setCompleteClass] = useState("");
   useEffect(() => {
-    if (props.status === -1) {
+    if (props.status === -2) {
+      setRequestClass("--pending");
+      setWaitingClass("");
+      setInscriptorClass("");
+      setBitcoinClass("");
+      setCompleteClass("");
+    } else if (props.status === -1) {
       setRequestClass("--cancel");
       setWaitingClass("--cancel");
       setInscriptorClass("--cancel");
@@ -44,7 +50,7 @@ function InscriptionStatus(props: any) {
       </div>
       <div className={`mx-2 flex-grow h-0.5 bg-gray-400 rounded-lg InscriptionStatus__line${requestClass}`}></div>
       <div className="flex flex-col items-center">
-        <div className={`InscriptionStatus__dot${waitingClass} w-2 h-2 rounded-full relative`}>
+        <div className={`InscriptionStatus__dot${waitingClass} w-2 h-2 bg-gray-400 rounded-full relative`}>
           <p className={`InscriptionStatus__text${waitingClass} text-xs text-wrap w-[8rem] text-center absolute top-[100%] left-[-4rem] origin-center`}>Waiting for Inscriptor</p>
         </div>
       </div>

@@ -14,7 +14,7 @@ function InscriptionForm(props: any) {
 
   useEffect(() => {
     setErrorMessage("");
-  }, [uploadedImage, address]);
+  }, [address, props.taprootAddress]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -65,9 +65,25 @@ function InscriptionForm(props: any) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
+      // Check image size
+      const imageObj = new Image();
+      imageObj.src = URL.createObjectURL(image);
+      imageObj.onload = () => {
+        const size = imageObj.width * imageObj.height;
+        const maxImageSize = 512 * 512;
+        if (size > maxImageSize) {
+          setErrorMessage("Image too large. Max 512x512");
+          setUploadedImage("");
+          return;
+        }
+        setErrorMessage("");
+        setUploadedImage(URL.createObjectURL(image));
+      };
+      setErrorMessage("");
       setUploadedImage(URL.createObjectURL(image));
     } else if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const image = e.dataTransfer.files[0];
+      setErrorMessage("");
       setUploadedImage(URL.createObjectURL(image));
     }
   }

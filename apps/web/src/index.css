@@ -94,6 +94,7 @@ body {
 }
 
 .button__primary {
+  color: var(--color-primary);
   border: 1px solid var(--color-secondary-dark);
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
@@ -139,7 +140,7 @@ body {
 }
 
 .bg__color--tertiary-dull {
-  background-image: linear-gradient(to bottom, var(--color-primary-light) 0%, var(--color-tertiary-dull-dark));
+  background-image: linear-gradient(to bottom, var(--color-primary-light) 50%, var(--color-tertiary-dull-dark));
 }
 
 .button__secondary {
