@@ -4,14 +4,16 @@
 
 /* variables */
 :root {
-  --color-primary: rgb(22, 19, 16);
-  --color-primary-light: rgb(30, 28, 27);
+  --color-primary: rgb(18, 26, 24);
+  --color-primary-light: rgb(28, 33, 34);
   --color-primary-xlight: rgb(100, 98, 97);
   --color-secondary: rgb(42, 220, 145);
-  --color-secondary-dark: rgba(22, 160, 90, 1);
-  --color-tertiary: rgb(24, 18, 26);
-  --color-tertiary-ldark: rgba(17, 12, 19);
+  --color-secondary-dark: rgba(22, 150, 60, 1);
+  --color-tertiary: rgb(44, 25, 46);
+  --color-tertiary-ldark: rgba(27, 12, 29);
   --color-tertiary-dark: rgba(8, 8, 10);
+  --color-tertiary-dull: rgb(34, 28, 36);
+  --color-tertiary-dull-dark: rgba(24, 23, 19);
 }
 /*
   --color-tertiary: rgb(19, 16, 22);
@@ -108,7 +110,7 @@ body {
 
 .button__primary--disabled {
   background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light));
-  border: 1px solid var(--color-primary-light);
+  border: 1px solid var(--color-tertiary-dull-dark);
   cursor: not-allowed;
   color: #a0a0a0;
 }
@@ -129,16 +131,20 @@ body {
 
 .bg__color--primary {
   background-color: var(--color-primary);
-  background-image: linear-gradient(to bottom, var(--color-primary) 0%, var(--color-primary-light));
+  background-image: linear-gradient(to bottom, var(--color-primary) 100%, var(--color-primary-light));
 }
 
 .bg__color--tertiary {
   background-image: linear-gradient(to bottom, var(--color-tertiary) 80%, var(--color-tertiary-ldark));
 }
 
+.bg__color--tertiary-dull {
+  background-image: linear-gradient(to bottom, var(--color-primary-light) 0%, var(--color-tertiary-dull-dark));
+}
+
 .button__secondary {
   color: #f9f9f9;
-  border: 1px solid var(--dropbutton-primary-dark);
+  border: 1px solid var(--dropbutton-tertiary-dull-dark);
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
   font-size: 1.2rem;
@@ -159,7 +165,7 @@ body {
 }
 
 .button__secondary--disabled {
-  background-color: var(--color-secondary-dark);
+  background-color: var(--color-tertiary-dull-dark);
   cursor: not-allowed;
   color: #a0a0a0;
 }
@@ -170,7 +176,7 @@ body {
 
 .button__secondary--active {
   background-image: linear-gradient(to bottom right, var(--color-tertiary), var(--color-tertiary-dark));
-  border: 1px solid var(--color-tertiary-dark);
+  border: 1px solid var(--color-tertiary-dull-dark);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   animation: active 1.5s infinite;
 }
@@ -193,7 +199,7 @@ body {
 }
 
 .button__circle {
-  border: 2px solid var(--color-tertiary);
+  border: 2px solid var(--color-tertiary-dull-dark);
   border-radius: 50%;
   width: 2.5rem;
   height: 2.5rem;

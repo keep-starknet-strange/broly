@@ -12,7 +12,7 @@ function Inscritpions(_props: any) {
   const defaultInscriptions: any[] = [];
   const [inscriptions, setInscriptions] = useState(defaultInscriptions);
   const [inscriptionsPagination, setInscriptionsPagination] = useState({
-    pageLength: 16,
+    pageLength: 25,
     page: 1
   });
   const defaultRequests: any[] = [];
@@ -123,7 +123,7 @@ function Inscritpions(_props: any) {
             ))}
           </div>
         </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-4 sm:py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 py-4 sm:py-8">
           {inscriptions.map((inscription, index) => (
             <InscriptionView key={index} inscription={inscription} />
           ))}

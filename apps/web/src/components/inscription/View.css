@@ -2,12 +2,12 @@
   overflow: hidden;
   min-width: 15rem;
   height: 20rem;
-  border: 6px solid var(--color-tertiary-dark);
+  border: 4px solid var(--color-tertiary-dark);
   border-radius: 1rem;
   background-image: linear-gradient(
     to bottom right,
-    var(--color-tertiary) 60%,
-    var(--color-tertiary-ldark)
+    var(--color-primary-light) 30%,
+    var(--color-tertiary-dull-dark)
   );
   box-shadow: 0 2px 4px var(--color-tertiary-dark);
   cursor: pointer;
@@ -25,22 +25,21 @@
 }
 
 .View__header {
-  padding-bottom: 2px;
   background-color: var(--color-tertiary-dark);
   color: #f9f9f9;
   text-align: center;
   width: 100%;
-  border-bottom: 2px solid var(--color-primary);
 }
 
 .LargeView__container {
   height: 33rem;
+  min-width: 25rem;
   border: 6px solid var(--color-tertiary-dark);
   border-radius: 1rem;
   background-image: linear-gradient(
     to bottom right,
-    var(--color-tertiary) 60%,
-    var(--color-tertiary-dark)
+    var(--color-primary-light) 30%,
+    var(--color-tertiary-dull-dark)
   );
   box-shadow: 0 2px 4px var(--color-tertiary-dark);
   overflow: hidden;

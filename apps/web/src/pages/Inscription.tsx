@@ -22,6 +22,17 @@ function Inscription(_props: any) {
     }
   }, [id]);
 
+  const [ownerFormatted, setOwnerFormatted] = useState<string>("");
+  useEffect(() => {
+    if (inscription) {
+      const owner = inscription.owner;
+      if (owner) {
+        const formatted = `0x${owner.slice(0, 6)}...${owner.slice(-4)}`;
+        setOwnerFormatted(formatted);
+      }
+    }
+  }, [inscription]);
+
   // TODO: Move inscription query up to parent component
   // TODO: Links on owner, block#, id, ...
   return (
@@ -34,11 +45,11 @@ function Inscription(_props: any) {
       </div>
     ) : (
       <div className="flex flex-col w-full items-center justify-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
-        <div className="flex flex-row w-full h-[70%] items-start justify-center">
-          <div className="flex flex-row h-full items-center justify-center w-1/3 p-4">
+        <div className="flex flex-col w-full h-[70%] items-center justify-start lg:flex-row lg:items-start lg:justify-center">
+          <div className="flex flex-row h-full items-center justify-center p-4">
             <InscriptionLargeView inscription={inscription} />
           </div>
-          <div className="flex flex-col w-2/3 py-8 p-4 justify-center">
+          <div className="flex flex-col py-8 p-4 justify-center">
             {inscription.properties && inscription.properties.length > 0 && (
               <div className="flex flex-col w-full h-full mb-6">
                 <h3 className="text-2xl font-bold underline">Properties</h3>
@@ -50,10 +61,11 @@ function Inscription(_props: any) {
               </div>
             )}
             <h3 className="text-2xl font-bold underline">Info</h3>
-            <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary border-2 border-[var(--color-primary-light)] rounded-lg">
+            <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary-dull border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Owner</h4>
-                <p className="text-lg text__color--primary">0x{inscription.owner}</p>
+                <p className="text-lg text__color--primary">{ownerFormatted}</p>
+                <img className="h-6 ml-2 hover:cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out active:scale-100 active:transform-none" src="https://img.icons8.com/?size=100&id=30&format=png&color=000000" alt="Copy" onClick={() => navigator.clipboard.writeText(`0x${inscription.owner}`)} />
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Sat #</h4>

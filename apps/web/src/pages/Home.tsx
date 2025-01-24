@@ -20,7 +20,7 @@ function Home(props: {
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
   const [recentsPagination, setRecentsPagination] = useState({
-    pageLength: 16,
+    pageLength: 25,
     page: 1,
   });
 
@@ -67,7 +67,7 @@ function Home(props: {
             <p className="text-sm font-bold px-4 tab__nav text-xl">Explore &rarr;</p>
           </NavLink>
         </div>
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 px-4 py-8">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 py-8">
           {recentInscriptions.map((inscription, index) => (
             <InscriptionView key={index} inscription={inscription} />
           ))}

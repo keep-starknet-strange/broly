@@ -21,16 +21,16 @@ function Info(_props: any) {
           </a>
         </div>
       </div>
-      <div className="w-[99%] h-[6px] bg-[var(--color-tertiary-ldark)] mb-1 rounded-lg shadow-xl"></div>
+      <div className="w-[99%] h-[6px] bg-[var(--color-primary-light)] mb-1 rounded-lg shadow-xl"></div>
       <div className="w-full flex flex-col">
         <h3 className="text__color--primary text-2xl sm:text-4xl font-bold px-8 mt-4">About</h3>
-        <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-tertiary-ldark)] mb-1 rounded-lg"></div>
+        <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-primary-light)] mb-1 rounded-lg"></div>
         <p className="text__color--primary text-xl sm:text-2xl px-8 mt-2 italic">Order on Starknet, write on Bitcoin, get money trustlessly, repeat</p>
         <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">Broly is a decentralized Bitcoin inscription service that uses Starknet for orderbook management. It enables a trustless Bitcoin inscription network with guaranteed payments through smart contracts and escrows. This project demonstrates a method for L2s like Starknet to send messages to/from Bitcoin L1 through the use of an inventivized network of relays/inscriptors!</p>
       </div>
       <div className="w-full flex flex-col">
         <h3 className="text__color--primary text-2xl sm:text-4xl font-bold px-8 mt-4">How It Works</h3>
-        <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-tertiary-ldark)] mb-1 rounded-lg"></div>
+        <div className="w-[98%] mx-[1%] h-[2px] bg-[var(--color-primary-light)] mb-1 rounded-lg"></div>
         <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">1. User connects both Bitcoin and Starknet wallets</p>
         <p className="text__color--primary text-lg sm:text-xl px-8 mt-2">2. User creates an inscription order</p>
         <p className="text__color--primary text-md sm:text-lg px-16 mt-1">Specifies inscription content and reward amount</p>

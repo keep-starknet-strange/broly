@@ -39,7 +39,6 @@ mod OrderbookMock {
         inscription_id: u32,
         #[key]
         caller: ContractAddress,
-        inscription_data: ByteArray,
         receiving_address: ByteArray,
         currency_fee: felt252,
         submitter_fee: u256,
@@ -97,7 +96,6 @@ mod OrderbookMock {
                     RequestCreated {
                         inscription_id: id,
                         caller: get_caller_address(),
-                        inscription_data: inscription_data,
                         receiving_address: receiving_address,
                         currency_fee: currency_fee,
                         submitter_fee: submitter_fee,

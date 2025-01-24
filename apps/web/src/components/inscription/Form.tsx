@@ -4,7 +4,8 @@ import DropButton from "../DropButton";
 import "./Form.css";
 
 function InscriptionForm(props: any) {
-  const dropOptions = ["Image", "Gif", "Message"];
+  const dropOptions = ["Image", "Message"];
+  // const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -20,13 +21,13 @@ function InscriptionForm(props: any) {
   
     let dataToInscribe = "";
     if (!address) {
-      setErrorMessage("Please login with your wallet");
+      setErrorMessage("Please login with your wallet(s)");
       return;
     }
   
     const taprootAddress = props.taprootAddress;
     if (!taprootAddress) {
-      setErrorMessage("Taproot address not found. Please connect Bitcoin wallet.");
+      setErrorMessage("Please login with Bitcoin Xverse.");
       return;
     }
 
@@ -114,11 +115,6 @@ function InscriptionForm(props: any) {
         />
         <button
           type="submit"
-          disabled={
-            !props.taprootAddress || 
-            !props.isStarknetConnected || 
-            (selectedOption === "Image" && !uploadedImage)
-          }
           className={`button--gradient button__primary ml-4 ${
             !props.taprootAddress || !props.isStarknetConnected
               ? "button__primary--disabled"
