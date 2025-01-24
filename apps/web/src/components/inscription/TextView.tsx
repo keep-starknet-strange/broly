@@ -3,7 +3,7 @@ import { useState } from "react";
 function InscriptionTextView(props: any) {
   // TODO: Traits and info on RHS?
   // TODO: Text centering?
-  const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [_isHovering, setIsHovering] = useState<boolean>(false);
   return (
     <div className="flex flex-col items-center justify-center h-full" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <h3 className={`text-lg View__header h-8 hidden`}>Message</h3>

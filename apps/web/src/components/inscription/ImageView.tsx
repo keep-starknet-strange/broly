@@ -21,7 +21,7 @@ function InscriptionImageView(props: any) {
   }, [props.inscription.inscription_data]);
 
   // TODO: Slide in/out the header instead of just showing/hiding it
-  const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [_isHovering, setIsHovering] = useState<boolean>(false);
   return (
     <div className="relative flex flex-col items-center justify-center h-full" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <h3 className={`absolute top-0 left-0 text-lg View__header h-8 hidden`}>Image</h3>
