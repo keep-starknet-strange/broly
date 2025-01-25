@@ -6,14 +6,14 @@ import { mockAddress } from "../api/mock";
 import { getMyNewInscriptions, getMyTopInscriptions, getMyInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
-function Collection(_props: any) {
+function Collection(props: any) {
   const filters = ["New", "Top", "Rare", "Requests"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const defaultInscriptions: any[] = [];
   const [collection, setCollection] = useState(defaultInscriptions);
   const [collectionPagination, setCollectionPagination] = useState({
-    pageLength: 25,
+    pageLength: 20,
     page: 1
   });
   const defaultRequests: any[] = [];
@@ -64,6 +64,23 @@ function Collection(_props: any) {
   useEffect(() => {
     resetPagination();
   }, [activeFilter]);
+
+  // Websocket messages
+  useEffect(() => {
+    if (props.requestedInscription) {
+      // TODO: Update requests if owned inscription is requested
+    }
+  }, [props.requestedInscription]);
+  useEffect(() => {
+    if (props.newInscription) {
+      // TODO: Add new inscription to collection if owned
+    }
+  }, [props.newInscription]);
+  useEffect(() => {
+    if (props.updateRequest) {
+      // TODO: Remove request or update status if on requests page
+    }
+  }, [props.updateRequest]);
 
   // TODO: Button to create new request if no requests are open
   // TODO: Button to view requests if requests are open

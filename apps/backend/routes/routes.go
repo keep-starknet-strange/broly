@@ -7,14 +7,14 @@ import (
 )
 
 func InitBaseRoutes() {
-  http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    routeutils.SetupHeaders(w)
-    w.WriteHeader(http.StatusOK)
-  })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		routeutils.SetupHeaders(w)
+		w.WriteHeader(http.StatusOK)
+	})
 }
 
 func InitRoutes() {
 	// Base route needed for health checks
-  InitBaseRoutes()
+	InitBaseRoutes()
 	InitInscriptionsRoutes()
 }

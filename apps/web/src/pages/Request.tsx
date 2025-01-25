@@ -5,7 +5,7 @@ import InscriptionStatus from "../components/inscription/Status";
 import InscriptionProperty from "../components/inscription/Property";
 import { getInscriptionRequest } from "../api/inscriptions";
 
-function Request(_props: any) {
+function Request(props: any) {
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
   const { id } = useParams<{ id: string }>();
 
@@ -35,6 +35,29 @@ function Request(_props: any) {
       }
     }
   }, [inscription]);
+  const [recipientFormatted, setRecipientFormatted] = useState<string>("");
+  useEffect(() => {
+    if (inscription) {
+      const recipient = inscription.bitcoin_address;
+      if (recipient) {
+        const formatted = `${recipient.slice(0, 6)}...${recipient.slice(-4)}`;
+        setRecipientFormatted(formatted);
+      }
+    }
+  }, [inscription]);
+
+  // Websocket messages
+  useEffect(() => {
+    if (props.requestedInscription) {
+      // TODO: Reload inscription if it's the same as the pg id
+    }
+  }, [props.requestedInscription]);
+  useEffect(() => {
+    if (props.updateRequest) {
+      // TODO: Update requests status
+    }
+  }, [props.updateRequest]);
+
   // TODO: Move inscription query up to parent component
   // TODO: Links on owner, block#, id, ...
   return (
@@ -46,12 +69,12 @@ function Request(_props: any) {
         </div>
       </div>
     ) : (
-      <div className="flex flex-col w-full items-center justify-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
-        <div className="flex flex-row w-full h-[70%] items-start justify-center">
-          <div className="flex flex-row h-full items-center justify-center w-1/3 p-4">
+      <div className="flex flex-col w-full items-center justify-center py-2 bg__color--primary h-fit lg:h-full border-t-2 border-[var(--color-primary-light)]">
+        <div className="flex flex-col w-full h-[70%] items-center justify-start lg:flex-row lg:items-start lg:justify-center">
+          <div className="flex flex-row h-full items-center justify-center p-4">
             <InscriptionLargeView inscription={inscription} />
           </div>
-          <div className="flex flex-col w-2/3 py-8 p-4 justify-center">
+          <div className="flex flex-col py-8 p-4 justify-center w-full">
             {inscription.properties && inscription.properties.length > 0 && (
               <div className="flex flex-col w-full h-full mb-6">
                 <h3 className="text-2xl font-bold underline">Properties</h3>
@@ -62,19 +85,26 @@ function Request(_props: any) {
                 </div>
               </div>
             )}
-            <h3 className="text-2xl font-bold underline">Request</h3>
-            <div className="pb-12">
+            <div className="flex flex-row w-full h-full items-center justify-between pr-[10%]">
+              <h3 className="text-2xl font-bold underline">Request</h3>
+              {inscription.status === 0 || inscription.status === "0" && (
+                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center" onClick={() => props.cancelInscriptionCall(inscription.inscription_id)}>
+                  <img className="h-6" alt="Cancel" src="https://img.icons8.com/?size=100&id=63688&format=png&color=000000" />
+                </button>
+              )}
+            </div>
+            <div className="pb-12 w-auto">
               <InscriptionStatus status={Number(inscription.status)} />
             </div>
             <h3 className="text-2xl font-bold underline">Info</h3>
-            <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary border-2 border-[var(--color-primary-light)] rounded-lg">
+            <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary-dull border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">From</h4>
                 <p className="text-lg text__color--primary">{requesterFormatted}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">To</h4>
-                <p className="text-lg text__color--primary">{inscription.bitcoin_address}</p>
+                <p className="text-lg text__color--primary">{recipientFormatted}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Fee</h4>

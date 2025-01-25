@@ -13,6 +13,9 @@ Api:
     - Content-Type
   Production: true
   Admin: true
+Websocket:
+  Host: websockets.broly-sepolia.svc.cluster.local
+  Port: 8083
 Consumer:
   Host: consumer.broly-sepolia.svc.cluster.local
   Port: 8081

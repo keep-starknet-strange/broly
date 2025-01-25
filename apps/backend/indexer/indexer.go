@@ -14,40 +14,40 @@ func InitIndexerRoutes() {
 }
 
 type IndexerTransaction struct {
-  Meta IndexerTransactionMeta `json:"meta"`
-  InvokeV0 IndexerInvokeV0 `json:"invokeV0"`
-  InvokeV1 IndexerInvokeV1 `json:"invokeV1"`
-  InvokeV3 IndexerInvokeV3 `json:"invokeV3"`
+	Meta     IndexerTransactionMeta `json:"meta"`
+	InvokeV0 IndexerInvokeV0        `json:"invokeV0"`
+	InvokeV1 IndexerInvokeV1        `json:"invokeV1"`
+	InvokeV3 IndexerInvokeV3        `json:"invokeV3"`
 }
 
 type IndexerTransactionMeta struct {
-  Meta struct {
-    Hash string `json:"hash"`
-    MaxFee string `json:"maxFee"`
-    Nonce string `json:"nonce"`
-    Version string `json:"version"`
-    TransactionIndex string `json:"transactionIndex"`
-  }
+	Meta struct {
+		Hash             string `json:"hash"`
+		MaxFee           string `json:"maxFee"`
+		Nonce            string `json:"nonce"`
+		Version          string `json:"version"`
+		TransactionIndex string `json:"transactionIndex"`
+	}
 }
 
 type IndexerInvokeV0 struct {
-  MaxFee string `json:"maxFee"`
-  ContractAddress string `json:"contractAddress"`
-  EntryPointSelector string `json:"entryPointSelector"`
-  Calldata []string `json:"calldata"`
+	MaxFee             string   `json:"maxFee"`
+	ContractAddress    string   `json:"contractAddress"`
+	EntryPointSelector string   `json:"entryPointSelector"`
+	Calldata           []string `json:"calldata"`
 }
 
 type IndexerInvokeV1 struct {
-  SenderAddress string `json:"senderAddress"`
-  Calldata []string `json:"calldata"`
-  MaxFee string `json:"maxFee"`
-  Nonce string `json:"nonce"`
+	SenderAddress string   `json:"senderAddress"`
+	Calldata      []string `json:"calldata"`
+	MaxFee        string   `json:"maxFee"`
+	Nonce         string   `json:"nonce"`
 }
 
 type IndexerInvokeV3 struct {
-  SenderAddress string `json:"senderAddress"`
-  Calldata []string `json:"calldata"`
-  Nonce string `json:"nonce"`
+	SenderAddress string   `json:"senderAddress"`
+	Calldata      []string `json:"calldata"`
+	Nonce         string   `json:"nonce"`
 }
 
 type IndexerCursor struct {
@@ -61,7 +61,7 @@ type IndexerEventWithTransaction struct {
 		Keys        []string `json:"keys"`
 		Data        []string `json:"data"`
 	} `json:"event"`
-  Transaction IndexerTransaction `json:"transaction"`
+	Transaction IndexerTransaction `json:"transaction"`
 }
 
 type IndexerMessage struct {
@@ -70,7 +70,7 @@ type IndexerMessage struct {
 		EndCursor IndexerCursor `json:"end_cursor"`
 		Finality  string        `json:"finality"`
 		Batch     []struct {
-			Status string         `json:"status"`
+			Status string                        `json:"status"`
 			Events []IndexerEventWithTransaction `json:"events"`
 		} `json:"batch"`
 	} `json:"data"`
@@ -90,24 +90,28 @@ const (
 	requestCreatedEvent   = "0x02206f1373fa5f0c53a9546d291d8e7389cdbee50a22dca64f02545611a91cc2"
 	requestLockedEvent    = "0x00cb8cf3a8b98da361712b27e7be452a22ec254dfa7c0b59a74dd7d111bcbe9d"
 	requestCompletedEvent = "0x0158f34f5ba2bc3f4b4aac16b288b8ea46dd0e884b0c8030a9e7313b259d8b98"
+	requestCancelledEvent = "0x02c663ab11c92d03f13ad4e49b9ee2e09db80bb9d1603ac5b5c281ed825445c1"
 )
 
 var eventProcessors = map[string](func(IndexerEventWithTransaction)){
 	requestCreatedEvent:   processRequestCreatedEvent,
 	requestLockedEvent:    processRequestLockedEvent,
 	requestCompletedEvent: processRequestCompletedEvent,
+	requestCancelledEvent: processRequestCancelledEvent,
 }
 
 var eventReverters = map[string](func(IndexerEventWithTransaction)){
 	requestCreatedEvent:   revertRequestCreatedEvent,
 	requestLockedEvent:    revertRequestLockedEvent,
 	requestCompletedEvent: revertRequestCompletedEvent,
+	requestCancelledEvent: revertRequestCancelledEvent,
 }
 
 var eventRequiresOrdering = map[string]bool{
 	requestCreatedEvent:   true,
 	requestLockedEvent:    true,
 	requestCompletedEvent: true,
+	requestCancelledEvent: true,
 }
 
 const (
@@ -127,20 +131,20 @@ func PrintIndexerEventError(funcName string, event IndexerEventWithTransaction, 
 	for _, data := range event.Event.Data {
 		fmt.Println("        ", data)
 	}
-  fmt.Println("    CallData:")
-  if event.Transaction.InvokeV0.Calldata != nil {
-    for _, calldata := range event.Transaction.InvokeV0.Calldata {
-      fmt.Println("        ", calldata)
-    }
-  } else if event.Transaction.InvokeV1.Calldata != nil {
-    for _, calldata := range event.Transaction.InvokeV1.Calldata {
-      fmt.Println("        ", calldata)
-    }
-  } else if event.Transaction.InvokeV3.Calldata != nil {
-    for _, calldata := range event.Transaction.InvokeV3.Calldata {
-      fmt.Println("        ", calldata)
-    }
-  }
+	fmt.Println("    CallData:")
+	if event.Transaction.InvokeV0.Calldata != nil {
+		for _, calldata := range event.Transaction.InvokeV0.Calldata {
+			fmt.Println("        ", calldata)
+		}
+	} else if event.Transaction.InvokeV1.Calldata != nil {
+		for _, calldata := range event.Transaction.InvokeV1.Calldata {
+			fmt.Println("        ", calldata)
+		}
+	} else if event.Transaction.InvokeV3.Calldata != nil {
+		for _, calldata := range event.Transaction.InvokeV3.Calldata {
+			fmt.Println("        ", calldata)
+		}
+	}
 }
 
 func PrintIndexerError(funcName string, err string, data interface{}) {

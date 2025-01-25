@@ -5,14 +5,14 @@ import InscriptionRequestView from "../components/inscription/RequestView";
 import { getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
-function Inscritpions(_props: any) {
+function Inscritpions(props: any) {
   const filters = ["Hot", "New", "Rare"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const defaultInscriptions: any[] = [];
   const [inscriptions, setInscriptions] = useState(defaultInscriptions);
   const [inscriptionsPagination, setInscriptionsPagination] = useState({
-    pageLength: 25,
+    pageLength: 20,
     page: 1
   });
   const defaultRequests: any[] = [];
@@ -39,7 +39,7 @@ function Inscritpions(_props: any) {
           setInscriptions(result.data);
         } else {
           const newInscriptios = result.data.filter((inscription: any) => {
-            return !inscriptions.some((i: any) => i.id === inscription.id);
+            return !inscriptions.some((i: any) => i.inscription_id === inscription.inscription_id);
           });
           setInscriptions([...inscriptions, ...newInscriptios]);
         }
@@ -54,7 +54,7 @@ function Inscritpions(_props: any) {
 
   const resetPagination = () => {
     setInscriptionsPagination({
-      pageLength: 16,
+      pageLength: 20,
       page: 1
     });
   }
@@ -71,7 +71,7 @@ function Inscritpions(_props: any) {
           setRequests(result.data);
         } else {
           const newRequests = result.data.filter((request: any) => {
-            return !requests.some((r: any) => r.id === request.id);
+            return !requests.some((r: any) => r.inscription_id === request.inscription_id);
           });
           setRequests([...requests, ...newRequests]);
         }
@@ -84,6 +84,23 @@ function Inscritpions(_props: any) {
     }
   }, [requestPagination]);
 
+  // Websocket messages
+  useEffect(() => {
+    if (props.requestedInscription) {
+      // TODO: Update open requests
+    }
+  }, [props.requestedInscription]);
+  useEffect(() => {
+    if (props.newInscription) {
+      // TODO: Update inscriptions lists ( new )
+    }
+  }, [props.newInscription]);
+  useEffect(() => {
+    if (props.updateRequest) {
+      // TODO: Remove request from open inscriptions or update status
+    }
+  }, [props.updateRequest]);
+
   // TODO: Button to create new request if no requests are open
   // TODO: shadow and arrow on rhs of scrollable div
   return (
@@ -95,7 +112,7 @@ function Inscritpions(_props: any) {
             {requests.map((request, index) => {
               return (
                 <div className="" key={index}>
-                  <InscriptionRequestView key={request.id} inscription={request} />
+                  <InscriptionRequestView key={request.inscription_id} inscription={request} />
                 </div>
               );
             })}

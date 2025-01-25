@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.websockets.name }}
+spec:
+  replicas: {{ .Values.deployments.websockets.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.websockets.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.websockets.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.websockets.name }}
+          image: {{ .Values.deployments.websockets.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          command: ["./websockets"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.websockets }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.websockets.name }}-secret

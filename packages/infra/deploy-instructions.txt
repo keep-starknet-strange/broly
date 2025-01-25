@@ -38,3 +38,4 @@ apply changes to cloud
 change frontend contract addresses/configs in vercel
   VITE_BROLY_CONTRACT_ADDRESS
 Redepoloy vercel FE
+copy account over to inscriber

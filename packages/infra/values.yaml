@@ -5,6 +5,8 @@ labels:
     name: postgres
   backend:
     name: backend
+  websockets:
+    name: websockets
   consumer:
     name: consumer
   inscriber:
@@ -17,6 +19,7 @@ ports:
   postgres: 5432
   backend: 8080
   consumer: 8081
+  websockets: 8083
 
 volumes:
   redis:
@@ -25,11 +28,6 @@ volumes:
     storage: 10Gi
   postgres:
     name: postgres-data
-    class: standard-rwo
-    storage: 50Gi
-  inscriptions:
-    name: inscription-data
-    claim: inscription-volume-claim
     class: standard-rwo
     storage: 50Gi
 
@@ -46,6 +44,9 @@ deployments:
   backend:
     replicas: 1
     image: brandonjroberts/broly-backend
+  websockets:
+    replicas: 1
+    image: brandonjroberts/broly-websockets
   consumer:
     replicas: 1
     image: brandonjroberts/broly-consumer
