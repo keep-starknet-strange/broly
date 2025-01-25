@@ -22,11 +22,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.labels.backend.name }}-secret
-          volumeMounts:
-            - mountPath: /app/inscriptions
-              name: {{ .Values.volumes.inscriptions.name }}
-      volumes:
-        - name: {{ .Values.volumes.inscriptions.name }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.volumes.inscriptions.claim }}
-
