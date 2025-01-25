@@ -150,8 +150,10 @@ function App() {
       return
     }
   
+    console.log('Cancel inscription', inscriptionId)
     const calldata = CallData.compile([
-      inscriptionId
+      inscriptionId,
+      toHex('STRK')
     ])
   
     setCalls([orderbookContract.populate('cancel_inscription', calldata)])

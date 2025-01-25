@@ -240,3 +240,35 @@ func revertRequestCompletedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 }
+
+func processRequestCancelledEvent(event IndexerEventWithTransaction) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("processRequestCancelledEvent", event, err)
+    return
+  }
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = -1 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("processRequestCancelledEvent", event, err)
+    return
+  }
+}
+
+func revertRequestCancelledEvent(event IndexerEventWithTransaction) {
+  inscriptionIdHex := event.Event.Keys[1]
+  inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCancelledEvent", event, err)
+    return
+  }
+
+  // Insert into Postgres
+  _, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 0 WHERE inscription_id = $1", inscriptionId)
+  if err != nil {
+    PrintIndexerEventError("revertRequestCancelledEvent", event, err)
+    return
+  }
+}

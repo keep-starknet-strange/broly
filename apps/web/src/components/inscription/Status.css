@@ -4,6 +4,7 @@
   --status-active-color-dark: rgba(20, 150, 20, 1);
   --status-pending-color: rgba(120, 160, 120, 1);
   --status-inactive-color: rgba(120, 120, 120, 1);
+  --status-cancel-color: rgba(200, 20, 20, 1);
 }
 
 .InscriptionStatus__dot--active {
@@ -38,4 +39,18 @@
 
 .InscriptionStatus__text--active {
   color: var(--status-active-color-dark);
+}
+
+.InscriptionStatus__dot--cancel {
+  background-color: var(--status-cancel-color);
+  box-shadow: 0 0 4px var(--status-cancel-color);
+}
+
+.InscriptionStatus__line--cancel {
+  background-color: var(--status-cancel-color);
+  box-shadow: 0 0 3px var(--status-cancel-color);
+}
+
+.InscriptionStatus__text--cancel {
+  color: var(--status-cancel-color);
 }
