@@ -36,6 +36,15 @@ services:
       - CONFIG_PATH=/configs/config.yaml
     volumes:
       - ./inscriptions:/app/inscriptions
+  websockets:
+    build:
+      dockerfile: apps/backend/Dockerfile.websockets
+      context: .
+    ports:
+      - 8083:8083
+    links:
+      - consumer
+    restart: always
   consumer:
     build:
       dockerfile: apps/backend/Dockerfile.consumer

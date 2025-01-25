@@ -8,31 +8,31 @@ function InscriptionStatus(props: any) {
   const [bitcoinClass, setBitcoinClass] = useState("");
   const [completeClass, setCompleteClass] = useState("");
   useEffect(() => {
-    if (props.status === -2) {
+    if (props.status === -2 || props.status === "-2") {
       setRequestClass("--pending");
       setWaitingClass("");
       setInscriptorClass("");
       setBitcoinClass("");
       setCompleteClass("");
-    } else if (props.status === -1) {
+    } else if (props.status === -1 || props.status === "-1") {
       setRequestClass("--cancel");
       setWaitingClass("--cancel");
       setInscriptorClass("--cancel");
       setBitcoinClass("--cancel");
       setCompleteClass("--cancel");
-    } else if (props.status === 0) {
+    } else if (props.status === 0 || props.status === "0") {
       setRequestClass("--active");
       setWaitingClass("--pending");
       setInscriptorClass("");
       setBitcoinClass("");
       setCompleteClass("");
-    } else if (props.status === 1) {
+    } else if (props.status === 1 || props.status === "1") {
       setRequestClass("--active");
       setWaitingClass("--active");
       setInscriptorClass("--active");
       setBitcoinClass("--pending");
       setCompleteClass("");
-    } else if (props.status === 2) {
+    } else if (props.status === 2 || props.status === "2") {
       setRequestClass("--active");
       setWaitingClass("--active");
       setInscriptorClass("--active");

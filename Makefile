@@ -24,6 +24,8 @@ docker-build:
 	@echo "Building docker images with version $(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building backend..."
 	docker build . -f apps/backend/Dockerfile.prod -t "brandonjroberts/broly-backend:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Building websockets..."
+	docker build . -f apps/backend/Dockerfile.websockets.prod -t "brandonjroberts/broly-websockets:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building consumer..."
 	docker build . -f apps/backend/Dockerfile.consumer.prod -t "brandonjroberts/broly-consumer:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building inscriber..."

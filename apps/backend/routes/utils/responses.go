@@ -2,7 +2,9 @@ package routeutils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/keep-starknet-strange/broly/backend/internal/config"
@@ -66,4 +68,17 @@ func ReadJsonDataResponse[targetType any](r *http.Response) (struct{ Data target
 		return struct{ Data targetType }{}, err
 	}
 	return struct{ Data targetType }{Data: target.Data}, nil
+}
+
+func SendMessageToWSS(message map[string]string) {
+	websocketHost := config.Conf.Websocket.Host + ":" + strconv.Itoa(config.Conf.Websocket.Port) + "/ws-msg"
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		fmt.Println("Failed to marshal websocket message")
+		return
+	}
+	_, err = http.Post("http://"+websocketHost, "application/json", strings.NewReader(string(messageBytes)))
+	if err != nil {
+		fmt.Println("Failed to send message to websocket server", err)
+	}
 }

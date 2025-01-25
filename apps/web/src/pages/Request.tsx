@@ -45,6 +45,19 @@ function Request(props: any) {
       }
     }
   }, [inscription]);
+
+  // Websocket messages
+  useEffect(() => {
+    if (props.requestedInscription) {
+      // TODO: Reload inscription if it's the same as the pg id
+    }
+  }, [props.requestedInscription]);
+  useEffect(() => {
+    if (props.updateRequest) {
+      // TODO: Update requests status
+    }
+  }, [props.updateRequest]);
+
   // TODO: Move inscription query up to parent component
   // TODO: Links on owner, block#, id, ...
   return (

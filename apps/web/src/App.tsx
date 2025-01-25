@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router'
 import { CallData, RpcProvider, constants, byteArray, uint256 } from 'starknet';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { useConnect, useDisconnect, useAccount, useContract, useSendTransaction } from '@starknet-react/core'
 import { useStarknetkitConnectModal, StarknetkitConnector } from "starknetkit";
 import { connectBitcoinWallet } from './connections/satsConnect';
+import { getInscriptionRequest, getInscription } from './api/inscriptions';
 import './App.css'
 import Header from './components/Header'
 import orderbook_abi from './abi/orderbook.abi.json';
@@ -171,6 +173,62 @@ function App() {
     orderbookContract
   }
 
+  // Websocket connection
+  let wsUrl = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8083/ws';
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(wsUrl, {
+    share: false,
+    shouldReconnect: (_e) => true,
+    reconnectAttempts: 10,
+    reconnectInterval: (attempt) => Math.min(10000, Math.pow(2, attempt) * 1000)
+  });
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      sendJsonMessage({
+        event: 'subscribe',
+        data: {
+          channel: 'general'
+        }
+      });
+    }
+  }, [readyState]);
+
+  const [updateRequest, setUpdateRequest] = useState<{ id: number, status: string } | null>(null);
+  const [newInscription, setNewInscription] = useState<any>(null);
+  const [requestedInscription, setRequestedInscription] = useState<any>(null);
+  useEffect(() => {
+    const processMessage = async (message: any) => {
+      if (message) {
+        if (message.messageType === 'requestCreated') {
+          let requester = message.requester;
+          if (address && requester === address.substring(2)) {
+            let inscriptionId = message.inscriptionId;
+            let request = await getInscriptionRequest(inscriptionId);
+            if (request && request.data) {
+              setRequestedInscription(request.data);
+            }
+          }
+        } else if (message.messageType === 'requestCancelled') {
+          let inscriptionId = message.inscriptionId;
+          setUpdateRequest({ id: inscriptionId, status: '-1' });
+        } else if (message.messageType === 'requestLocked') {
+          let inscriptionId = message.inscriptionId;
+          setUpdateRequest({ id: inscriptionId, status: '1' });
+        } else if (message.messageType === 'requestCompleted') {
+          let inscriptionId = message.inscriptionId;
+          setUpdateRequest({ id: inscriptionId, status: '2' });
+          let inscription = await getInscription(inscriptionId);
+          if (inscription && inscription.data) {
+            setNewInscription(inscription.data);
+          }
+        }
+      }
+    }
+
+    processMessage(lastJsonMessage);
+  }, [lastJsonMessage]);
+
+
   // TODO: <Route path="*" element={<NotFound />} />
   return (
     <div className="h-screen relative">
@@ -202,6 +260,9 @@ function App() {
                 disconnectBitcoinWallet={disconnectBitcoinWallet}
                 isBitcoinWalletConnected={!!taprootAddress}
                 isStarknetConnected={isStarknetConnected}
+                requestedInscription={requestedInscription}
+                updateRequest={updateRequest}
+                newInscription={newInscription}
                 {...tabProps}
               />
             }
