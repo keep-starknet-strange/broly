@@ -39,6 +39,8 @@ docker-push:
 	@echo "Pushing docker images with version $(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing backend..."
 	docker push "brandonjroberts/broly-backend:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Pushing websockets..."
+	docker push "brandonjroberts/broly-websockets:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing consumer..."
 	docker push "brandonjroberts/broly-consumer:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing inscriber..."
