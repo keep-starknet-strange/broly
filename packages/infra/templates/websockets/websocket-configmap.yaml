@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.labels.websockets.name }}-secret
+  labels:
+    app: {{ .Values.labels.websockets.name }}
+data:
+  BROLY_ORDERBOOK_CONTRACT_ADDRESS: {{ .Values.contracts.brolyOrderbookContract }}
+  CONFIG_PATH: /configs/config.yaml

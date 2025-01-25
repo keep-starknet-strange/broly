@@ -8,6 +8,13 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
+  - path: /ws
+    pathType: Exact
+    backend:
+      service:
+        name: {{ .Values.labels.websockets.name }}
+        port:
+          number: {{ .Values.ports.websockets }}
   - path: /inscriptions
     pathType: Prefix
     backend:
@@ -17,6 +24,13 @@ spec:
           number: {{ .Values.ports.backend }}
   - http:
       paths:
+      - path: /ws
+        pathType: Exact
+        backend:
+          service:
+            name: {{ .Values.labels.websockets.name }}
+            port:
+              number: {{ .Values.ports.websockets }}
       - path: /inscriptions
         pathType: Prefix
         backend:

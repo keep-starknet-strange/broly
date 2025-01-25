@@ -5,6 +5,8 @@ labels:
     name: postgres
   backend:
     name: backend
+  websockets:
+    name: websockets
   consumer:
     name: consumer
   inscriber:
@@ -17,6 +19,7 @@ ports:
   postgres: 5432
   backend: 8080
   consumer: 8081
+  websockets: 8083
 
 volumes:
   redis:
@@ -46,6 +49,9 @@ deployments:
   backend:
     replicas: 1
     image: brandonjroberts/broly-backend
+  websockets:
+    replicas: 1
+    image: brandonjroberts/broly-websockets
   consumer:
     replicas: 1
     image: brandonjroberts/broly-consumer
