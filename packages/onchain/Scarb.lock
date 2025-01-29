@@ -4,7 +4,7 @@ version = 1
 [[package]]
 name = "alexandria_math"
 version = "0.2.1"
-source = "git+https://github.com/keep-starknet-strange/alexandria#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 
 [[package]]
 name = "consensus"
@@ -31,8 +31,8 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -49,17 +49,16 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_access"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_introspection",
- "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_account"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -67,8 +66,8 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_finance"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_token",
@@ -76,29 +75,30 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_governance"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
  "openzeppelin_introspection",
  "openzeppelin_token",
+ "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_introspection"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 
 [[package]]
 name = "openzeppelin_merkle_tree"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 
 [[package]]
 name = "openzeppelin_presets"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -111,13 +111,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_security"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 
 [[package]]
 name = "openzeppelin_token"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -127,13 +127,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_upgrades"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 
 [[package]]
 name = "openzeppelin_utils"
-version = "0.19.0"
-source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.19.0#8d49e8c445efd9bdc99b050c8b7d11ae5ad19628"
+version = "0.20.0"
+source = "git+https://github.com/openzeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
 
 [[package]]
 name = "ripemd160"
@@ -162,13 +162,13 @@ source = "git+https://github.com/keep-starknet-strange/shinigami.git?rev=3415ed6
 
 [[package]]
 name = "snforge_scarb_plugin"
-version = "0.33.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
+version = "0.36.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.36.0#6af1722bad3dd98001285e76f43a83d8b38614de"
 
 [[package]]
 name = "snforge_std"
-version = "0.33.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.33.0#221b1dbff42d650e9855afd4283508da8f8cacba"
+version = "0.36.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.36.0#6af1722bad3dd98001285e76f43a83d8b38614de"
 dependencies = [
  "snforge_scarb_plugin",
 ]
@@ -181,7 +181,7 @@ source = "git+https://github.com/keep-starknet-strange/raito.git?rev=02a13045b70
 [[package]]
 name = "utu_relay"
 version = "0.1.0"
-source = "git+https://github.com/lana-shanghai/utu_relay.git#25f8d9799df04465c716155e9ece61d9145b0f8c"
+source = "git+https://github.com/lana-shanghai/utu_relay.git#dfdfcdddf5f089c73c4c43ec8eb062422a8b3ff7"
 dependencies = [
  "openzeppelin",
  "openzeppelin_upgrades",

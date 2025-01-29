@@ -55,7 +55,6 @@ mod OrderbookMock {
     pub struct RequestLocked {
         #[key]
         inscription_id: u32,
-        tx_hash: ByteArray,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -127,13 +126,11 @@ mod OrderbookMock {
         /// lock can be created.
         /// Inputs:
         /// - `inscription_id: u32`, the ID of the inscription being locked.
-        /// - `tx_hash: ByteArray`, the precomputed bitcoin transaction hash that will be
-        /// submitted onchain by the submitter.
-        fn lock_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+        fn lock_inscription(ref self: ContractState, inscription_id: u32) {
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_REQUESTED);
             self.inscription_status.write(inscription_id, INSCRIPTION_LOCKED);
-            self.emit(RequestLocked { inscription_id: inscription_id, tx_hash: tx_hash });
+            self.emit(RequestLocked { inscription_id: inscription_id });
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
@@ -152,7 +149,6 @@ mod OrderbookMock {
             block_header: BlockHeader,
             inclusion_proof: Array<(Digest, bool)>,
         ) {
-            // TODO: process the submitted transaction hash, verify that it is on Bitcoin
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_LOCKED);
             self.inscription_status.write(inscription_id, INSCRIPTION_COMPLETED);
@@ -161,14 +157,14 @@ mod OrderbookMock {
 
         fn query_inscription(
             self: @ContractState, inscription_id: u32,
-        ) -> (ContractAddress, ByteArray, u256) {
-            return (get_contract_address(), "", 0);
+        ) -> (ContractAddress, ByteArray, u256, ByteArray) {
+            return (get_contract_address(), "", 0, "");
         }
 
         fn query_inscription_lock(
             self: @ContractState, inscription_id: u32,
-        ) -> (ContractAddress, ByteArray, u64) {
-            return (get_contract_address(), "", 0);
+        ) -> (ContractAddress, u64) {
+            return (get_contract_address(), 0);
         }
     }
 
