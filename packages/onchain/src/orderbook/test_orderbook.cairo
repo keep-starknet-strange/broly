@@ -390,3 +390,4 @@ fn test_cancel_inscription_fails_canceled() {
 //     inclusion_proof);
 // }
 
+
