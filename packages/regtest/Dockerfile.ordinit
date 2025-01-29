@@ -1,0 +1,8 @@
+FROM brandonjroberts/ord:0.22.2-ca9950a1 AS ordinals
+
+RUN apt-get update && apt-get install -y jq
+
+WORKDIR /scripts
+COPY ./ordinit.sh .
+
+CMD ["/bin/bash", "ordinit.sh"]

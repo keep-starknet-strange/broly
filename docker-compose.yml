@@ -1,6 +1,62 @@
 version: "3"
 
 services:
+  regtest:
+    image: bitcoin/bitcoin:28.1
+    restart: always
+    ports:
+      - 18443:18443
+    entrypoint: bitcoind -regtest -txindex
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  ord:
+    image: brandonjroberts/ord:0.22.2-ca9950a1
+    restart: always
+    ports:
+      - 8553:8553
+    entrypoint: ord --regtest --bitcoin-rpc-url http://broly-regtest-1:18443 --bitcoin-rpc-username user --bitcoin-rpc-password password --bitcoin-data-dir /root/.bitcoin server --http-port 8553
+    links:
+      - regtest
+    volumes:
+      - bitcoin:/root/.bitcoin
+  ordinit:
+    build:
+      dockerfile: ./Dockerfile.ordinit
+      context: packages/regtest
+    depends_on:
+      - ord
+    restart: no
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  reginit:
+    build:
+      dockerfile: ./Dockerfile.reginit
+      context: packages/regtest
+    depends_on:
+      ord:
+        condition: service_started
+      ordinit:
+        condition: service_completed_successfully
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  updater:
+    build:
+      dockerfile: ./Dockerfile.update
+      context: packages/regtest
+    restart: always
+    depends_on:
+      ord:
+        condition: service_started
+      ordinit:
+        condition: service_completed_successfully
+      reginit:
+        condition: service_completed_successfully
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
   redis:
     image: redis:7.2.4-alpine
     restart: always
@@ -112,3 +168,4 @@ services:
 volumes:
   redis:
   postgres:
+  bitcoin:
