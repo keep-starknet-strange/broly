@@ -36,10 +36,10 @@ func InitScriptConfig() {
 	}
 }
 
-func LockInscriptionInvokeScript(inscriptionId int, txHash string) error {
+func LockInscriptionInvokeScript(inscriptionId int) error {
 	shellCmd := Conf.LockInscriptionScript
 
-	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
+	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId))
 	_, err := cmd.Output()
 	if err != nil {
 		return err
@@ -48,10 +48,10 @@ func LockInscriptionInvokeScript(inscriptionId int, txHash string) error {
 	return nil
 }
 
-func SubmitInscriptionInvokeScript(inscriptionId int, txHash string) error {
+func SubmitInscriptionInvokeScript(inscriptionId int) error {
 	shellCmd := Conf.SubmitInscriptionScript
 
-	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId), txHash)
+	cmd := exec.Command(shellCmd, strconv.Itoa(inscriptionId))
 	_, err := cmd.Output()
 	if err != nil {
 		return err
