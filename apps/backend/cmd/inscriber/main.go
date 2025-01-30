@@ -18,7 +18,7 @@ func InscriberLockingService() {
 
 	backendUrl := "http://" + config.Conf.Api.Host + ":" + strconv.Itoa(config.Conf.Api.Port)
 	for {
-		sleepTime := 5 // Wait 5 seconds before querying the backend
+		sleepTime := 10 // Wait 10 seconds before querying the backend
 		time.Sleep(time.Duration(sleepTime) * time.Second)
 
 		// Query the backend for open inscription requests
@@ -59,6 +59,14 @@ func InscriberLockingService() {
 				fmt.Println("No locked inscription requests")
 				continue
 			}
+
+      // Inscribe on Bitcoin
+      fmt.Println("Inscribing on Bitcoin: ", responseJson.Data[0].InscriptionId)
+      err = scripts.RunInscribeScript(responseJson.Data[0].InscriptionData)
+      if err != nil {
+        fmt.Println("Error while inscribing on Bitcoin")
+        continue
+      }
 
 			// Submit the locked inscription request for completion
 			fmt.Println("Submitting inscription: ", responseJson.Data[0])

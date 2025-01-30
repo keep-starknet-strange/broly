@@ -1,2 +1,3 @@
 LockInscriptionScript: /scripts/lock_request.sh
 SubmitInscriptionScript: /scripts/submit_request.sh
+InscribeScript: /scripts/ord_inscribe.sh

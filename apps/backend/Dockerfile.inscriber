@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine
+FROM golang:1.23.1-alpine AS builder
 
 RUN apk add --no-cache bash curl git jq yq ncurses
 
@@ -26,5 +26,12 @@ COPY ./apps/backend .
 
 # Build the app & run it
 RUN go build -o inscriber ./cmd/inscriber/main.go
+
+FROM brandonjroberts/ord:0.22.2-ca9950a1 AS ordinals
+COPY --from=builder /app/inscriber /app/inscriber
+COPY --from=builder /configs /configs
+COPY --from=builder /scripts /scripts
+
+WORKDIR /app
 
 CMD ["./inscriber"]

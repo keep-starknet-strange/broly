@@ -1,10 +1,12 @@
 package scripts
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -12,6 +14,7 @@ import (
 type ScriptConfig struct {
 	LockInscriptionScript   string `yaml:"LockInscriptionScript"`
 	SubmitInscriptionScript string `yaml:"SubmitInscriptionScript"`
+  InscribeScript          string `yaml:"InscribeScript"`
 }
 
 var Conf *ScriptConfig
@@ -58,4 +61,56 @@ func SubmitInscriptionInvokeScript(inscriptionId int, txHash string) error {
 	}
 
 	return nil
+}
+
+func DecodeBase64(base64Data string) ([]byte, error) {
+  return base64.StdEncoding.DecodeString(base64Data)
+}
+
+func RunInscribeScript(inscriptionData string) error {
+  shellCmd := Conf.InscribeScript
+
+  // inscriptionData in a format like: image/png;base64,iVBORw0KGgoA...
+  dataPrefix := strings.Split(inscriptionData, ",")[0]
+  fileType := strings.Split(dataPrefix, ";")[0]
+  encoding := strings.Split(dataPrefix, ";")[1]
+
+  if fileType != "image/png" {
+    return fmt.Errorf("Only image/png is supported")
+  }
+  if encoding != "base64" {
+    return fmt.Errorf("Only base64 encoding is supported")
+  }
+
+  // Write the data to a temporary file
+  tmpFile, err := os.CreateTemp("", "inscription-*.png")
+  if err != nil {
+    return err
+  }
+  defer tmpFile.Close()
+
+  base64Data := strings.Split(inscriptionData, ",")[1]
+  decodedInscriptionData, err := DecodeBase64(base64Data)
+  if err != nil {
+    return err
+  }
+
+  _, err = tmpFile.Write(decodedInscriptionData)
+  if err != nil {
+    return err
+  }
+
+  cmd := exec.Command(shellCmd, tmpFile.Name())
+  _, err = cmd.Output()
+  if err != nil {
+    return err
+  }
+
+  // Remove the temporary file
+  err = os.Remove(tmpFile.Name())
+  if err != nil {
+    return err
+  }
+
+  return nil
 }
