@@ -20,10 +20,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.labels.inscriber.name }}-secret
-          volumeMounts:
-            - mountPath: /root/.bitcoin
-              name: {{ .Values.volumes.bitcoin.name }}
-      volumes:
-        - name: {{ .Values.volumes.bitcoin.name }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.volumes.bitcoin.claimName }}

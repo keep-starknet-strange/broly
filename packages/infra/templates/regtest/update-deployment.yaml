@@ -15,18 +15,9 @@ spec:
     spec:
       containers:
         - name: {{ .Values.labels.update.name }}
-          image: {{ .Values.deployments.backend.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          image: {{ .Values.deployments.update.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
           imagePullPolicy: Always
-          ports:
-            - containerPort: {{ .Values.ports.update }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.labels.update.name }}-secret
-          volumeMounts:
-            - mountPath: /root/.bitcoin
-              name: {{ .Values.volumes.bitcoin.name }}
-      volumes:
-        - name: {{ .Values.volumes.bitcoin.name }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.volumes.bitcoin.claimName }}
 {{- end }}
