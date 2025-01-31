@@ -23,9 +23,9 @@ apply changes to cloud
    clone / pull latest
    If full reset
      make helm-uninstall
-     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-install
+     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-install
   else
-     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-upgrade
+     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
 
   kubectl cp apps/backend/postgres/init.sql pod:/home
     kubectl exec -it pod/pod-name bash
@@ -33,9 +33,10 @@ apply changes to cloud
     kubectl delete pvc redis-volume-claim
     kubectl delete deployment.apps/redis
     kubectl delete deployment.apps/indexer
-    POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc make helm-upgrade
+    POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
 
 change frontend contract addresses/configs in vercel
   VITE_BROLY_CONTRACT_ADDRESS
 Redepoloy vercel FE
 copy account over to inscriber
+do bitcoin regtest / ord setup
