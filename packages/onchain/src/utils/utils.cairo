@@ -38,8 +38,8 @@ pub fn compute_merkle_root(tx_hash: Digest, siblings: Array<(Digest, bool)>) -> 
 }
 
 pub fn extract_p2tr_tweaked_pubkey(script: @ByteArray) -> ByteArray {
-    assert(script[0] == 0x51, 'expected OP_1prefix');
-    assert(script[1] == 0x20, 'expected OP_PUSHBYTES_32prefix');
+    assert(script[0] == 0x51, 'expected OP_1 prefix');
+    assert(script[1] == 0x20, 'expected OP_PUSHBYTES_32 prefix');
     let script_length = script.len();
     assert(script_length == 34, 'expected length 34');
 
