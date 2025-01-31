@@ -32,6 +32,8 @@ docker-build:
 	docker build . -f apps/backend/Dockerfile.inscriber.prod -t "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building indexer..."	
 	docker build . -f packages/indexer/Dockerfile.prod -t "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Building regtest updater..."
+	docker build . -f packages/regtest/Dockerfile.update.prod -t "brandonjroberts/broly-regtest-updater:$(APP_VERSION)-$(COMMIT_SHA)"
 
 docker-push:
 	$(eval APP_VERSION := $(shell cat packages/infra/Chart.yaml | yq eval '.appVersion' -))
@@ -47,6 +49,8 @@ docker-push:
 	docker push "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing indexer..."
 	docker push "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Pushing regtest updater..."
+	docker push "brandonjroberts/broly-regtest-updater:$(APP_VERSION)-$(COMMIT_SHA)"
 
 helm-uninstall:
 	@echo "Uninstalling helm chart..."

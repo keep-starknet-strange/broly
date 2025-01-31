@@ -1,0 +1,32 @@
+{{- if .Values.contracts.useRegtest}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.update.name }}
+spec:
+  replicas: {{ .Values.labels.update.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.update.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.update.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.update.name }}
+          image: {{ .Values.deployments.backend.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.update }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.update.name }}-secret
+          volumeMounts:
+            - mountPath: /root/.bitcoin
+              name: {{ .Values.volumes.bitcoin.name }}
+      volumes:
+        - name: {{ .Values.volumes.bitcoin.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.bitcoin.claimName }}
+{{- end }}

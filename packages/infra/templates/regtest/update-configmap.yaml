@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.labels.update.name }}-secret
+  labels:
+    app: {{ .Values.labels.update.name }}
+data:
+  REGTEST_URL: {{ .Values.bitcoin.rpcUrl }}

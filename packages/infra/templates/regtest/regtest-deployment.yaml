@@ -1,0 +1,33 @@
+{{- if .Values.contracts.useRegtest}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.regtest.name }}
+spec:
+  replicas: {{ .Values.labels.regtest.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.regtest.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.regtest.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.regtest.name }}
+          image: {{ .Values.deployments.regtest.image }}
+          entrypoint: ["bitcoind", "-regtest", "-txindex"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.regtest }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.regtest.name }}-secret
+          volumeMounts:
+            - mountPath: /root/.bitcoin
+              name: {{ .Values.volumes.bitcoin.name }}
+      volumes:
+        - name: {{ .Values.volumes.bitcoin.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumes.bitcoin.claimName }}
+{{- end }}
