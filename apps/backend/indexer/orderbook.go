@@ -126,13 +126,13 @@ func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 
-  // Send message to all connected clients
-  var message = map[string]string{
-    "messageType": "requestCreated",
-    "inscriptionId": strconv.FormatInt(inscriptionId, 10),
-    "requester": caller,
-  }
-  routeutils.SendMessageToWSS(message)
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCreated",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+		"requester":     caller,
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestCreatedEvent(event IndexerEventWithTransaction) {
@@ -180,12 +180,12 @@ func processRequestLockedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 
-  // Send message to all connected clients
-  var message = map[string]string{
-    "messageType": "requestLocked",
-    "inscriptionId": strconv.FormatInt(inscriptionId, 10),
-  }
-  routeutils.SendMessageToWSS(message)
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestLocked",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestLockedEvent(event IndexerEventWithTransaction) {
@@ -234,12 +234,12 @@ func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 
-  // Send message to all connected clients
-  var message = map[string]string{
-    "messageType": "requestCompleted",
-    "inscriptionId": strconv.FormatInt(inscriptionId, 10),
-  }
-  routeutils.SendMessageToWSS(message)
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCompleted",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestCompletedEvent(event IndexerEventWithTransaction) {
@@ -279,12 +279,12 @@ func processRequestCancelledEvent(event IndexerEventWithTransaction) {
 		return
 	}
 
-  // Send message to all connected clients
-  var message = map[string]string{
-    "messageType": "requestCancelled",
-    "inscriptionId": strconv.FormatInt(inscriptionId, 10),
-  }
-  routeutils.SendMessageToWSS(message)
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCancelled",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestCancelledEvent(event IndexerEventWithTransaction) {

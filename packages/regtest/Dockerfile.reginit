@@ -1,0 +1,8 @@
+FROM bitcoin/bitcoin:28.1 AS btc
+
+RUN apt-get update && apt-get install -y jq
+
+WORKDIR /scripts
+COPY ./reginit.sh .
+
+CMD ["/bin/bash", "reginit.sh"]
