@@ -60,13 +60,13 @@ func InscriberLockingService() {
 				continue
 			}
 
-      // Inscribe on Bitcoin
-      fmt.Println("Inscribing on Bitcoin: ", responseJson.Data[0].InscriptionId)
-      err = scripts.RunInscribeScript(responseJson.Data[0].InscriptionData)
-      if err != nil {
-        fmt.Println("Error while inscribing on Bitcoin")
-        continue
-      }
+			// Inscribe on Bitcoin
+			fmt.Println("Inscribing on Bitcoin: ", responseJson.Data[0].InscriptionId)
+			err = scripts.RunInscribeScript(responseJson.Data[0].InscriptionData)
+			if err != nil {
+				fmt.Println("Error while inscribing on Bitcoin")
+				continue
+			}
 
 			// Submit the locked inscription request for completion
 			fmt.Println("Submitting inscription: ", responseJson.Data[0])
