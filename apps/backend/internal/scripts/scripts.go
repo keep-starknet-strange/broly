@@ -75,15 +75,21 @@ func RunInscribeScript(inscriptionData string) error {
 	fileType := strings.Split(dataPrefix, ";")[0]
 	encoding := strings.Split(dataPrefix, ";")[1]
 
-	if fileType != "image/png" {
-		return fmt.Errorf("Only image/png is supported")
+	if fileType != "image/png" || fileType != "image/jpeg" {
+		return fmt.Errorf("Only image/png or image/jpeg file types are supported")
 	}
 	if encoding != "base64" {
 		return fmt.Errorf("Only base64 encoding is supported")
 	}
 
 	// Write the data to a temporary file
-	tmpFile, err := os.CreateTemp("", "inscription-*.png")
+	var tmpFile *os.File
+	var err error
+	if fileType == "image/png" {
+		tmpFile, err = os.CreateTemp("", "inscription-*.png")
+	} else if fileType == "image/jpeg" {
+		tmpFile, err = os.CreateTemp("", "inscription-*.jpeg")
+	}
 	if err != nil {
 		return err
 	}
