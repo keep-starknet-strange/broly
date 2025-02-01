@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.volumes.bitcoin.claimName }}
+  labels:
+    app: {{ .Values.volumes.bitcoin.name }}
+spec:
+  storageClassName: {{ .Values.volumes.bitcoin.class }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.volumes.postgres.storage }}
+

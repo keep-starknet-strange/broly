@@ -1,0 +1,25 @@
+{{- if .Values.contracts.useRegtest}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.update.name }}
+spec:
+  replicas: {{ .Values.labels.update.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.update.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.update.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.update.name }}
+          image: {{ .Values.deployments.update.image }}:{{ .Chart.AppVersion }}-{{ .Values.deployments.sha }}
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.update.name }}-secret
+            - configMapRef:
+                name: {{ .Values.labels.ord.name }}-secret
+{{- end }}

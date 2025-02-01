@@ -54,6 +54,8 @@ services:
         condition: service_completed_successfully
       reginit:
         condition: service_completed_successfully
+    environment:
+      - REGTEST_HOST=broly-regtest-1
     volumes:
       - bitcoin:/root/.bitcoin
       - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf

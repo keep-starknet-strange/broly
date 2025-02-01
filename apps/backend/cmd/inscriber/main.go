@@ -64,7 +64,7 @@ func InscriberLockingService() {
 			fmt.Println("Inscribing on Bitcoin: ", responseJson.Data[0].InscriptionId)
 			err = scripts.RunInscribeScript(responseJson.Data[0].InscriptionData)
 			if err != nil {
-				fmt.Println("Error while inscribing on Bitcoin")
+				fmt.Println("Error while inscribing on Bitcoin", err)
 				continue
 			}
 

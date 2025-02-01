@@ -32,6 +32,8 @@ docker-build:
 	docker build . -f apps/backend/Dockerfile.inscriber.prod -t "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building indexer..."	
 	docker build . -f packages/indexer/Dockerfile.prod -t "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Building regtest update..."
+	docker build . -f packages/regtest/Dockerfile.update.prod -t "brandonjroberts/broly-regtest-update:$(APP_VERSION)-$(COMMIT_SHA)"
 
 docker-push:
 	$(eval APP_VERSION := $(shell cat packages/infra/Chart.yaml | yq eval '.appVersion' -))
@@ -47,6 +49,8 @@ docker-push:
 	docker push "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing indexer..."
 	docker push "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Pushing regtest update..."
+	docker push "brandonjroberts/broly-regtest-update:$(APP_VERSION)-$(COMMIT_SHA)"
 
 helm-uninstall:
 	@echo "Uninstalling helm chart..."
@@ -55,14 +59,14 @@ helm-uninstall:
 helm-install:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Installing helm chart..."
-	helm install --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm install --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra
 
 helm-template:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Rendering helm chart..."
-	helm template --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm template --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra
 
 helm-upgrade:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Upgrading helm chart..."
-	helm upgrade --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm upgrade --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra

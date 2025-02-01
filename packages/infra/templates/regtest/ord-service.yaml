@@ -1,0 +1,14 @@
+{{- if .Values.contracts.useRegtest}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.labels.ord.name }}
+  labels:
+    app: {{ .Values.labels.ord.name }}
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.ports.ord }}
+  selector:
+    app: {{ .Values.labels.ord.name }}
+{{- end }}

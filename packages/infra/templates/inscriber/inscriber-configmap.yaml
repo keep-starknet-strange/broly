@@ -11,3 +11,8 @@ data:
   KEYSTORE_PATH: /app/account/test.key
   ACCOUNT_FILE: /app/account/account.json
   BROLY_ORDERBOOK_CONTRACT_ADDRESS: {{ .Values.contracts.brolyOrderbookContract }}
+  BITCOIN_RPC_URL: "{{ .Values.bitcoin.rpcUrl }}:{{ .Values.ports.regtest }}"
+  BITCOIN_RPC_USER: {{ .Values.bitcoin.user }}
+  BITCOIN_RPC_PASSWORD: {{ .Values.bitcoin.password }}
+  BITCOIN_DATA_DIR: /root/.bitcoin
+  ORD_SERVER_URL: "http://{{ .Values.bitcoin.ordUrl }}:{{ .Values.ports.ord }}"
