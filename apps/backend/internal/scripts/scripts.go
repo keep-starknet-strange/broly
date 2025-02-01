@@ -75,7 +75,7 @@ func RunInscribeScript(inscriptionData string) error {
 	fileType := strings.Split(dataPrefix, ";")[0]
 	encoding := strings.Split(dataPrefix, ";")[1]
 
-	if fileType != "image/png" || fileType != "image/jpeg" {
+	if fileType != "image/png" && fileType != "image/jpeg" {
 		return fmt.Errorf("Only image/png or image/jpeg file types are supported")
 	}
 	if encoding != "base64" {
