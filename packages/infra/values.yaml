@@ -77,7 +77,7 @@ deployments:
     image: brandonjroberts/ord:0.22.2-ca9950a1
   update:
     replicas: 1
-    image: brandonjroberts/broly-update
+    image: brandonjroberts/broly-regtest-update
 
 postgres:
   db: broly-db

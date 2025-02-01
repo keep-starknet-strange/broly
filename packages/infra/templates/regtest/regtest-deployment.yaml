@@ -16,18 +16,27 @@ spec:
       containers:
         - name: {{ .Values.labels.regtest.name }}
           image: {{ .Values.deployments.regtest.image }}
-          entrypoint: ["bitcoind", "-regtest", "-txindex"]
+          command: ["bitcoind", "-regtest", "-txindex"]
           imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.ports.regtest }}
-          envFrom:
-            - configMapRef:
-                name: {{ .Values.labels.regtest.name }}-secret
           volumeMounts:
             - mountPath: /root/.bitcoin
               name: {{ .Values.volumes.bitcoin.name }}
+            - mountPath: /root/.bitcoin/bitcoin.conf
+              name: bitcoin-conf-volume
+              subPath: bitcoin_conf_path
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.ord.name }}-secret
       volumes:
         - name: {{ .Values.volumes.bitcoin.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.volumes.bitcoin.claimName }}
+        - name: bitcoin-conf-volume
+          configMap:
+            name: bitcoin-conf
+            items:
+            - key: bitcoin.conf
+              path: bitcoin_conf_path
 {{- end }}

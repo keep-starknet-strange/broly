@@ -16,20 +16,20 @@ spec:
       containers:
         - name: {{ .Values.labels.ord.name }}
           image: {{ .Values.deployments.ord.image }}
-          entrypoint:
+          command:
             - ord
             - --regtest
             - --bitcoin-rpc-url
-            - {{ .Values.bitcoin.rpcUrl }}:{{ .Values.ports.regtest }}
+            - "{{ .Values.bitcoin.rpcUrl }}:{{ .Values.ports.regtest }}"
             - --bitcoin-rpc-username
-            - {{ .Values.bitcoin.user }}
+            - "{{ .Values.bitcoin.user }}"
             - --bitcoin-rpc-password
-            - {{ .Values.bitcoin.password }}
+            - "{{ .Values.bitcoin.password }}"
             - --bitcoin-data-dir
             - /root/.bitcoin
             - server
             - --http-port
-            - {{ .Values.ports.ord }}
+            - "{{ .Values.ports.ord }}"
           imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.ports.ord }}

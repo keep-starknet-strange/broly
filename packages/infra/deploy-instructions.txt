@@ -27,6 +27,18 @@ apply changes to cloud
   else
      POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
 
+copy account over to inscriber
+do bitcoin regtest / ord setup
+  kubectl exec -it pod/ord-pod-name bash
+  ord --regtest --bitcoin-rpc-url $BITCOIN_RPC_URL --bitcoin-rpc-username $BITCOIN_USER --bitcoin-rpc-password $BITCOIN_PASSWORD --bitcoin-data-dir /root/.bitcoin wallet --server-url $ORD_SERVER_URL create
+  ord --regtest --bitcoin-rpc-url $BITCOIN_RPC_URL --bitcoin-rpc-username $BITCOIN_USER --bitcoin-rpc-password $BITCOIN_PASSWORD --bitcoin-data-dir /root/.bitcoin wallet --server-url $ORD_SERVER_URL receive
+  copy address
+  kubectl exec -it pod/regtest-pod-name bash
+  bitcoin-cli -rpcconnect=$BITCOIN_RPC_URL -regtest generatetoaddress 101 <address>
+  kubectl exec -it pod/update-pod-name bash
+  export ORDINALS_RECEIVE_ADDRESS=<address>
+  sed -i 's/\$ORDINALS_RECEIVE_ADDRESS/'$ORDINALS_RECEIVE_ADDRESS'/g' /scripts/update-prod.sh
+
   kubectl cp apps/backend/postgres/init.sql pod:/home
     kubectl exec -it pod/pod-name bash
     psql -U broly-user -d broly-db -f /home/init.sql
@@ -38,5 +50,3 @@ apply changes to cloud
 change frontend contract addresses/configs in vercel
   VITE_BROLY_CONTRACT_ADDRESS
 Redepoloy vercel FE
-copy account over to inscriber
-do bitcoin regtest / ord setup

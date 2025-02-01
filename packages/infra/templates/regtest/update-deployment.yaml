@@ -20,4 +20,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Values.labels.update.name }}-secret
+            - configMapRef:
+                name: {{ .Values.labels.ord.name }}-secret
 {{- end }}

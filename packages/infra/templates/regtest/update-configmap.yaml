@@ -5,4 +5,4 @@ metadata:
   labels:
     app: {{ .Values.labels.update.name }}
 data:
-  REGTEST_URL: {{ .Values.bitcoin.rpcUrl }}
+  REGTEST_HOST: {{ .Values.bitcoin.rpcUrl }}
