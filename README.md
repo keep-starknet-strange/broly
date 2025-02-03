@@ -87,6 +87,17 @@ docker compose build
 docker compose up
 ```
 
+2. Run the proof-utils package
+
+```bash
+cd packages/proof-utils
+pnpm add -D typescript ts-node
+pnpm run build 
+node dist/index.js
+```
+
+The script will print the serialized transaction hex.
+
 ## Project Structure
 
 ```text
