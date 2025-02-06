@@ -11,7 +11,7 @@ function InscriptionImageLargeView(props: any) {
       return;
     }
 
-    if (props.inscription.inscription_data.includes("http")) {
+    if (props.inscription.inscription_data.startsWith("http")) {
       setImage(props.inscription.inscription_data);
       return;
     } else {

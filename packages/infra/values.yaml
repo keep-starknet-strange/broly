@@ -5,18 +5,29 @@ labels:
     name: postgres
   backend:
     name: backend
+  websockets:
+    name: websockets
   consumer:
     name: consumer
   inscriber:
     name: inscriber
   indexer:
     name: indexer
+  regtest:
+    name: regtest
+  ord:
+    name: ord
+  update:
+    name: update
 
 ports:
   redis: 6379
   postgres: 5432
   backend: 8080
   consumer: 8081
+  websockets: 8083
+  regtest: 18443
+  ord: 8553
 
 volumes:
   redis:
@@ -27,11 +38,11 @@ volumes:
     name: postgres-data
     class: standard-rwo
     storage: 50Gi
-  inscriptions:
-    name: inscription-data
-    claim: inscription-volume-claim
+  bitcoin:
+    name: bitcoin-data
     class: standard-rwo
     storage: 50Gi
+    claimName: bitcoin-data-volume-claim
 
 deployments:
   sha: aabbccdd
@@ -46,6 +57,9 @@ deployments:
   backend:
     replicas: 1
     image: brandonjroberts/broly-backend
+  websockets:
+    replicas: 1
+    image: brandonjroberts/broly-websockets
   consumer:
     replicas: 1
     image: brandonjroberts/broly-consumer
@@ -55,11 +69,26 @@ deployments:
   indexer:
     replicas: 1
     image: brandonjroberts/broly-indexer
+  regtest:
+    replicas: 1
+    image: bitcoin/bitcoin:28.1
+  ord:
+    replicas: 1
+    image: brandonjroberts/ord:0.22.2-ca9950a1
+  update:
+    replicas: 1
+    image: brandonjroberts/broly-regtest-update
 
 postgres:
   db: broly-db
   user: broly-user
   password: BrolyPassword1234
+
+bitcoin:
+  user: bitcoin-user
+  password: BitcoinPassword1234
+  rpcUrl: regtest.broly-sepolia.svc.cluster.local
+  ordUrl: ord.broly-sepolia.svc.cluster.local
 
 apibara:
   #streamUrl: https://mainnet.starknet.a5a.ch
@@ -69,3 +98,4 @@ apibara:
 
 contracts:
   brolyOrderbookContract: 0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
+  useRegtest: true

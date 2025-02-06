@@ -24,12 +24,16 @@ docker-build:
 	@echo "Building docker images with version $(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building backend..."
 	docker build . -f apps/backend/Dockerfile.prod -t "brandonjroberts/broly-backend:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Building websockets..."
+	docker build . -f apps/backend/Dockerfile.websockets.prod -t "brandonjroberts/broly-websockets:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building consumer..."
 	docker build . -f apps/backend/Dockerfile.consumer.prod -t "brandonjroberts/broly-consumer:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building inscriber..."
 	docker build . -f apps/backend/Dockerfile.inscriber.prod -t "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Building indexer..."	
 	docker build . -f packages/indexer/Dockerfile.prod -t "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Building regtest update..."
+	docker build . -f packages/regtest/Dockerfile.update.prod -t "brandonjroberts/broly-regtest-update:$(APP_VERSION)-$(COMMIT_SHA)"
 
 docker-push:
 	$(eval APP_VERSION := $(shell cat packages/infra/Chart.yaml | yq eval '.appVersion' -))
@@ -37,12 +41,16 @@ docker-push:
 	@echo "Pushing docker images with version $(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing backend..."
 	docker push "brandonjroberts/broly-backend:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Pushing websockets..."
+	docker push "brandonjroberts/broly-websockets:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing consumer..."
 	docker push "brandonjroberts/broly-consumer:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing inscriber..."
 	docker push "brandonjroberts/broly-inscriber:$(APP_VERSION)-$(COMMIT_SHA)"
 	@echo "Pushing indexer..."
 	docker push "brandonjroberts/broly-indexer:$(APP_VERSION)-$(COMMIT_SHA)"
+	@echo "Pushing regtest update..."
+	docker push "brandonjroberts/broly-regtest-update:$(APP_VERSION)-$(COMMIT_SHA)"
 
 helm-uninstall:
 	@echo "Uninstalling helm chart..."
@@ -51,14 +59,14 @@ helm-uninstall:
 helm-install:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Installing helm chart..."
-	helm install --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm install --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra
 
 helm-template:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Rendering helm chart..."
-	helm template --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm template --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra
 
 helm-upgrade:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Upgrading helm chart..."
-	helm upgrade --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) broly-infra packages/infra
+	helm upgrade --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra

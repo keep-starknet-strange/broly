@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.labels.ord.name }}-secret
+  labels:
+    app: {{ .Values.labels.ord.name }}
+data:
+  ORD_SERVER_URL: "http://{{ .Values.bitcoin.ordUrl }}:{{ .Values.ports.ord }}"
+  BITCOIN_USER: {{ .Values.bitcoin.user }}
+  BITCOIN_PASSWORD: {{ .Values.bitcoin.password }}
+  BITCOIN_RPC_URL: "{{ .Values.bitcoin.rpcUrl }}:{{ .Values.ports.regtest }}"

@@ -16,7 +16,7 @@ func main() {
 	db.InitDB()
 	defer db.CloseDB()
 
-  routes.InitBaseRoutes()
+	routes.InitBaseRoutes()
 	indexer.InitIndexerRoutes()
 	indexer.StartMessageProcessor()
 

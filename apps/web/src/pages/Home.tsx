@@ -6,21 +6,14 @@ import InscriptionStatus from "../components/inscription/Status";
 import { Pagination } from "../components/Pagination";
 import { getNewInscriptions } from "../api/inscriptions";
 
-function Home(props: {
-  requestInscriptionCall: (dataToInscribe: string, taprootAddress: string) => Promise<void>;
-  taprootAddress: string | null;
-  connectBitcoinWalletHandler: () => Promise<void>;
-  disconnectBitcoinWallet: () => void;
-  isBitcoinWalletConnected: boolean;
-  isStarknetConnected: boolean;
-}) {
+function Home(props: any) {
   const [isInscribing, setIsInscribing] = useState(false);
-  const [inscribingStatus, _setInscribingStatus] = useState(-2);
+  const [inscribingStatus, setInscribingStatus] = useState(-2);
 
   const defaultInscription: any[] = [];
   const [recentInscriptions, setRecentInscriptions] = useState(defaultInscription);
   const [recentsPagination, setRecentsPagination] = useState({
-    pageLength: 25,
+    pageLength: 20,
     page: 1,
   });
 
@@ -33,7 +26,7 @@ function Home(props: {
           setRecentInscriptions(result.data);
         } else {
           const newInscriptions = result.data.filter((inscription: any) => {
-            return !recentInscriptions.some((recent: any) => recent.id === inscription.id);
+            return !recentInscriptions.some((recent: any) => recent.inscription_id === inscription.inscription_id);
           });
           setRecentInscriptions([...recentInscriptions, ...newInscriptions]);
         }
@@ -46,9 +39,36 @@ function Home(props: {
     }
   }, [recentsPagination, isInscribing]);
 
+  // Websocket messages
+  const [requestId, setRequestId] = useState(null);
+  useEffect(() => {
+    if (props.requestedInscription) {
+      setRequestId(props.requestedInscription.inscription_id.toString());
+      setInscribingStatus(props.requestedInscription.status);
+    }
+  }, [props.requestedInscription]);
+  useEffect(() => {
+    if (props.newInscription) {
+      let newRecentInscriptions = recentInscriptions.filter((inscription) => {
+        return inscription.inscription_id !== props.newInscription.inscription_id;
+      });
+      if (newRecentInscriptions.length % recentsPagination.pageLength === 0) {
+        newRecentInscriptions = [props.newInscription, ...newRecentInscriptions.slice(0, recentsPagination.pageLength - 1)];
+      } else {
+        newRecentInscriptions = [props.newInscription, ...newRecentInscriptions];
+      }
+      setRecentInscriptions(newRecentInscriptions);
+    }
+  }, [props.newInscription]);
+  useEffect(() => {
+    if (props.updateRequest && props.updateRequest.id === requestId) {
+      setInscribingStatus(props.updateRequest.status);
+    }
+  }, [props.updateRequest]);
+
   return (
     <div className="w-full flex flex-col h-max">
-      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-8">
+      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center pt-8 pb-10">
         <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
         <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
         <InscriptionForm

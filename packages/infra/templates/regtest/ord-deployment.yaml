@@ -1,0 +1,39 @@
+{{- if .Values.contracts.useRegtest}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.labels.ord.name }}
+spec:
+  replicas: {{ .Values.labels.ord.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.labels.ord.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.labels.ord.name }}
+    spec:
+      containers:
+        - name: {{ .Values.labels.ord.name }}
+          image: {{ .Values.deployments.ord.image }}
+          command:
+            - ord
+            - --regtest
+            - --bitcoin-rpc-url
+            - "{{ .Values.bitcoin.rpcUrl }}:{{ .Values.ports.regtest }}"
+            - --bitcoin-rpc-username
+            - "{{ .Values.bitcoin.user }}"
+            - --bitcoin-rpc-password
+            - "{{ .Values.bitcoin.password }}"
+            - --bitcoin-data-dir
+            - /root/.bitcoin
+            - server
+            - --http-port
+            - "{{ .Values.ports.ord }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.ports.ord }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.labels.ord.name }}-secret
+{{- end }}

@@ -36,6 +36,16 @@ export const config = {
         includeReverted: false,
         includeTransaction: false,
         includeReceipt: false
+      },
+      {
+        fromAddress: Deno.env.get("BROLY_CONTRACT_ADDRESS"),
+        keys: [
+          // RequestCanceled Event
+          "0x02c663ab11c92d03f13ad4e49b9ee2e09db80bb9d1603ac5b5c281ed825445c1",
+        ],
+        includeReverted: false,
+        includeTransaction: false,
+        includeReceipt: false
       }
     ]
   },

@@ -8,15 +8,44 @@ metadata:
     kubernetes.io/ingress.class: "gce"
 spec:
   rules:
-  - path: /inscriptions
-    pathType: Prefix
-    backend:
-      service:
-        name: {{ .Values.labels.backend.name }}
-        port:
-          number: {{ .Values.ports.backend }}
+  - host: api.broly-btc.com
+    http:
+      paths:
+        - path: /ws
+          pathType: Exact
+          backend:
+            service:
+              name: {{ .Values.labels.websockets.name }}
+              port:
+                number: {{ .Values.ports.websockets }}
+        - path: /inscriptions
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Values.labels.backend.name }}
+              port:
+                number: {{ .Values.ports.backend }}
+  {{- if .Values.contracts.useRegtest}}
+  - host: ord.broly-btc.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Values.labels.ord.name }}
+              port:
+                number: {{ .Values.ports.ord }}
+  {{- end }}
   - http:
       paths:
+      - path: /ws
+        pathType: Exact
+        backend:
+          service:
+            name: {{ .Values.labels.websockets.name }}
+            port:
+              number: {{ .Values.ports.websockets }}
       - path: /inscriptions
         pathType: Prefix
         backend:

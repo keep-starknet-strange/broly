@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/keep-starknet-strange/broly/backend/internal/db"
+	routeutils "github.com/keep-starknet-strange/broly/backend/routes/utils"
 )
 
 func readByteArray(data []string, offset int) (string, int, error) {
@@ -72,7 +73,7 @@ func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 	}
 	caller := event.Event.Keys[2][2:] // remove 0x prefix
 
-  // TODO: InvokeV0 & V3?
+	// TODO: InvokeV0 & V3?
 	inscriptionData, _, err := readByteArray(event.Transaction.InvokeV1.Calldata, 4)
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
@@ -124,6 +125,14 @@ func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
 	}
+
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCreated",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+		"requester":     caller,
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestCreatedEvent(event IndexerEventWithTransaction) {
@@ -170,6 +179,13 @@ func processRequestLockedEvent(event IndexerEventWithTransaction) {
 		PrintIndexerEventError("processRequestLockedEvent", event, err)
 		return
 	}
+
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestLocked",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestLockedEvent(event IndexerEventWithTransaction) {
@@ -217,6 +233,13 @@ func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 		PrintIndexerEventError("processRequestCompletedEvent", event, err)
 		return
 	}
+
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCompleted",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
 }
 
 func revertRequestCompletedEvent(event IndexerEventWithTransaction) {
@@ -237,6 +260,45 @@ func revertRequestCompletedEvent(event IndexerEventWithTransaction) {
 	_, err = db.Db.Postgres.Exec(context.Background(), "DELETE FROM Inscriptions WHERE inscription_id = $1", inscriptionId)
 	if err != nil {
 		PrintIndexerEventError("revertRequestCompletedEvent", event, err)
+		return
+	}
+}
+
+func processRequestCancelledEvent(event IndexerEventWithTransaction) {
+	inscriptionIdHex := event.Event.Keys[1]
+	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+	if err != nil {
+		PrintIndexerEventError("processRequestCancelledEvent", event, err)
+		return
+	}
+
+	// Insert into Postgres
+	_, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = -1 WHERE inscription_id = $1", inscriptionId)
+	if err != nil {
+		PrintIndexerEventError("processRequestCancelledEvent", event, err)
+		return
+	}
+
+	// Send message to all connected clients
+	var message = map[string]string{
+		"messageType":   "requestCancelled",
+		"inscriptionId": strconv.FormatInt(inscriptionId, 10),
+	}
+	routeutils.SendMessageToWSS(message)
+}
+
+func revertRequestCancelledEvent(event IndexerEventWithTransaction) {
+	inscriptionIdHex := event.Event.Keys[1]
+	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
+	if err != nil {
+		PrintIndexerEventError("revertRequestCancelledEvent", event, err)
+		return
+	}
+
+	// Insert into Postgres
+	_, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 0 WHERE inscription_id = $1", inscriptionId)
+	if err != nil {
+		PrintIndexerEventError("revertRequestCancelledEvent", event, err)
 		return
 	}
 }

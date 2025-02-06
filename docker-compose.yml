@@ -1,6 +1,64 @@
 version: "3"
 
 services:
+  regtest:
+    image: bitcoin/bitcoin:28.1
+    restart: always
+    ports:
+      - 18443:18443
+    entrypoint: bitcoind -regtest -txindex
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  ord:
+    image: brandonjroberts/ord:0.22.2-ca9950a1
+    restart: always
+    ports:
+      - 8553:8553
+    entrypoint: ord --regtest --bitcoin-rpc-url http://broly-regtest-1:18443 --bitcoin-rpc-username user --bitcoin-rpc-password password --bitcoin-data-dir /root/.bitcoin server --http-port 8553
+    links:
+      - regtest
+    volumes:
+      - bitcoin:/root/.bitcoin
+  ordinit:
+    build:
+      dockerfile: ./Dockerfile.ordinit
+      context: packages/regtest
+    depends_on:
+      - ord
+    restart: no
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  reginit:
+    build:
+      dockerfile: ./Dockerfile.reginit
+      context: packages/regtest
+    depends_on:
+      ord:
+        condition: service_started
+      ordinit:
+        condition: service_completed_successfully
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
+  updater:
+    build:
+      dockerfile: ./Dockerfile.update
+      context: packages/regtest
+    restart: always
+    depends_on:
+      ord:
+        condition: service_started
+      ordinit:
+        condition: service_completed_successfully
+      reginit:
+        condition: service_completed_successfully
+    environment:
+      - REGTEST_HOST=broly-regtest-1
+    volumes:
+      - bitcoin:/root/.bitcoin
+      - ./packages/regtest/bitcoin.conf:/root/.bitcoin/bitcoin.conf
   redis:
     image: redis:7.2.4-alpine
     restart: always
@@ -36,6 +94,15 @@ services:
       - CONFIG_PATH=/configs/config.yaml
     volumes:
       - ./inscriptions:/app/inscriptions
+  websockets:
+    build:
+      dockerfile: apps/backend/Dockerfile.websockets
+      context: .
+    ports:
+      - 8083:8083
+    links:
+      - consumer
+    restart: always
   consumer:
     build:
       dockerfile: apps/backend/Dockerfile.consumer
@@ -56,6 +123,9 @@ services:
     links:
       - backend
       - indexer
+      - ord
+      - regtest
+      - updater
     restart: always
     environment:
       - CONFIG_PATH=/configs/config.yaml
@@ -63,7 +133,13 @@ services:
       - KEYSTORE_PATH=/app/account/test.key
       - ACCOUNT_FILE=/app/account/account.json
       - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
+      - BITCOIN_RPC_URL=http://broly-regtest-1:18443
+      - BITCOIN_RPC_USER=user
+      - BITCOIN_RPC_PASSWORD=password
+      - BITCOIN_DATA_DIR=/root/.bitcoin
+      - ORD_SERVER_URL=http://broly-ord-1:8553
     volumes:
+      - bitcoin:/root/.bitcoin
       - ./account:/app/account
   indexer:
     build:
@@ -103,3 +179,4 @@ services:
 volumes:
   redis:
   postgres:
+  bitcoin:

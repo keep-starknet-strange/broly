@@ -1,0 +1,9 @@
+FROM bitcoin/bitcoin:28.1
+
+RUN apt-get update && apt-get install -y jq watch curl
+
+
+WORKDIR /scripts
+COPY ./update.sh .
+
+CMD ["/bin/bash", "update.sh"]
