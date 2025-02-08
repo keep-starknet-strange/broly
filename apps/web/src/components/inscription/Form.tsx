@@ -57,7 +57,22 @@ function InscriptionForm(props: any) {
     // inscriptionData = window.location.origin + "/inscriptions/" + imagePath;
   
     setErrorMessage("");
-    await props.requestInscriptionCall(dataToInscribe, taprootAddress, "STRK", 20000);
+    // TODO: Use a backend route to estimate the inscription cost
+    const inscriptionSize = dataToInscribe.length;
+    const constantTxSize = 1000;
+    const lenientScalingFactor = 1.1;
+    const inscribeTxVbytesEstimate = ((inscriptionSize / 4) + constantTxSize) * lenientScalingFactor;
+    const feeRateResponse = await fetch("https://mempool.space/api/v1/fees/recommended");
+    const feeRateData = await feeRateResponse.json();
+    const feeRateEstimate = feeRateData.halfHourFee;
+    const incribeCostEstimate = feeRateEstimate * inscribeTxVbytesEstimate;
+    const btcToSat = 100000000;
+    const btcToStrkResponse = await fetch("https://api.coinconvert.net/convert/btc/strk?amount=1");
+    const btcToStrkData = await btcToStrkResponse.json();
+    const btcToStrk = btcToStrkData.STRK;
+    const inscribeCostEstimateStrk = incribeCostEstimate * btcToStrk / btcToSat;
+    // TODO: STRK to u256 strk ( * 10^18? )
+    await props.requestInscriptionCall(dataToInscribe, taprootAddress, "STRK", inscribeCostEstimateStrk);
     props.setIsInscribing(true);
   }
   

@@ -17,6 +17,8 @@ import (
 
 type Inscription struct {
 	InscriptionId   int        `json:"inscription_id"`
+  TxHash          string     `json:"tx_hash"`
+  TxIndex         int        `json:"tx_index"`
 	Owner           string     `json:"owner"`
 	SatNumber       int        `json:"sat_number"`
 	MintedBlock     int        `json:"minted_block"`
@@ -26,14 +28,15 @@ type Inscription struct {
 }
 
 type InscriptionRequest struct {
-	InscriptionId   int    `json:"inscription_id"`
-	Requester       string `json:"requester"`
-	BitcoinAddress  string `json:"bitcoin_address"`
-	FeeToken        string `json:"fee_token"`
-	FeeAmount       int    `json:"fee_amount"`
-	Type            string `json:"type"`
-	InscriptionData string `json:"inscription_data"`
-	Status          string `json:"status"`
+	InscriptionId   int     `json:"inscription_id"`
+	Requester       string  `json:"requester"`
+	BitcoinAddress  string  `json:"bitcoin_address"`
+	FeeToken        string  `json:"fee_token"`
+	FeeAmount       float64 `json:"fee_amount"`
+  Bytes           int     `json:"bytes"`
+	Type            string  `json:"type"`
+	InscriptionData string  `json:"inscription_data"`
+	Status          string  `json:"status"`
 }
 
 func InitInscriptionsRoutes() {
@@ -49,6 +52,9 @@ func InitInscriptionsRoutes() {
 	http.HandleFunc("/inscriptions/get-open-requests", getOpenInscriptionRequests)
 	http.HandleFunc("/inscriptions/get-locked-requests", getLockedInscriptionRequests)
 	http.HandleFunc("/inscriptions/upload-image", uploadInsciptionImage)
+
+  http.HandleFunc("/inscriptions/estimate-vbytes", estimateVbytes)
+  http.HandleFunc("/inscriptions/get-profitable-requests", getProfitableInscriptionRequests)
 
 	http.Handle("/inscriptions/images/", http.StripPrefix("/inscriptions/", http.FileServer(http.Dir("./inscriptions/images"))))
 }
@@ -346,4 +352,59 @@ func uploadInsciptionImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	routeutils.WriteResultJson(w, hex.EncodeToString(hash[:]))
+}
+
+func estimateVbytes(w http.ResponseWriter, r *http.Request) {
+  // Size of the inscription in bytes
+  size, err := strconv.Atoi(r.URL.Query().Get("size"))
+  if err != nil {
+    routeutils.WriteErrorJson(w, http.StatusBadRequest, "Invalid size")
+    return
+  }
+
+  // TODO: Implement a better vbytes estimation using ord --dry-run
+  txSizeConstant := 1000.0
+  estimateVbytes := float64(size) / 4.0 + txSizeConstant 
+  lenientScaler := 1.1 // 10% extra for leniency & inscribor payment
+  totalEstimate := int(estimateVbytes * lenientScaler)
+
+  // TODO: Change to estimate fee
+  routeutils.WriteDataJson(w, fmt.Sprintf("%d", totalEstimate))
+}
+
+func getProfitableInscriptionRequests(w http.ResponseWriter, r *http.Request) {
+  strkPerVbyte, err := strconv.ParseFloat(r.URL.Query().Get("feeRate"), 10)
+  if err != nil {
+    routeutils.WriteErrorJson(w, http.StatusBadRequest, "Invalid feeRate")
+    return
+  }
+  lenience, err := strconv.ParseFloat(r.URL.Query().Get("lenience"), 10)
+  if err != nil {
+    lenience = 1.1
+  }
+  constTxSize, err := strconv.Atoi(r.URL.Query().Get("txExtraBytes"))
+  if err != nil {
+    constTxSize = 1000.0
+  }
+
+  pageLength, err := strconv.Atoi(r.URL.Query().Get("pageLength"))
+  if err != nil || pageLength <= 0 {
+    pageLength = 10
+  }
+  if pageLength > 30 {
+    pageLength = 30
+  }
+  page, err := strconv.Atoi(r.URL.Query().Get("page"))
+  if err != nil || page <= 0 {
+    page = 1
+  }
+  offset := (page - 1) * pageLength
+
+  query := "SELECT r.*, d.type, d.inscription_data, s.status FROM InscriptionRequests r LEFT JOIN InscriptionRequestsData d ON r.inscription_id = d.inscription_id LEFT JOIN InscriptionRequestsStatus s ON r.inscription_id = s.inscription_id WHERE s.status = 0 AND r.fee_amount >= ((r.bytes / 4) + $1) * $2 * $3 ORDER BY r.inscription_id ASC LIMIT $4 OFFSET $5"
+  requests, err := db.PostgresQueryJson[InscriptionRequest](query, constTxSize, strkPerVbyte, lenience, pageLength, offset)
+  if err != nil {
+    routeutils.WriteErrorJson(w, http.StatusInternalServerError, "Error getting inscription requests")
+    return
+  }
+  routeutils.WriteDataJson(w, string(requests))
 }

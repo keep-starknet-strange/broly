@@ -8,6 +8,7 @@ import { connectBitcoinWallet } from './connections/satsConnect';
 import { getInscriptionRequest, getInscription } from './api/inscriptions';
 import './App.css'
 import Header from './components/Header'
+import erc20_abi from './abi/erc20.abi.json';
 import orderbook_abi from './abi/orderbook.abi.json';
 
 import Home from './pages/Home'
@@ -113,6 +114,10 @@ function App() {
     return hex;
   };
 
+  const { contract: strkContract } = useContract({
+    address: import.meta.env.VITE_STRK_CONTRACT_ADDRESS,
+    abi: erc20_abi as any
+  });
   const { contract: orderbookContract } = useContract({
     address: import.meta.env.VITE_BROLY_CONTRACT_ADDRESS,
     abi: orderbook_abi as any
@@ -120,18 +125,30 @@ function App() {
 
   const [calls, setCalls] = useState([] as any[])
   const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string, feeToken: string, fee: number) => {
-    if (!address || !orderbookContract) {
+    if (!address || !orderbookContract || !strkContract) {
       return
     }
   
+    /* global BigInt */
+    const strkDecimals = BigInt(10) ** BigInt(18)
+    const bnFee = strkDecimals * (BigInt(fee.toFixed(0)) + BigInt(1))
+    console.log('Request inscription', dataToInscribe, taprootAddress, feeToken, fee, bnFee)
     const calldata = CallData.compile([
       byteArray.byteArrayFromString(dataToInscribe),
       byteArray.byteArrayFromString(taprootAddress),
       toHex(feeToken),
-      uint256.bnToUint256(fee)
+      uint256.bnToUint256(bnFee)
     ])
+    const approveCalldata = CallData.compile([
+      orderbookContract.address,
+      uint256.bnToUint256(bnFee)
+    ])
+    console.log('Calldata', calldata)
   
-    setCalls([orderbookContract.populate('request_inscription', calldata)])
+    setCalls([
+      strkContract.populate('approve', approveCalldata),
+      orderbookContract.populate('request_inscription', calldata)
+    ])
   }
   
   const { send, data, isPending } = useSendTransaction({
@@ -170,6 +187,7 @@ function App() {
   const tabProps = {
     requestInscriptionCall,
     cancelInscriptionCall,
+    strkContract,
     orderbookContract
   }
 

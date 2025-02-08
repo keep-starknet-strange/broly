@@ -1,3 +1,4 @@
 LockInscriptionScript: ../../packages/scripts/lock_request.sh
 SubmitInscriptionScript: ../../packages/scripts/submit_request.sh
 InscribeScript: ../../packages/scripts/ord_inscribe.sh
+EstimateFeeScript: ../../packages/scripts/estimate_fee.sh

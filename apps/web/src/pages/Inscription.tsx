@@ -82,7 +82,12 @@ function Inscription(_props: any) {
               </div>
             </div>
             <div className="flex flex-row mx-2 mr-8 px-2 h-12 items-center justify-between">
-              <button className="button--gradient button__primary w-fit">Ordiscan</button>
+              <button
+                className="button--gradient button__primary w-fit"
+                onClick={() => window.open(`https://ord.link/${inscription.tx_hash}i${inscription.tx_index}`, "_blank")}
+              >
+                Ordiscan
+              </button>
               <div className="flex flex-row h-full items-center justify-center gap-2">
                 <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
                   <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>

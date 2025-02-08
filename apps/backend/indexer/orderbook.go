@@ -3,6 +3,8 @@ package indexer
 import (
 	"context"
 	"encoding/hex"
+	"math/big"
+	"os"
 	"strconv"
 	"strings"
 
@@ -64,6 +66,45 @@ func readFeltString(data string) (string, error) {
 	return feltString, nil
 }
 
+func readU256(low string, high string) (string, error) {
+  // TODO: Check if this is correct
+  return "0x" + high[2:] + low[2:], nil
+}
+
+type TransactionCall struct {
+  contractAddress string
+  selector string
+  calldata []string
+}
+
+type TransactionCalldata struct {
+  calls []TransactionCall
+}
+
+func parseCalldata(calldata []string) (TransactionCalldata, error) {
+  calls := []TransactionCall{}
+  callsCount, err := strconv.ParseInt(calldata[0], 0, 64)
+  if err != nil {
+    return TransactionCalldata{}, err
+  }
+  offset := 1
+  for i := 0; i < int(callsCount); i++ {
+    contractAddress := calldata[offset]
+    selector := calldata[offset+1]
+    callDataLength, err := strconv.ParseInt(calldata[offset+2], 0, 64)
+    if err != nil {
+      return TransactionCalldata{}, err
+    }
+    callData := []string{}
+    for j := 0; j < int(callDataLength); j++ {
+      callData = append(callData, calldata[offset+3+j])
+    }
+    calls = append(calls, TransactionCall{contractAddress, selector, callData})
+    offset += 3 + int(callDataLength)
+  }
+  return TransactionCalldata{calls}, nil
+}
+
 func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 	inscriptionIdHex := event.Event.Keys[1]
 	inscriptionId, err := strconv.ParseInt(inscriptionIdHex, 0, 64)
@@ -74,7 +115,33 @@ func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 	caller := event.Event.Keys[2][2:] // remove 0x prefix
 
 	// TODO: InvokeV0 & V3?
-	inscriptionData, _, err := readByteArray(event.Transaction.InvokeV1.Calldata, 4)
+  var callDataRaw []string
+  if len(event.Transaction.InvokeV1.Calldata) > 0 {
+    callDataRaw = event.Transaction.InvokeV1.Calldata
+  } else if len(event.Transaction.InvokeV3.Calldata) > 0 {
+    callDataRaw = event.Transaction.InvokeV3.Calldata
+  } else {
+    callDataRaw = event.Transaction.InvokeV0.Calldata
+  }
+  calldata, err := parseCalldata(callDataRaw)
+  if err != nil {
+    PrintIndexerEventError("processRequestCreatedEvent", event, err)
+    return
+  }
+
+  // TODO: If multi-call other than standard
+  // TODO: Hardcoded
+  var requestInscriptionCalldata []string
+  for _, call := range calldata.calls {
+    contractAddress := os.Getenv("BROLY_ORDERBOOK_CONTRACT_ADDRESS")
+    if call.contractAddress == contractAddress &&
+       call.selector == "0x02678cd90d58e18b88458577e7f7ddeaf93824a1e715f9e17a5b3842958541af" {
+      requestInscriptionCalldata = call.calldata
+      break
+    }
+  }
+
+	inscriptionData, _, err := readByteArray(requestInscriptionCalldata, 0)
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
@@ -100,15 +167,25 @@ func processRequestCreatedEvent(event IndexerEventWithTransaction) {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
 	}
-	feeAmountHex := event.Event.Data[offset+1]
-	feeAmount, err := strconv.ParseInt(feeAmountHex, 0, 64)
+  feeAmountHex, err := readU256(event.Event.Data[offset+1], event.Event.Data[offset+2])
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
 	}
+  feeAmountU256, ok := new(big.Int).SetString(feeAmountHex[2:], 16)
+  if !ok {
+    PrintIndexerEventError("processRequestCreatedEvent", event, err)
+    return
+  }
+  strkDecimals := big.NewInt(1000000000000000000)
+  feeAmount := new(big.Float).SetInt(feeAmountU256)
+  feeAmount = new(big.Float).Quo(feeAmount, new(big.Float).SetInt(strkDecimals))
+  feeAmountF64, _ := feeAmount.Float64()
+
+  inscriptionByteSize := len(inscriptionData)
 
 	// Insert into Postgres
-	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO InscriptionRequests (inscription_id, requester, bitcoin_address, fee_token, fee_amount) VALUES ($1, $2, $3, $4, $5)", inscriptionId, caller, bitcoinAddress, feeToken, feeAmount)
+	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO InscriptionRequests (inscription_id, requester, bitcoin_address, fee_token, fee_amount, bytes) VALUES ($1, $2, $3, $4, $5, $6)", inscriptionId, caller, bitcoinAddress, feeToken, feeAmountF64, inscriptionByteSize)
 	if err != nil {
 		PrintIndexerEventError("processRequestCreatedEvent", event, err)
 		return
@@ -212,6 +289,16 @@ func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 
+  txHashStr, _, err := readByteArray(event.Event.Data, 0)
+  if err != nil {
+    PrintIndexerEventError("processRequestCompletedEvent", event, err)
+    return
+  }
+  // Remove 0x and surrounding spaces
+  txHashTrimmed := strings.ReplaceAll(txHashStr[2:], " ", "")
+  // TODO: Multi inscription
+  txIndex := 0
+
 	// Insert into Postgres
 	_, err = db.Db.Postgres.Exec(context.Background(), "UPDATE InscriptionRequestsStatus SET status = 2 WHERE inscription_id = $1", inscriptionId)
 	if err != nil {
@@ -228,7 +315,7 @@ func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 	satNumber := 1000   // TODO
 	mintedBlock := 1000 // TODO
 	mintedTime := 1000  // TODO
-	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO Inscriptions (inscription_id, owner, sat_number, minted_block, minted) VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5))", inscriptionId, *owner, satNumber, mintedBlock, mintedTime)
+	_, err = db.Db.Postgres.Exec(context.Background(), "INSERT INTO Inscriptions (inscription_id, tx_hash, tx_index, owner, sat_number, minted_block, minted) VALUES ($1, $2, $3, $4, $5, $6, TO_TIMESTAMP($7))", inscriptionId, txHashTrimmed, txIndex, *owner, satNumber, mintedBlock, mintedTime)
 	if err != nil {
 		PrintIndexerEventError("processRequestCompletedEvent", event, err)
 		return
