@@ -17,6 +17,7 @@ import Collection from './pages/Collection'
 import Info from './pages/Info'
 import Inscription from './pages/Inscription'
 import Request from './pages/Request'
+import Account from './pages/Account'
 
 export const NODE_URL = 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7';
 export const STARKNET_CHAIN_ID = constants.StarknetChainId.SN_SEPOLIA;
@@ -143,7 +144,6 @@ function App() {
       orderbookContract.address,
       uint256.bnToUint256(bnFee)
     ])
-    console.log('Calldata', calldata)
   
     setCalls([
       strkContract.populate('approve', approveCalldata),
@@ -181,8 +181,8 @@ function App() {
   const [tabs, _setTabs] = useState([
     { name: 'Home', path: '/', component: Home as any },
     { name: 'Inscriptions', path: '/inscriptions', component: Inscriptions },
-    { name: 'Collection', path: '/collection', component: Collection },
-    { name: 'Info', path: '/info', component: Info },
+    { name: 'Collections', path: '/collection', component: Collection },
+    { name: 'Info', path: '/info', component: Info }
   ])
   const tabProps = {
     requestInscriptionCall,
@@ -265,7 +265,7 @@ function App() {
           disconnectWallet: disconnectBitcoinWallet
         }}
       />      
-      <div className="h-[4.5rem]" />
+      <div className="h-[3rem] sm:h-[3.5rem]" />
       <Routes>
         {tabs.map((tab) => (
           <Route
@@ -281,6 +281,18 @@ function App() {
                 requestedInscription={requestedInscription}
                 updateRequest={updateRequest}
                 newInscription={newInscription}
+                starknetWallet={{
+                  isConnected: isStarknetConnected,
+                  connectWallet: connectStarknetWallet,
+                  disconnectWallet: disconnectStarknetWallet
+                }}
+                bitcoinWallet={{
+                  paymentAddress: bitcoinWallet.paymentAddress,
+                  ordinalsAddress: bitcoinWallet.ordinalsAddress,
+                  stacksAddress: bitcoinWallet.stacksAddress,
+                  connectWallet: connectBitcoinWalletHandler,
+                  disconnectWallet: disconnectBitcoinWallet
+                }}
                 {...tabProps}
               />
             }
@@ -288,6 +300,7 @@ function App() {
         ))}
         <Route path="/inscription/:id" element={<Inscription {...tabProps} />} />
         <Route path="/request/:id" element={<Request {...tabProps} />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
 
     </div>

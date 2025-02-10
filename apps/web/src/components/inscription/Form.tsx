@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAccount } from '@starknet-react/core'
-import DropButton from "../DropButton";
+import "../DropButton.css";
 import "./Form.css";
 
 function InscriptionForm(props: any) {
-  const dropOptions = ["Image", "Message"];
+  const dropOptions = ["Image", "Message", "Gif"];
   // const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
@@ -13,7 +13,9 @@ function InscriptionForm(props: any) {
   const { address } = useAccount()
 
   useEffect(() => {
-    setErrorMessage("");
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 500);
   }, [address, props.taprootAddress]);
 
   const handleSubmit = async (e: any) => {
@@ -21,13 +23,15 @@ function InscriptionForm(props: any) {
   
     let dataToInscribe = "";
     if (!address) {
-      setErrorMessage("Please login with your wallet(s)");
+      setErrorMessage("Please login to inscribe");
+      props.starknetWallet.connectWallet();
       return;
     }
   
     const taprootAddress = props.taprootAddress;
     if (!taprootAddress) {
-      setErrorMessage("Please login with Bitcoin Xverse.");
+      setErrorMessage("Please link your Bitcoin address");
+      props.bitcoinWallet.connectWallet();
       return;
     }
 
@@ -84,10 +88,10 @@ function InscriptionForm(props: any) {
       const imageObj = new Image();
       imageObj.src = URL.createObjectURL(image);
       imageObj.onload = () => {
-        const size = imageObj.width * imageObj.height;
-        const maxImageSize = 512 * 512;
-        if (size > maxImageSize) {
-          setErrorMessage("Image too large. Max 512x512");
+        const size = image.size;
+        const maxImageBytes = 50000;
+        if (size > maxImageBytes) {
+          setErrorMessage("Image too large. Max 50kB");
           setUploadedImage("");
           return;
         }
@@ -109,18 +113,44 @@ function InscriptionForm(props: any) {
 
   // TODO: disabled button b4 input
   return (
-    <form className="flex flex-row items-center justify-center w-full md:w-[80%] lg:w-[60%] xl:w-[40%] px-8" onSubmit={handleSubmit}>
-      <div className="flex-grow Form__input">
+    <form className="flex flex-col items-center justify-center w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[35%] px-8 py-4 gap-2 bg-[var(--color-tertiary-dark)] rounded-xl shadow-xl" onSubmit={handleSubmit}>
+      <div className="flex flex-row items-center justify-around gap-2 w-full bg-[var(--color-primary)] rounded-[1.5rem] p-1">
+        {dropOptions.map((option, index) => (
+          <button
+            key={index}
+            type="button"
+            className={`w-full h-8 ${
+              selectedOption === option ? "Form__selection--selected" : "Form__selection"
+            }`}
+            onClick={() => setSelectedOption(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <div className="flex-grow Form__input h-[35vh]">
         {selectedOption === "Image" ? (
           <div>
             <label
-              className={`text-lg Form__image ${uploadedImage ? "Form__image--grid" : ""}`}
+              className="text-xl Form__image"
               htmlFor="image"
               onDrop={handleImageUpload}
               onDragOver={handleImgDrag}
             >
-              {uploadedImage ? "Image to Inscribe →" : "Upload an Image..."}{" "}
-              {uploadedImage && <img className="Form__image__up" src={uploadedImage} alt="uploaded" />}
+              {uploadedImage ? (
+                <div className="flex flex-col items-center justify-center w-full h-full gap-1 relative">
+                  <img src={uploadedImage} alt="uploaded" className="w-[80%] h-[80%] object-contain" style={{ imageRendering: "pixelated" }} />
+                  <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 opacity-0 hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-200 rounded-[1rem]">
+                    <img src="/icons/edit.png" alt="edit" className="absolute top-[50%] left-[50%] transform translate-x-[-50%] translate-y-[-50%] w-12 h-12" />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full h-full gap-1">
+                  <img src="/icons/upload.png" alt="plus" className="w-6 h-6" />
+                  <p className="text-xl">Upload an image</p>
+                  <p className="text-sm">Max 50kB</p>
+                </div>
+              )}
             </label>
             <input
               style={{ display: "none" }}
@@ -138,15 +168,10 @@ function InscriptionForm(props: any) {
           />
         )}
       </div>
-      <div className="flex flex-row items-center justify-center relative">
-        <DropButton
-          options={dropOptions}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-        />
+      <div className="relative py-2">
         <button
           type="submit"
-          className={`button--gradient button__primary ml-4 ${
+          className={`button--gradient button__primary text-2xl ${
             !props.taprootAddress || !props.isStarknetConnected
               ? "button__primary--disabled"
               : (selectedOption === "Image" && uploadedImage) || selectedOption === "Message"
@@ -157,13 +182,28 @@ function InscriptionForm(props: any) {
           Inscribe
         </button>
         {errorMessage && (
-          <p className="absolute right-0 translate-x-[110%] text-red-500 text-xs">
+          <div className="absolute bottom-[-1rem] transform -translate-x-1/2 left-1/2">
+          <p className="text-red-500 text-md text-center text-nowrap">
             {errorMessage}
           </p>
+          </div>
         )}
       </div>
     </form>
-  );  
+  );
 }
 
+/*
+        <select
+          className="text-lg Form__select"
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+        >
+          {dropOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+*/
 export default InscriptionForm;

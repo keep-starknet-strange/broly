@@ -5,7 +5,7 @@ import InscriptionRequestView from "../components/inscription/RequestView";
 import { getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 
-function Inscritpions(props: any) {
+function Inscriptions(props: any) {
   const filters = ["Hot", "New", "Rare"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
@@ -156,4 +156,4 @@ function Inscritpions(props: any) {
 }
 // TODO: Search icon
 
-export default Inscritpions;
+export default Inscriptions;
