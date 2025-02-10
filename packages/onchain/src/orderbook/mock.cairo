@@ -5,7 +5,9 @@ mod OrderbookMock {
     use core::byte_array::ByteArray;
     use consensus::{types::transaction::{Transaction}};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use starknet::{ContractAddress, get_caller_address, get_contract_address, contract_address_const};
+    use starknet::{
+        ContractAddress, get_caller_address, get_contract_address, contract_address_const,
+    };
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
@@ -97,9 +99,13 @@ mod OrderbookMock {
         ) -> u32 {
             assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
             if (currency_fee == 'STRK'.into()) {
-                self.strk_token.read()
+                self
+                    .strk_token
+                    .read()
                     .transfer_from(
-                        sender: get_caller_address(), recipient: get_contract_address(), amount: submitter_fee,
+                        sender: get_caller_address(),
+                        recipient: get_contract_address(),
+                        amount: submitter_fee,
                     );
             }
             let id = self.new_inscription_id.read();
@@ -131,10 +137,7 @@ mod OrderbookMock {
             let requester = self.inscription_requester.read(inscription_id);
             assert!(requester == get_caller_address());
             let submitter_fee = self.inscription_submitter_fee.read(inscription_id);
-            self.strk_token.read()
-                .transfer(
-                    recipient: requester, amount: submitter_fee,
-                );
+            self.strk_token.read().transfer(recipient: requester, amount: submitter_fee);
             self.inscription_status.write(inscription_id, INSCRIPTION_CANCELED);
             self
                 .emit(
@@ -179,10 +182,7 @@ mod OrderbookMock {
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_LOCKED);
             let submitter_fee = self.inscription_submitter_fee.read(inscription_id);
-            self.strk_token.read()
-                .transfer(
-                    recipient: get_caller_address(), amount: submitter_fee,
-                );
+            self.strk_token.read().transfer(recipient: get_caller_address(), amount: submitter_fee);
             self.inscription_status.write(inscription_id, INSCRIPTION_COMPLETED);
             self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
@@ -205,7 +205,9 @@ mod OrderbookMock {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
         fn initializer(ref self: ContractState, strk_token: ContractAddress) {
-            let strk_token_addr = contract_address_const::<0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d>();
+            let strk_token_addr = contract_address_const::<
+                0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,
+            >();
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token_addr });
         }
     }
