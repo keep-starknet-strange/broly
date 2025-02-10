@@ -4,7 +4,7 @@ import "./Header.css";
 import { useAccount } from "@starknet-react/core";
 
 function Header(props: any) {
-  const { tabs, starknetWallet, bitcoinWallet } = props
+  const { tabs, starknetWallet } = props
 
   const { address } = useAccount();
   const [userShortAddress, setUserShortAddress] = useState("")
