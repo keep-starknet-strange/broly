@@ -41,7 +41,7 @@ function InscriptionStatus(props: any) {
     }
   }, [props.status]);
   return (
-    <div className="w-full flex flex-row justify-center items-center mt-10 mb-2">
+    <div className="w-full flex flex-row justify-center items-center mt-10 mb-6">
       <div className="mx-1 flex-grow h-0.5 rounded-lg"></div>
       <div className="flex flex-col items-center">
         <div className={`InscriptionStatus__dot${requestClass} w-2 h-2 rounded-full relative`}>

@@ -70,6 +70,15 @@ func ReadJsonDataResponse[targetType any](r *http.Response) (struct{ Data target
 	return struct{ Data targetType }{Data: target.Data}, nil
 }
 
+func ReadJsonResponse[targetType any](r *http.Response) (*targetType, error) {
+	var target targetType
+	err := json.NewDecoder(r.Body).Decode(&target)
+	if err != nil {
+		return nil, err
+	}
+	return &target, nil
+}
+
 func SendMessageToWSS(message map[string]string) {
 	websocketHost := config.Conf.Websocket.Host + ":" + strconv.Itoa(config.Conf.Websocket.Port) + "/ws-msg"
 	messageBytes, err := json.Marshal(message)

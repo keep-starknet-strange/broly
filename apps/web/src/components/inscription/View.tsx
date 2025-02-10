@@ -5,7 +5,7 @@ import "./View.css";
 
 function InscriptionView(props: any) {
   return (
-    <div className="View__container">
+    <div className="View__container z-10">
       <NavLink to={`/inscription/${props.inscription.inscription_id}`}>
         {props.inscription.type === "text" || props.inscription.type === "unknown" ? (
           <InscriptionTextView inscription={props.inscription} />

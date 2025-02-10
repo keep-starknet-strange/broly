@@ -1,11 +1,11 @@
 .Form__input {
-  height: 6rem;
-  background-color: var(--color-tertiary);
-  margin-right: 2rem;
-  border: 1px solid var(--color-primary-xlight);
+  width: 100%;
+  background-color: var(--color-primary);
+  border: 1px dashed var(--color-primary-xlight);
   border-radius: 1rem;
   box-shadow: 0 0 0.5rem var(--color-tertiary-ldark);
   position: relative;
+  opacity: 0.85;
 }
 
 .Form__image {
@@ -13,22 +13,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 97%;
-  height: 100%;
-  text-align: center;
   cursor: pointer;
   display: flex;
-  display: grid;
-  grid-template-columns: 1fr;
   align-items: center;
   justify-content: center;
-}
-
-.Form__image--grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .Form__image:hover {
@@ -63,5 +53,55 @@
     var(--color-primary) 60%,
     var(--color-primary-light)
   );
+  outline: 0px;
+}
+
+.Form__selection {
+  border-radius: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.Form__selection:hover {
+  position: relative;
+  text-decoration: underline;
+}
+
+.Form__selection--selected {
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary-xlight);
+  border-radius: 1rem;
+  box-shadow: 0 0 0.5rem var(--color-tertiary-ldark);
+  position: relative;
+}
+
+.Form__selection--selected:hover {
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary-xlight);
+  border-radius: 1rem;
+  box-shadow: 0 0 0.5rem var(--color-tertiary-ldark);
+  position: relative;
+}
+
+.Form__select {
+  font-size: 1.2rem;
+  width: 7rem;
+  color: #f8f8f8;
+  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='Indigo'><polygon points='5,10 95,10 50,85'/></svg>") no-repeat right 6px center,
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='Black'><polygon points='0,5 100,5 55,90'/></svg>") no-repeat right 6px center,
+    linear-gradient(to bottom, var(--dropbutton-primary), var(--dropbutton-primary-dark));
+  background-size: 0.75rem;
+  border: 1px solid var(--dropbutton-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem var(--color-tertiary-ldark);
+  cursor: pointer;
+}
+
+.Form__select:focus {
   outline: 0px;
 }

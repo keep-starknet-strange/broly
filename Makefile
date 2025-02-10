@@ -70,3 +70,7 @@ helm-upgrade:
 	$(eval COMMIT_SHA := $(shell git rev-parse --short HEAD))
 	@echo "Upgrading helm chart..."
 	helm upgrade --set postgres.password=$(POSTGRES_PASSWORD) --set deployments.sha=$(COMMIT_SHA) --set apibara.authToken=$(AUTH_TOKEN) --set bitcoin.user=$(BITCOIN_USER) --set bitcoin.password=$(BITCOIN_PASSWORD) broly-infra packages/infra
+
+update-frontend-contracts:
+	@echo "Updating frontend contracts abis..."
+	cat packages/onchain/target/dev/onchain_OrderbookMock.contract_class.json | jq -r '.abi' > apps/web/src/abi/orderbook.abi.json

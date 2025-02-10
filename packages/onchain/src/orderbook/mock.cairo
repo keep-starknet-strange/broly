@@ -5,9 +5,12 @@ mod OrderbookMock {
     use core::byte_array::ByteArray;
     use consensus::{types::transaction::{Transaction}};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use starknet::{ContractAddress, get_caller_address, get_contract_address};
+    use starknet::{
+        ContractAddress, get_caller_address, get_contract_address, contract_address_const,
+    };
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
+    use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
 
     const INSCRIPTION_CANCELED: i8 = -1;
@@ -20,8 +23,14 @@ mod OrderbookMock {
     struct Storage {
         // ID of the next inscription.
         new_inscription_id: u32,
-        // Locks: Map inscription_id -> status.
+        // Map inscription_id -> requester.
+        inscription_requester: Map<u32, ContractAddress>,
+        // Map inscription_id -> requester fee.
+        inscription_submitter_fee: Map<u32, u256>,
+        // Map inscription_id -> status.
         inscription_status: Map<u32, i8>,
+        // STRK fee token.
+        strk_token: ERC20ABIDispatcher,
     }
 
     #[event]
@@ -88,8 +97,21 @@ mod OrderbookMock {
             currency_fee: felt252,
             submitter_fee: u256,
         ) -> u32 {
+            assert(currency_fee == 'STRK'.into(), 'The currency is not supported');
+            if (currency_fee == 'STRK'.into()) {
+                self
+                    .strk_token
+                    .read()
+                    .transfer_from(
+                        sender: get_caller_address(),
+                        recipient: get_contract_address(),
+                        amount: submitter_fee,
+                    );
+            }
             let id = self.new_inscription_id.read();
             self.new_inscription_id.write(id + 1);
+            self.inscription_requester.write(id, get_caller_address());
+            self.inscription_submitter_fee.write(id, submitter_fee);
             self.inscription_status.write(id, INSCRIPTION_REQUESTED);
             self
                 .emit(
@@ -112,6 +134,10 @@ mod OrderbookMock {
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_REQUESTED);
+            let requester = self.inscription_requester.read(inscription_id);
+            assert!(requester == get_caller_address());
+            let submitter_fee = self.inscription_submitter_fee.read(inscription_id);
+            self.strk_token.read().transfer(recipient: requester, amount: submitter_fee);
             self.inscription_status.write(inscription_id, INSCRIPTION_CANCELED);
             self
                 .emit(
@@ -155,6 +181,8 @@ mod OrderbookMock {
             // TODO: process the submitted transaction hash, verify that it is on Bitcoin
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_LOCKED);
+            let submitter_fee = self.inscription_submitter_fee.read(inscription_id);
+            self.strk_token.read().transfer(recipient: get_caller_address(), amount: submitter_fee);
             self.inscription_status.write(inscription_id, INSCRIPTION_COMPLETED);
             self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
@@ -176,6 +204,11 @@ mod OrderbookMock {
     pub impl InternalImpl of InternalTrait {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
-        fn initializer(ref self: ContractState, strk_token: ContractAddress) {}
+        fn initializer(ref self: ContractState, strk_token: ContractAddress) {
+            let strk_token_addr = contract_address_const::<
+                0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,
+            >();
+            self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token_addr });
+        }
     }
 }

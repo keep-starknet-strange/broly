@@ -68,23 +68,32 @@ function Home(props: any) {
 
   return (
     <div className="w-full flex flex-col h-max">
-      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center pt-8 pb-10">
-        <h1 className="text-4xl font-bold">Inscribe on Bitcoin</h1>
-        <h2 className="text-lg mb-8">Starknet's Decentralized Inscriptor Network</h2>
+      <div className="bg__color--tertiary w-full flex flex-col items-center justify-center pt-2 lg:pt-4 pb-8">
+        <div className="z-10 relative">
+          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 right-[100%] mr-1 md:mr-2 xl:mr-4 text-nowrap transform -translate-y-1/2 z-10 pb-3 sm:pb-4 xl:pb-5">Order on Starknet</h1>
+          <img
+            src="/images/logo.png"
+            alt="B.R.O.L.Y. Logo"
+            className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24"
+          />
+          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 left-[100%] ml-1 md:ml-2 xl:ml-4 text-nowrap transform -translate-y-1/2 z-10 pt-3 sm:pt-4 xl:pt-5">Inscribe on Bitcoin</h1>
+        </div>
         <InscriptionForm
           isInscribing={isInscribing}
           setIsInscribing={setIsInscribing}
           requestInscriptionCall={props.requestInscriptionCall}
           taprootAddress={props.taprootAddress}
           isStarknetConnected={props.isStarknetConnected}
+          starknetWallet={props.starknetWallet}
+          bitcoinWallet={props.bitcoinWallet}
         />
         {isInscribing && <InscriptionStatus status={inscribingStatus} />}
       </div>
       <div className="w-full flex flex-col items-center py-2 bg__color--primary h-full border-t-2 border-[var(--color-primary-light)]">
         <div className="w-full flex flex-row items-center justify-between">
-          <h1 className="text-xl font-bold px-4">Recent Inscriptions</h1>
+          <h1 className="text-xl font-bold px-4 z-10">Recent Inscriptions</h1>
           <NavLink to="/inscriptions" className="flex flex-row items-center">
-            <p className="text-sm font-bold px-4 tab__nav text-xl">Explore &rarr;</p>
+            <p className="text-sm font-bold px-4 tab__nav text-xl z-10">Explore &rarr;</p>
           </NavLink>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4 py-8">

@@ -1,7 +1,7 @@
 /* variables */
 :root {
-  --dropbutton-primary: rgb(121, 45, 146);
-  --dropbutton-primary-dark: rgb(100, 25, 120);
+  --dropbutton-primary: rgba(121, 45, 146, 0.7);
+  --dropbutton-primary-dark: rgba(100, 25, 120, 0.8);
   --dropbutton-primary-darker: rgb(60, 15, 80);
   --dropbutton-primary-darkest: rgb(40, 10, 60);
   --dropbutton-border: rgb(70, 20, 70);

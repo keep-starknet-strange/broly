@@ -8,6 +8,7 @@ import { connectBitcoinWallet } from './connections/satsConnect';
 import { getInscriptionRequest, getInscription } from './api/inscriptions';
 import './App.css'
 import Header from './components/Header'
+import erc20_abi from './abi/erc20.abi.json';
 import orderbook_abi from './abi/orderbook.abi.json';
 
 import Home from './pages/Home'
@@ -16,6 +17,7 @@ import Collection from './pages/Collection'
 import Info from './pages/Info'
 import Inscription from './pages/Inscription'
 import Request from './pages/Request'
+import Account from './pages/Account'
 
 export const NODE_URL = 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7';
 export const STARKNET_CHAIN_ID = constants.StarknetChainId.SN_SEPOLIA;
@@ -113,6 +115,10 @@ function App() {
     return hex;
   };
 
+  const { contract: strkContract } = useContract({
+    address: import.meta.env.VITE_STRK_CONTRACT_ADDRESS,
+    abi: erc20_abi as any
+  });
   const { contract: orderbookContract } = useContract({
     address: import.meta.env.VITE_BROLY_CONTRACT_ADDRESS,
     abi: orderbook_abi as any
@@ -120,18 +126,29 @@ function App() {
 
   const [calls, setCalls] = useState([] as any[])
   const requestInscriptionCall = async (dataToInscribe: string, taprootAddress: string, feeToken: string, fee: number) => {
-    if (!address || !orderbookContract) {
+    if (!address || !orderbookContract || !strkContract) {
       return
     }
   
+    /* global BigInt */
+    const strkDecimals = BigInt(10) ** BigInt(18)
+    const bnFee = strkDecimals * (BigInt(fee.toFixed(0)) + BigInt(1))
+    console.log('Request inscription', dataToInscribe, taprootAddress, feeToken, fee, bnFee)
     const calldata = CallData.compile([
       byteArray.byteArrayFromString(dataToInscribe),
       byteArray.byteArrayFromString(taprootAddress),
       toHex(feeToken),
-      uint256.bnToUint256(fee)
+      uint256.bnToUint256(bnFee)
+    ])
+    const approveCalldata = CallData.compile([
+      orderbookContract.address,
+      uint256.bnToUint256(bnFee)
     ])
   
-    setCalls([orderbookContract.populate('request_inscription', calldata)])
+    setCalls([
+      strkContract.populate('approve', approveCalldata),
+      orderbookContract.populate('request_inscription', calldata)
+    ])
   }
   
   const { send, data, isPending } = useSendTransaction({
@@ -164,12 +181,13 @@ function App() {
   const [tabs, _setTabs] = useState([
     { name: 'Home', path: '/', component: Home as any },
     { name: 'Inscriptions', path: '/inscriptions', component: Inscriptions },
-    { name: 'Collection', path: '/collection', component: Collection },
-    { name: 'Info', path: '/info', component: Info },
+    { name: 'Collections', path: '/collection', component: Collection },
+    { name: 'Info', path: '/info', component: Info }
   ])
   const tabProps = {
     requestInscriptionCall,
     cancelInscriptionCall,
+    strkContract,
     orderbookContract
   }
 
@@ -247,7 +265,7 @@ function App() {
           disconnectWallet: disconnectBitcoinWallet
         }}
       />      
-      <div className="h-[4.5rem]" />
+      <div className="h-[3rem] sm:h-[3.5rem]" />
       <Routes>
         {tabs.map((tab) => (
           <Route
@@ -263,6 +281,18 @@ function App() {
                 requestedInscription={requestedInscription}
                 updateRequest={updateRequest}
                 newInscription={newInscription}
+                starknetWallet={{
+                  isConnected: isStarknetConnected,
+                  connectWallet: connectStarknetWallet,
+                  disconnectWallet: disconnectStarknetWallet
+                }}
+                bitcoinWallet={{
+                  paymentAddress: bitcoinWallet.paymentAddress,
+                  ordinalsAddress: bitcoinWallet.ordinalsAddress,
+                  stacksAddress: bitcoinWallet.stacksAddress,
+                  connectWallet: connectBitcoinWalletHandler,
+                  disconnectWallet: disconnectBitcoinWallet
+                }}
                 {...tabProps}
               />
             }
@@ -270,6 +300,7 @@ function App() {
         ))}
         <Route path="/inscription/:id" element={<Inscription {...tabProps} />} />
         <Route path="/request/:id" element={<Request {...tabProps} />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
 
     </div>
