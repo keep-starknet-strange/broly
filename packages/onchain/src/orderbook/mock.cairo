@@ -145,6 +145,7 @@ mod OrderbookMock {
             inscription_id: u32,
             tx_hash: ByteArray,
             tx: Transaction,
+            pk_script: Array<u8>,
             block_height: u64,
             block_header: BlockHeader,
             inclusion_proof: Array<(Digest, bool)>,

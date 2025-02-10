@@ -11,11 +11,11 @@ use openzeppelin::presets::interfaces::{
 };
 use openzeppelin::utils::serde::SerializedAppend;
 use onchain::orderbook::interface::{OrderbookABIDispatcher, OrderbookABIDispatcherTrait};
-use onchain::utils::{constants, erc20_utils};
-use utils::{hex::{from_hex, hex_to_hash_rev}, hash::{Digest, DigestImpl}};
+use onchain::utils::{constants, erc20_utils, taproot_utils};
+use utils::{hex::{from_hex, to_hex, hex_to_hash_rev}, hash::{Digest, DigestImpl}};
 use utu_relay::{
     interfaces::{IUtuRelayDispatcher, IUtuRelayDispatcherTrait, HeightProof},
-    bitcoin::block::{BlockHeader, BlockHeaderTrait, BlockHashImpl, BlockHashTrait},
+    bitcoin::block::{BlockHeaderTrait, BlockHashImpl, BlockHashTrait},
     bitcoin::coinbase::get_coinbase_data,
 };
 
@@ -322,15 +322,57 @@ fn test_update_canonical_chain_utxo_transaction() {
     utu.update_canonical_chain(880626, 880626, block_880626.hash(), height_proof);
 }
 
-// TODO: uncomment test when transaction is replaced with a Taproot transaction
+#[test]
+fn test_extract_p2tr_address_works() {
+    let expected_address: ByteArray =
+        "bc1p6h7srce4arywqss8aafu3h46zmwcugxy0y7wpv3psn09v82yg7pqn9sc28";
+
+    let script = array![
+        0x51,
+        0x20,
+        0xd5,
+        0xfd,
+        0x01,
+        0xe3,
+        0x35,
+        0xe8,
+        0xc8,
+        0xe0,
+        0x42,
+        0x07,
+        0xef,
+        0x53,
+        0xc8,
+        0xde,
+        0xba,
+        0x16,
+        0xdd,
+        0x8e,
+        0x20,
+        0xc4,
+        0x79,
+        0x3c,
+        0xe0,
+        0xb2,
+        0x21,
+        0x84,
+        0xde,
+        0x56,
+        0x1d,
+        0x44,
+        0x47,
+        0x82,
+    ];
+
+    assert_eq!(taproot_utils::extract_p2tr_tweaked_pubkey(script), expected_address);
+}
+
 #[test]
 fn test_submit_inscription_works() {
-    // TODO: this test only verifies the inclusion of some Bitcoin transaction.
-    // Replace later with an actual transaction that inscribes correct data.
     let (orderbook_dispatcher, token_dispatcher, tx_inclusion, utu) = setup();
 
     let test_taproot_address: ByteArray =
-        "5120d5fd01e335e8c8e04207ef53c8deba16dd8e20c4793ce0b22184de561d444782";
+        "bc1p6h7srce4arywqss8aafu3h46zmwcugxy0y7wpv3psn09v82yg7pqn9sc28";
     let test_data: ByteArray = "data";
 
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
@@ -417,39 +459,18 @@ fn test_submit_inscription_works() {
     };
 
     let siblings = array![
-        (
-            hex_to_hash_rev("76e3e8b317c545d79ce1d1757677ec82111cd9470c402079d8551e14642809d4"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("00eba47c25e16ba5b8b806a1bbcee5c04dd1ca61c1084be42104f0b03cae1f90"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("a2f7d14b4f7d7bc1563f5c27dc5755aeecdbffa4def6a96f6f5f360e4f44c9a8"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("ecb7a50da43f7a965404cdfc153c41cc8290d42adc0ec6b375f5a6d4bfa66c96"),
-            false,
-        ),
+        (hex_to_hash_rev("76e3e8b317c545d79ce1d1757677ec82111cd9470c402079d8551e14642809d4"), false),
+        (hex_to_hash_rev("00eba47c25e16ba5b8b806a1bbcee5c04dd1ca61c1084be42104f0b03cae1f90"), false),
+        (hex_to_hash_rev("a2f7d14b4f7d7bc1563f5c27dc5755aeecdbffa4def6a96f6f5f360e4f44c9a8"), false),
+        (hex_to_hash_rev("ecb7a50da43f7a965404cdfc153c41cc8290d42adc0ec6b375f5a6d4bfa66c96"), false),
         (hex_to_hash_rev("8926a1ae808a95fdaf52e47cd41c27b54e5608def744952df23a8199b7f594d9"), true),
         (hex_to_hash_rev("4bb567de383734312006634e4ac98210a47cd4b878c31e293ddfd59407c57963"), true),
         (hex_to_hash_rev("b9ede48e3e21f5e33ea86eb37ad48888ef60da9f81cfba0e900f0592a6376fbe"), true),
         (hex_to_hash_rev("936c439349f841566d74e16bebaf24b9701032f4f318fb355879a680135ed152"), true),
         (hex_to_hash_rev("2283fad85f5f5b38679393035437d627096157001f75147c037a03f7bb78529a"), true),
-        (
-            hex_to_hash_rev("ad11b8dd12cb8025d1c465800048d89f7f30413eb1aa01c6105f4a86e2602c1a"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("01654fe022244c77d7bb8308014fabe856a9497973d15e95bfea89390bbea6b3"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("6bbc0cb273bfacea3c9a1171fdd8f9ffcf219ce0e0fa235cc3cc480475d92de3"),
-            false,
-        ),
+        (hex_to_hash_rev("ad11b8dd12cb8025d1c465800048d89f7f30413eb1aa01c6105f4a86e2602c1a"), false),
+        (hex_to_hash_rev("01654fe022244c77d7bb8308014fabe856a9497973d15e95bfea89390bbea6b3"), false),
+        (hex_to_hash_rev("6bbc0cb273bfacea3c9a1171fdd8f9ffcf219ce0e0fa235cc3cc480475d92de3"), false),
     ];
 
     let block_880626 = BlockHeaderTrait::new(
@@ -501,19 +522,50 @@ fn test_submit_inscription_works() {
 
     utu.register_blocks(array![block_880626].span());
     utu.update_canonical_chain(880626, 880626, block_880626.hash(), height_proof);
-    // TODO: fix the bech32m address check
-// let block_header = block_880626;
-// let inclusion_proof = siblings;
-// let tx_hash: ByteArray = "79c91b595ef08490eff1805cd368eb54ec2d0d82b9e5cc4600ca5484f687f5d3";
 
-    // start_cheat_block_timestamp(tx_inclusion, 1_737_715_932 + 3600); // submit after one hour
-// orderbook_dispatcher.submit_inscription(
-//     id,
-//     tx_hash,
-//     tx,
-//     880626,
-//     block_header,
-//     inclusion_proof
-// );
+    let block_header = block_880626;
+    let inclusion_proof = siblings;
+    let tx_hash: ByteArray = "79c91b595ef08490eff1805cd368eb54ec2d0d82b9e5cc4600ca5484f687f5d3";
+
+    let script = array![
+        0x51,
+        0x20,
+        0xd5,
+        0xfd,
+        0x01,
+        0xe3,
+        0x35,
+        0xe8,
+        0xc8,
+        0xe0,
+        0x42,
+        0x07,
+        0xef,
+        0x53,
+        0xc8,
+        0xde,
+        0xba,
+        0x16,
+        0xdd,
+        0x8e,
+        0x20,
+        0xc4,
+        0x79,
+        0x3c,
+        0xe0,
+        0xb2,
+        0x21,
+        0x84,
+        0xde,
+        0x56,
+        0x1d,
+        0x44,
+        0x47,
+        0x82,
+    ];
+
+    start_cheat_block_timestamp(tx_inclusion, 1_737_715_932 + 3600); // submit after one hour
+    orderbook_dispatcher
+        .submit_inscription(id, tx_hash, tx, script, 880626, block_header, inclusion_proof);
 }
 

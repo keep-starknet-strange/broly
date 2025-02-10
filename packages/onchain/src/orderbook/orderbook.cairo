@@ -5,7 +5,7 @@ mod Orderbook {
     use core::byte_array::ByteArray;
     use consensus::{types::transaction::Transaction};
     use onchain::orderbook::interface::Status;
-    use onchain::utils::utils::extract_p2tr_tweaked_pubkey;
+    use onchain::utils::taproot_utils::extract_p2tr_tweaked_pubkey;
     use openzeppelin::utils::serde::SerializedAppend;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
@@ -231,6 +231,7 @@ mod Orderbook {
             inscription_id: u32,
             tx_hash: ByteArray,
             tx: Transaction,
+            pk_script: Array<u8>,
             block_height: u64,
             block_header: BlockHeader,
             inclusion_proof: Array<(Digest, bool)>,
@@ -246,7 +247,7 @@ mod Orderbook {
 
             let (_, _, _, expected_address) = self.inscriptions.read(inscription_id);
             assert(
-                extract_p2tr_tweaked_pubkey(*tx.outputs[0].pk_script) == expected_address,
+                extract_p2tr_tweaked_pubkey(pk_script) == expected_address,
                 'Unexpected address in pkscript',
             );
 
