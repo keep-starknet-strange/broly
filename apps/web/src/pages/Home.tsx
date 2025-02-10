@@ -70,13 +70,13 @@ function Home(props: any) {
     <div className="w-full flex flex-col h-max">
       <div className="bg__color--tertiary w-full flex flex-col items-center justify-center pt-2 lg:pt-4 pb-8">
         <div className="z-10 relative">
-          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 right-[100%] mr-1 md:mr-2 xl:mr-4 text-nowrap transform -translate-y-1/2 z-10 pb-3 sm:pb-4 xl:pb-5">Order on Starknet</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 right-[100%] mr-1 md:mr-2 xl:mr-4 text-nowrap transform -translate-y-1/2 z-10 pb-3 sm:pb-4 xl:pb-5 whitespace-nowrap">Order on Starknet</h1>
           <img
             src="/images/logo.png"
             alt="B.R.O.L.Y. Logo"
             className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24"
           />
-          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 left-[100%] ml-1 md:ml-2 xl:ml-4 text-nowrap transform -translate-y-1/2 z-10 pt-3 sm:pt-4 xl:pt-5">Inscribe on Bitcoin</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl xl:text-4xl font-bold absolute top-1/2 left-[100%] ml-1 md:ml-2 xl:ml-4 text-nowrap transform -translate-y-1/2 z-10 pt-3 sm:pt-4 xl:pt-5 whitespace-nowrap">Inscribe on Bitcoin</h1>
         </div>
         <InscriptionForm
           isInscribing={isInscribing}
