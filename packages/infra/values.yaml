@@ -97,5 +97,5 @@ apibara:
   authToken: dna_aabbcc
 
 contracts:
-  brolyOrderbookContract: 0x06dc9096322dca7b07def62bb49502c9b9f3d497d6e10854cd36ce95682081c5
+  brolyOrderbookContract: 0x0318d13dfad7467d24573458c74db8a512ce525a7f8064ed6f67df91f0327391
   useRegtest: true
