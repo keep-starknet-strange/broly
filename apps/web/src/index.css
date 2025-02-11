@@ -205,8 +205,8 @@ body {
   height: 200%;
   background-image: url('../public/space2.jpg');
   background-size: 100%;
-  background-repeat: no-repeat;
-  opacity: 0.05;
+  background-repeat: repeat;
+  opacity: 0.15;
   overflow: none;
   z-index: 0;
 }
