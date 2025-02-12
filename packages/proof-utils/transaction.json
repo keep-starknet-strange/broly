@@ -1,0 +1,60 @@
+{
+    "txid": "79c91b595ef08490eff1805cd368eb54ec2d0d82b9e5cc4600ca5484f687f5d3",
+    "size": 366,
+    "version": 2,
+    "locktime": 0,
+    "fee": 1404,
+    "inputs": [
+      {
+        "coinbase": false,
+        "txid": "6352425c7a5130352e41c8029b89f774da43a9792a80fc68aebeebb6fb0c3326",
+        "output": 1,
+        "sigscript": "",
+        "sequence": 4294967293,
+        "pkscript": "51201f0e01c871ea1babd36fc7c3e3221129014c0ae7cc5b349837c37d010025ea04",
+        "value": 546,
+        "address": "bc1pru8qrjr3agd6h5m0clp7xgs39yq5czh8e3dnfxphcd7szqp9agzqmlj95j",
+        "witness": [
+          "5c825367aa15ee6ce494ff25788dc8b96620f108f2fa135ebf271e841ad3f5a6b9bf907a47abf4a2fceda632dc52f9cd155b5eb109fdcf8264f4e057db49fa22"
+        ]
+      },
+      {
+        "coinbase": false,
+        "txid": "6352425c7a5130352e41c8029b89f774da43a9792a80fc68aebeebb6fb0c3326",
+        "output": 6,
+        "sigscript": "160014e7856c9701014deb75a777a4eafd31db4b63252a",
+        "sequence": 4294967293,
+        "pkscript": "a914543c330b5c8fa2e4843f0f52ac4a8a3882bbc9bb87",
+        "value": 20897,
+        "address": "39NQoPG3yeJqxAcPyh12W6wMADo7sPL2R4",
+        "witness": [
+          "3045022100fb445735445d6b4d94f341eece7cb0e66ac848364323ada4fa89b3a6cd50d50902206a40e8f23bf7ca288de437ca5be5b2a817574f8cd0d245afe0da301e6b697c8301",
+          "03ad555f65db5151ba551d22394c86cca6eee38f1934d30b1aab08e92cb643943c"
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "address": "bc1p6h7srce4arywqss8aafu3h46zmwcugxy0y7wpv3psn09v82yg7pqn9sc28",
+        "pkscript": "5120d5fd01e335e8c8e04207ef53c8deba16dd8e20c4793ce0b22184de561d444782",
+        "value": 546,
+        "spent": false,
+        "spender": null
+      },
+      {
+        "address": "39NQoPG3yeJqxAcPyh12W6wMADo7sPL2R4",
+        "pkscript": "a914543c330b5c8fa2e4843f0f52ac4a8a3882bbc9bb87",
+        "value": 19493,
+        "spent": false,
+        "spender": null
+      }
+    ],
+    "block": {
+      "height": 880626,
+      "position": 496
+    },
+    "deleted": false,
+    "time": 1737715568,
+    "rbf": false,
+    "weight": 936
+  }

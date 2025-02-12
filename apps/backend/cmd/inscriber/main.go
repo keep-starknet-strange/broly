@@ -143,8 +143,7 @@ func InscriberLockingService() {
 
 			// Submit the locked inscription request for completion
 			fmt.Println("Submitting inscription: ", responseJson.Data[0])
-			txHash := "0x1234567890" // TODO
-			err = scripts.SubmitInscriptionInvokeScript(responseJson.Data[0].InscriptionId, txHash)
+			err = scripts.SubmitInscriptionInvokeScript(responseJson.Data[0].InscriptionId)
 			if err != nil {
 				fmt.Println("Error while invoking the submitInscription script")
 				continue
@@ -169,8 +168,7 @@ func InscriberLockingService() {
 		// TODO: Determine which requests to use
 		// Lock the inscription request
 		fmt.Println("Locking inscription request: ", responseJson.Data[0])
-		txHash := "0x1234567890" // TODO
-		err = scripts.LockInscriptionInvokeScript(responseJson.Data[0].InscriptionId, txHash)
+		err = scripts.LockInscriptionInvokeScript(responseJson.Data[0].InscriptionId)
 		if err != nil {
 			fmt.Println("Error while invoking the lockInscription script")
 			continue

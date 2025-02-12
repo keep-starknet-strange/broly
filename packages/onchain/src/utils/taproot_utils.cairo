@@ -1,5 +1,7 @@
 use utils::hash::Digest;
+use utils::hex::to_hex;
 use utils::double_sha256::double_sha256_parent;
+use onchain::utils::bech32m::encode;
 
 /// Computes the Merkle root from a transaction hash and its siblings.
 ///
@@ -34,4 +36,26 @@ pub fn compute_merkle_root(tx_hash: Digest, siblings: Array<(Digest, bool)>) -> 
     };
 
     current_hash
+}
+
+pub fn extract_p2tr_tweaked_pubkey(script: Array<u8>) -> ByteArray {
+    assert(*script[0] == 0x51, 'expected OP_1 prefix');
+    assert(*script[1] == 0x20, 'expected OP_PUSHBYTES_32 prefix');
+    let script_length = script.len();
+    assert(script_length == 34, 'expected length 34');
+
+    let mut tweaked_pubkey: ByteArray = Default::default();
+    tweaked_pubkey.append_byte(0x01);
+    let mut i = 2;
+    let stop = i + 32;
+    loop {
+        if i == stop {
+            break;
+        }
+        tweaked_pubkey.append_byte(*script[i]);
+        i += 1;
+    };
+
+    let hrp = "bc";
+    return encode(@hrp, @tweaked_pubkey, 90);
 }
