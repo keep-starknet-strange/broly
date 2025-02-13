@@ -1,5 +1,4 @@
 use utils::hash::Digest;
-use utils::hex::to_hex;
 use utils::double_sha256::double_sha256_parent;
 use onchain::utils::bech32m::encode;
 
@@ -38,6 +37,10 @@ pub fn compute_merkle_root(tx_hash: Digest, siblings: Array<(Digest, bool)>) -> 
     current_hash
 }
 
+/// Arguments:
+/// - `script: Array<u8>`: the tweaked public key contained in the `pk_script` field of `TxOut`.
+/// Returns:
+/// - `ByteArray`: the bech32m encoded Taproot compatible Bitcoin address.
 pub fn extract_p2tr_tweaked_pubkey(script: Array<u8>) -> ByteArray {
     assert(*script[0] == 0x51, 'expected OP_1 prefix');
     assert(*script[1] == 0x20, 'expected OP_PUSHBYTES_32 prefix');

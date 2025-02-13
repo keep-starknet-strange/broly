@@ -10,6 +10,7 @@ mod OrderbookMock {
     };
     use utils::hash::Digest;
     use utu_relay::bitcoin::block::BlockHeader;
+    use utu_relay::interfaces::HeightProof;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
 
@@ -160,21 +161,42 @@ mod OrderbookMock {
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
-        /// the inscription on Bitcoin has been made. The submitted hash must
-        /// match the precomputed transaction hash in storage. If successful,
-        /// the status of the inscription changes from 'Locked' to 'Closed'.
+        /// the inscription on Bitcoin has been made. If successful,the status
+        /// of the inscription changes from 'Locked' to 'Closed'.
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
-        /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
+        /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
+        /// - `tx_hash: ByteArray`, the hash of the creation transaction on Bitcoin.
+        /// - `prev_tx_hash: ByteArray`, the hash of the transfer transaction on Bitcoin.
+        /// - `tx: Transaction`, the `Transaction` structure with the creation details.
+        /// - `prev_tx: Transaction`, the `Transaction` structure with the transfer details.
+        /// - `pk_script: Array<u8>`, the unlocking script in the output referencing the
+        /// inscription.
+        /// - `block_height: u64`, the number of the block that contains the transfer tx.
+        /// - `prev_block_height: u64`, the number of the block that contains the creation tx.
+        /// - `block_header: BlockHeader`, the header of the block that contains the transfer tx.
+        /// - `prev_block_header: BlockHeader`, the header of the block that contains the creation
+        /// tx.
+        /// - `inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the transfer tx.
+        /// - `prev_inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the creation
+        /// tx.
         fn submit_inscription(
             ref self: ContractState,
             inscription_id: u32,
+            currency_fee: felt252,
             tx_hash: ByteArray,
+            prev_tx_hash: ByteArray,
             tx: Transaction,
+            prev_tx: Transaction,
             pk_script: Array<u8>,
             block_height: u64,
+            prev_block_height: u64,
             block_header: BlockHeader,
+            prev_block_header: BlockHeader,
+            height_proof: Option<HeightProof>,
+            prev_height_proof: Option<HeightProof>,
             inclusion_proof: Array<(Digest, bool)>,
+            prev_inclusion_proof: Array<(Digest, bool)>,
         ) {
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_LOCKED);

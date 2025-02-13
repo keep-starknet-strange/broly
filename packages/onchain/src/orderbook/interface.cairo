@@ -1,7 +1,8 @@
 use core::starknet::contract_address::ContractAddress;
 use consensus::{types::transaction::{Transaction}};
-use utils::hash::Digest;
 use utu_relay::bitcoin::block::BlockHeader;
+use utu_relay::interfaces::HeightProof;
+use utils::hash::Digest;
 
 #[derive(Default, Drop, PartialEq, starknet::Store)]
 pub enum Status {
@@ -27,12 +28,20 @@ pub trait IOrderbook<TContractState> {
     fn submit_inscription(
         ref self: TContractState,
         inscription_id: u32,
+        currency_fee: felt252,
         tx_hash: ByteArray,
+        prev_tx_hash: ByteArray,
         tx: Transaction,
+        prev_tx: Transaction,
         pk_script: Array<u8>,
         block_height: u64,
+        prev_block_height: u64,
         block_header: BlockHeader,
+        prev_block_header: BlockHeader,
+        height_proof: Option<HeightProof>,
+        prev_height_proof: Option<HeightProof>,
         inclusion_proof: Array<(Digest, bool)>,
+        prev_inclusion_proof: Array<(Digest, bool)>,
     );
     fn query_inscription(
         self: @TContractState, inscription_id: u32,
@@ -54,12 +63,20 @@ pub trait OrderbookABI<TContractState> {
     fn submit_inscription(
         ref self: TContractState,
         inscription_id: u32,
+        currency_fee: felt252,
         tx_hash: ByteArray,
+        prev_tx_hash: ByteArray,
         tx: Transaction,
+        prev_tx: Transaction,
         pk_script: Array<u8>,
         block_height: u64,
+        prev_block_height: u64,
         block_header: BlockHeader,
+        prev_block_header: BlockHeader,
+        height_proof: Option<HeightProof>,
+        prev_height_proof: Option<HeightProof>,
         inclusion_proof: Array<(Digest, bool)>,
+        prev_inclusion_proof: Array<(Digest, bool)>,
     );
     fn query_inscription(
         self: @TContractState, inscription_id: u32,
