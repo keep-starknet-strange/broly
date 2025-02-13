@@ -311,8 +311,9 @@ mod Orderbook {
             );
 
             // Check that the transfer transaction input points to the previous transaction id.
+            let previous_tx_hash_from_output: Digest = *tx.inputs[0].previous_output.txid;
             assert(
-                *tx.inputs[0].previous_output.txid == hex_to_hash_rev(prev_tx_hash),
+                previous_tx_hash_from_output == hex_to_hash_rev(prev_tx_hash),
                 'Unexpected previous tx id.',
             );
 
