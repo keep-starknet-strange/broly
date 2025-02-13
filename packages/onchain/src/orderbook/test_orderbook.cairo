@@ -544,9 +544,6 @@ fn test_submit_inscription_works() {
         },
     );
 
-    // utu.register_blocks(array![block_883305].span());
-    // utu.update_canonical_chain(883305, 883305, block_883305.hash(), height_proof);
-
     // previous tx 63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758
     let prev_tx = Transaction {
         version: 2_u32,
@@ -681,9 +678,6 @@ fn test_submit_inscription_works() {
             merkle_branch: prev_merkle_branch,
         },
     );
-
-    // utu.register_blocks(array![block_883300].span());
-    // utu.update_canonical_chain(883300, 883300, block_883300.hash(), prev_height_proof);
 
     let block_header = block_883305;
     let inclusion_proof = siblings;
