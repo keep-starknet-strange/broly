@@ -1,6 +1,6 @@
 use utils::hash::Digest;
 use utils::double_sha256::double_sha256_parent;
-use onchain::utils::bech32m::encode;
+use onchain::broly_utils::bech32m::encode;
 
 /// Computes the Merkle root from a transaction hash and its siblings.
 ///

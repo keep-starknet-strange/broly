@@ -6,7 +6,7 @@ mod Orderbook {
     use core::array::{ToSpanTrait, SpanTrait};
     use consensus::{types::transaction::Transaction};
     use onchain::orderbook::interface::Status;
-    use onchain::utils::taproot_utils::extract_p2tr_tweaked_pubkey;
+    use onchain::broly_utils::taproot_utils::extract_p2tr_tweaked_pubkey;
     use openzeppelin::utils::serde::SerializedAppend;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
