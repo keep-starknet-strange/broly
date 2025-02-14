@@ -63,7 +63,7 @@ pub fn extract_p2tr_tweaked_pubkey(script: Array<u8>) -> ByteArray {
     return encode(@hrp, @tweaked_pubkey, 90);
 }
 
-// TODO: remove the functions below, import failed, but they are from 
+// TODO: remove the functions below, import failed, but they are from
 // https://github.com/keep-starknet-strange/raito/blob/main/packages/utils/src/hex.cairo
 // Gets `Digest` from reversed `ByteArray`.
 pub fn hex_to_hash_rev(hex_string: ByteArray) -> Digest {
