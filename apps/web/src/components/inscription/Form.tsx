@@ -30,7 +30,7 @@ function InscriptionForm(props: any) {
   
     const taprootAddress = props.taprootAddress;
     if (!taprootAddress) {
-      setErrorMessage("Please link your Bitcoin address");
+      setErrorMessage("Please link your Bitcoin Wallet (Xverse)");
       props.bitcoinWallet.connectWallet();
       return;
     }
