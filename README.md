@@ -17,6 +17,20 @@ Broly is a decentralized Bitcoin inscription service that uses Starknet for orde
 
 ---
 
+## Why Broly? 
+
+Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. All they need is a Bitcoin and a Starknet wallet extension. They broadcast their request transaction to Starknet. The data is stored in the Broly contract. A user running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the requester's Bitcoin address. The `inscribor` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution. 
+
+Try [Broly](https://www.broly-btc.com/)!
+
+### Dependencies
+
+`raito`: A provable [Bitcoin light client](https://github.com/keep-starknet-strange/raito) written in Cairo. 
+`shinigami`: A [Bitcoin script VM](https://github.com/keep-starknet-strange/shinigami), aka Bitcoin Execution Engine in Cairo. 
+`utu_relay`: A [smart contract](https://github.com/lfglabs-dev/utu_relay) that enables secure verification of Bitcoin transactions and events, and bridges Bitcoin data to Starknet. 
+
+Kudos to the [Exploration](https://github.com/keep-starknet-strange) team and [LFG](https://github.com/lfglabs-dev) labs for the effort!
+
 ## Architecture
 
 ```mermaid
@@ -34,6 +48,7 @@ flowchart TB
 
     subgraph Starknet
         OB[Orderbook Contract]
+        TI[Tx Inclusion]
     end
 
     subgraph Bitcoin
@@ -52,13 +67,15 @@ flowchart TB
     SW <--> OB
     IS --> BTC
     OM --> OB
+    OB --> TI
     API --> IS
     IS --> API
+    IS --> OB
 ```
 
 ## Flow
 
-1. User connects both Bitcoin and Starknet wallets
+1. User connects both Bitcoin [Xverse](https://www.xverse.app/) and [Starknet](https://www.argent.xyz/) Argent or [Braavos](https://braavos.app/) wallets
 2. User creates an inscription order:
    - Specifies inscription content and reward amount
    - Order is created on Starknet orderbook
@@ -79,7 +96,9 @@ cp .env.example .env
 docker compose up
 ```
 
-1. Restart your app ( after changes to backend(s), indexer, ... )
+View the website [locally](http://localhost:5173/). 
+
+2. Restart your app ( after changes to backend(s), indexer, ... )
 
 ```bash
 docker compose down --volumes
@@ -142,6 +161,7 @@ broly/
 ### Smart Contracts (onchain)
 
 - Orderbook contract
+- Transaction inclusion
 - Payment handling
 
 ### Inscribor Service
