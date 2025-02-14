@@ -26,7 +26,9 @@ Try [Broly](https://www.broly-btc.com/)!
 ### Dependencies
 
 `raito`: A provable [Bitcoin light client](https://github.com/keep-starknet-strange/raito) written in Cairo. 
+
 `shinigami`: A [Bitcoin script VM](https://github.com/keep-starknet-strange/shinigami), aka Bitcoin Execution Engine in Cairo. 
+
 `utu_relay`: A [smart contract](https://github.com/lfglabs-dev/utu_relay) that enables secure verification of Bitcoin transactions and events, and bridges Bitcoin data to Starknet. 
 
 Kudos to the [Exploration](https://github.com/keep-starknet-strange) team and [LFG](https://github.com/lfglabs-dev) labs for the effort!
