@@ -6,7 +6,7 @@ mod Orderbook {
     use core::array::{ToSpanTrait, SpanTrait};
     use consensus::{types::transaction::Transaction};
     use onchain::orderbook::interface::Status;
-    use onchain::broly_utils::taproot_utils::extract_p2tr_tweaked_pubkey;
+    use onchain::broly_utils::taproot_utils::{extract_p2tr_tweaked_pubkey, hex_to_hash_rev, to_hex};
     use openzeppelin::utils::serde::SerializedAppend;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
@@ -16,7 +16,6 @@ mod Orderbook {
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
     use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
     use utils::hash::Digest;
-    use utils::hex::{hex_to_hash_rev, to_hex};
     use utu_relay::bitcoin::block::{BlockHeader, BlockHashImpl, BlockHashTrait};
     use utu_relay::interfaces::HeightProof;
 
