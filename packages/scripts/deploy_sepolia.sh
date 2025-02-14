@@ -66,8 +66,11 @@ while getopts ":h" opt; do
 done
 
 STARK_TOKEN=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d
+TX_INCLUSION=0x0793d3d424805b98e2edb33ec0244a12e312b117923e1370b4e840da156fa69a
+UTU_RELAY=0x064e21f88caa162294fdda7f73d67ad09b81419e97df3409a5eb13ba39b88c31
 ONCHAIN_DIR=$PROJECT_ROOT/packages/onchain
-BROLY_ORDERBOOK_SIERRA_FILE=$ONCHAIN_DIR/target/dev/onchain_OrderbookMock.contract_class.json
+MOCK_ORDERBOOK_SIERRA_FILE=$ONCHAIN_DIR/target/dev/onchain_OrderbookMock.contract_class.json
+BROLY_ORDERBOOK_SIERRA_FILE=$ONCHAIN_DIR/target/dev/onchain_Orderbook.contract_class.json
 
 # Build the contract
 echo "Building the contract..."
@@ -81,7 +84,7 @@ BROLY_ORDERBOOK_CONTRACT_CLASSHASH=$(echo $BROLY_ORDERBOOK_DECLARE_OUTPUT | tail
 echo "Contract class hash: $BROLY_ORDERBOOK_CONTRACT_CLASSHASH"
 
 # Deploying the contract
-CALLDATA=$(echo $STARK_TOKEN)
+CALLDATA=$(echo $STARK_TOKEN $TX_INCLUSION $UTU_RELAY)
 echo "Deploying the contract..."
 echo "starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $BROLY_ORDERBOOK_CONTRACT_CLASSHASH $CALLDATA"
 starkli deploy --network sepolia --keystore $STARKNET_KEYSTORE --account $STARKNET_ACCOUNT --watch $BROLY_ORDERBOOK_CONTRACT_CLASSHASH $CALLDATA
