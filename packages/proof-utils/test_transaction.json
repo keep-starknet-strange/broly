@@ -1,0 +1,40 @@
+{
+    "txid": "fa89c32152bf324cd1d47d48187f977c7e0f380f6f78132c187ce27923f62fcc",
+    "size": 224,
+    "version": 2,
+    "locktime": 0,
+    "fee": 384,
+    "inputs": [
+      {
+        "coinbase": false,
+        "txid": "8813df6d1acff8f7cadbd54734616f0391074d05ba8aeb3a5a9469ce50af4860",
+        "output": 1,
+        "sigscript": "483045022100b48355267ec0dd5d542cf91e8af4d6dbe7aab97c38cdaa0d11388982ecd21682022001ca88ae99dfc199c9dc3244e77c0c07d54e3a67a66a61defab376f9a5b512400141043577d3135275fdc03da1665722e40ca4e5737d9b8ab4685994a9cdaef7fe15a5e13a6584221d1d7eeabc6a8725bad898cf0233631912a259cba2b8e34f167d9c",
+        "sequence": 4294967295,
+        "pkscript": "76a914f7b9e17571ce9b85f7d1bd525abb48975e55fd5788ac",
+        "value": 100044331,
+        "address": "1ParabmZ9ToucLBL4E3z98n66LPYGu7VZm",
+        "witness": []
+      }
+    ],
+    "outputs": [
+      {
+        "address": "1LgXWxpELt2o9hPGiwqDT1B5Z7994MQPTN",
+        "pkscript": "76a914d7e4161c4e2d4a5cd559d8accf208a2df867873088ac",
+        "value": 100043947,
+        "spent": true,
+        "spender": {
+          "txid": "c957762a4b819140541ceb80f4f7c0c07db71cbf13223882bba1cb822be5c3d7",
+          "input": 5
+        }
+      }
+    ],
+    "block": {
+      "height": 868239,
+      "position": 1
+    },
+    "deleted": false,
+    "time": 1730161629,
+    "rbf": false,
+    "weight": 896
+  }

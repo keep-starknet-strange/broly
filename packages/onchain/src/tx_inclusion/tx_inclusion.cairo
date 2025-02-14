@@ -16,7 +16,7 @@ pub trait ITransactionInclusion<TContractState> {
 #[starknet::contract]
 mod TransactionInclusion {
     use consensus::{codec::Encode, types::transaction::Transaction};
-    use onchain::utils::utils::compute_merkle_root;
+    use onchain::broly_utils::taproot_utils::compute_merkle_root;
     use utu_relay::bitcoin::block::BlockHashTrait;
     use starknet::{ContractAddress, get_block_timestamp};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};

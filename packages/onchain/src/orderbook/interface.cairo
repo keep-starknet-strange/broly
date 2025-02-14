@@ -1,7 +1,8 @@
 use core::starknet::contract_address::ContractAddress;
 use consensus::{types::transaction::{Transaction}};
-use utils::hash::Digest;
 use utu_relay::bitcoin::block::BlockHeader;
+use utu_relay::interfaces::HeightProof;
+use utils::hash::Digest;
 
 #[derive(Default, Drop, PartialEq, starknet::Store)]
 pub enum Status {
@@ -23,22 +24,29 @@ pub trait IOrderbook<TContractState> {
         submitter_fee: u256,
     ) -> u32;
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
-    fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
+    fn lock_inscription(ref self: TContractState, inscription_id: u32);
     fn submit_inscription(
         ref self: TContractState,
         inscription_id: u32,
+        currency_fee: felt252,
         tx_hash: ByteArray,
+        prev_tx_hash: ByteArray,
         tx: Transaction,
+        prev_tx: Transaction,
+        pk_script: Array<u8>,
         block_height: u64,
+        prev_block_height: u64,
         block_header: BlockHeader,
+        prev_block_header: BlockHeader,
+        height_proof: Option<HeightProof>,
+        prev_height_proof: Option<HeightProof>,
         inclusion_proof: Array<(Digest, bool)>,
+        prev_inclusion_proof: Array<(Digest, bool)>,
     );
     fn query_inscription(
         self: @TContractState, inscription_id: u32,
-    ) -> (ContractAddress, ByteArray, u256);
-    fn query_inscription_lock(
-        self: @TContractState, inscription_id: u32,
-    ) -> (ContractAddress, ByteArray, u64);
+    ) -> (ContractAddress, ByteArray, u256, ByteArray);
+    fn query_inscription_lock(self: @TContractState, inscription_id: u32) -> (ContractAddress, u64);
 }
 
 #[starknet::interface]
@@ -51,22 +59,29 @@ pub trait OrderbookABI<TContractState> {
         submitter_fee: u256,
     ) -> u32;
     fn cancel_inscription(ref self: TContractState, inscription_id: u32, currency_fee: felt252);
-    fn lock_inscription(ref self: TContractState, inscription_id: u32, tx_hash: ByteArray);
+    fn lock_inscription(ref self: TContractState, inscription_id: u32);
     fn submit_inscription(
         ref self: TContractState,
         inscription_id: u32,
+        currency_fee: felt252,
         tx_hash: ByteArray,
+        prev_tx_hash: ByteArray,
         tx: Transaction,
+        prev_tx: Transaction,
+        pk_script: Array<u8>,
         block_height: u64,
+        prev_block_height: u64,
         block_header: BlockHeader,
+        prev_block_header: BlockHeader,
+        height_proof: Option<HeightProof>,
+        prev_height_proof: Option<HeightProof>,
         inclusion_proof: Array<(Digest, bool)>,
+        prev_inclusion_proof: Array<(Digest, bool)>,
     );
     fn query_inscription(
         self: @TContractState, inscription_id: u32,
-    ) -> (ContractAddress, ByteArray, u256);
-    fn query_inscription_lock(
-        self: @TContractState, inscription_id: u32,
-    ) -> (ContractAddress, ByteArray, u64);
+    ) -> (ContractAddress, ByteArray, u256, ByteArray);
+    fn query_inscription_lock(self: @TContractState, inscription_id: u32) -> (ContractAddress, u64);
 
     // ERC20 functions
     fn balance_of(self: @TContractState, account: ContractAddress) -> felt252;

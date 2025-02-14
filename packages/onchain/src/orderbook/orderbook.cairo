@@ -3,8 +3,10 @@ use onchain::orderbook::interface::IOrderbook;
 #[starknet::contract]
 mod Orderbook {
     use core::byte_array::ByteArray;
-    use consensus::{types::transaction::{Transaction}};
+    use core::array::{ToSpanTrait, SpanTrait};
+    use consensus::{types::transaction::Transaction};
     use onchain::orderbook::interface::Status;
+    use onchain::broly_utils::taproot_utils::{extract_p2tr_tweaked_pubkey, hex_to_hash_rev, to_hex};
     use openzeppelin::utils::serde::SerializedAppend;
     use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use starknet::storage::{
@@ -14,35 +16,41 @@ mod Orderbook {
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
     use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
     use utils::hash::Digest;
-    use utu_relay::bitcoin::block::BlockHeader;
+    use utu_relay::bitcoin::block::{BlockHeader, BlockHashImpl, BlockHashTrait};
+    use utu_relay::interfaces::HeightProof;
 
     #[storage]
     struct Storage {
         // ID of the next inscription.
         new_inscription_id: u32,
         // A map from the inscription ID to a tuple with the caller, the
-        // inscribed data, and submitter fee.
-        inscriptions: Map<u32, (ContractAddress, ByteArray, u256)>,
+        // inscribed data, submitter fee, and the expected address.
+        inscriptions: Map<u32, (ContractAddress, ByteArray, u256, ByteArray)>,
         // A map from the inscription ID to status. Possible values:
         // 'Open', 'Locked', 'Canceled', 'Closed', 'Undefined'.
         inscription_statuses: Map<u32, Status>,
         // A map from the inscription ID to the potential submitters.
         submitters: Map<u32, Map<ContractAddress, ContractAddress>>,
         // Locks on inscriptions. Maps the inscription ID to a tuple of
-        // submitter address, precomputed transaction hash, and block number.
-        inscription_locks: Map<u32, (ContractAddress, ByteArray, u64)>,
+        // submitter address, and block number.
+        inscription_locks: Map<u32, (ContractAddress, u64)>,
         // STRK fee token.
         strk_token: ERC20ABIDispatcher,
-        // Address of the contract checking transaction inclusion.
-        relay_address: ContractAddress,
+        // Address of the contract checking transaction inclusion in the block.
+        tx_inclusion: ContractAddress,
+        // Address of the contract checking block inclusion in the Bitcoin blockchain.
+        utu_relay: ContractAddress,
     }
 
     #[constructor]
     fn constructor(
-        ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+        ref self: ContractState,
+        strk_token: ContractAddress,
+        tx_inclusion: ContractAddress,
+        utu_relay: ContractAddress,
     ) {
         // initialize contract
-        self.initializer(:strk_token, :relay_address);
+        self.initializer(:strk_token, :tx_inclusion, :utu_relay);
     }
 
     #[event]
@@ -78,7 +86,6 @@ mod Orderbook {
         #[key]
         pub id: u32,
         pub submitter: ContractAddress,
-        pub tx_hash: ByteArray,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -117,7 +124,12 @@ mod Orderbook {
                     );
             }
             let id = self.new_inscription_id.read();
-            self.inscriptions.write(id, (caller, inscription_data.clone(), submitter_fee));
+            self
+                .inscriptions
+                .write(
+                    id,
+                    (caller, inscription_data.clone(), submitter_fee, receiving_address.clone()),
+                );
             self.inscription_statuses.write(id, Status::Open);
             self
                 .emit(
@@ -140,18 +152,18 @@ mod Orderbook {
         /// inscribed data and the fee.
         fn query_inscription(
             self: @ContractState, inscription_id: u32,
-        ) -> (ContractAddress, ByteArray, u256) {
+        ) -> (ContractAddress, ByteArray, u256, ByteArray) {
             self.inscriptions.read(inscription_id)
         }
 
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
-        /// - `(ContractAddress, ByteArray, felt252)`, the tuple with submitter address,
-        /// the precomputed tx, and the block number.
+        /// - `(ContractAddress, felt252)`, the tuple with submitter address
+        /// and the block number.
         fn query_inscription_lock(
             self: @ContractState, inscription_id: u32,
-        ) -> (ContractAddress, ByteArray, u64) {
+        ) -> (ContractAddress, u64) {
             self.inscription_locks.read(inscription_id)
         }
 
@@ -162,7 +174,7 @@ mod Orderbook {
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         fn cancel_inscription(ref self: ContractState, inscription_id: u32, currency_fee: felt252) {
             let caller = get_caller_address();
-            let (request_creator, inscription_data, amount) = self
+            let (request_creator, inscription_data, amount, expected_address) = self
                 .inscriptions
                 .read(inscription_id);
             assert(caller == request_creator, 'Caller cannot cancel this id');
@@ -178,7 +190,9 @@ mod Orderbook {
                 let strk_token = self.strk_token.read();
                 strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
             }
-            self.inscriptions.write(inscription_id, (caller, inscription_data, 0));
+            self
+                .inscriptions
+                .write(inscription_id, (caller, inscription_data, 0, expected_address));
             self.inscription_statuses.write(inscription_id, Status::Canceled);
             self.emit(RequestCanceled { id: inscription_id, currency_fee: currency_fee });
         }
@@ -191,16 +205,14 @@ mod Orderbook {
         /// lock can be created.
         /// Inputs:
         /// - `inscription_id: u32`, the ID of the inscription being locked.
-        /// - `tx_hash: ByteArray`, the precomputed bitcoin transaction hash that will be
-        /// submitted onchain by the submitter.
-        fn lock_inscription(ref self: ContractState, inscription_id: u32, tx_hash: ByteArray) {
+        fn lock_inscription(ref self: ContractState, inscription_id: u32) {
             let status = self.inscription_statuses.read(inscription_id);
             assert(status != Status::Undefined, 'Inscription does not exist');
             assert(status != Status::Canceled, 'The inscription is canceled');
             assert(status != Status::Closed, 'The inscription has been closed');
 
             if (status == Status::Locked) {
-                let (_, _, blocknumber) = self.inscription_locks.read(inscription_id);
+                let (_, blocknumber) = self.inscription_locks.read(inscription_id);
                 // TODO: replace hardcoded block time delta
                 assert(get_block_number() - blocknumber > 100, 'Prior lock has not expired');
             }
@@ -210,38 +222,131 @@ mod Orderbook {
             submitters.write(submitter, submitter);
 
             self.inscription_statuses.write(inscription_id, Status::Locked);
-            self
-                .inscription_locks
-                .write(inscription_id, (submitter, tx_hash.clone(), get_block_number()));
-            self.emit(RequestLocked { id: inscription_id, submitter: submitter, tx_hash: tx_hash });
+            self.inscription_locks.write(inscription_id, (submitter, get_block_number()));
+            self.emit(RequestLocked { id: inscription_id, submitter: submitter });
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
-        /// the inscription on Bitcoin has been made. The submitted hash must
-        /// match the precomputed transaction hash in storage. If successful,
-        /// the status of the inscription changes from 'Locked' to 'Closed'.
+        /// the inscription on Bitcoin has been made. If successful,the status
+        /// of the inscription changes from 'Locked' to 'Closed'.
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
-        /// - `tx_hash: ByteArray`, the hash of the transaction submitted to Bitcoin.
+        /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
+        /// - `tx_hash: ByteArray`, the hash of the creation transaction on Bitcoin.
+        /// - `prev_tx_hash: ByteArray`, the hash of the transfer transaction on Bitcoin.
+        /// - `tx: Transaction`, the `Transaction` structure with the creation details.
+        /// - `prev_tx: Transaction`, the `Transaction` structure with the transfer details.
+        /// - `pk_script: Array<u8>`, the unlocking script in the output referencing the
+        /// inscription.
+        /// - `block_height: u64`, the number of the block that contains the transfer tx.
+        /// - `prev_block_height: u64`, the number of the block that contains the creation tx.
+        /// - `block_header: BlockHeader`, the header of the block that contains the transfer tx.
+        /// - `prev_block_header: BlockHeader`, the header of the block that contains the creation
+        /// tx.
+        /// - `inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the transfer tx.
+        /// - `prev_inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the creation
+        /// tx.
         fn submit_inscription(
             ref self: ContractState,
             inscription_id: u32,
+            currency_fee: felt252,
             tx_hash: ByteArray,
+            prev_tx_hash: ByteArray,
             tx: Transaction,
+            prev_tx: Transaction,
+            pk_script: Array<u8>,
             block_height: u64,
+            prev_block_height: u64,
             block_header: BlockHeader,
+            prev_block_header: BlockHeader,
+            height_proof: Option<HeightProof>,
+            prev_height_proof: Option<HeightProof>,
             inclusion_proof: Array<(Digest, bool)>,
+            prev_inclusion_proof: Array<(Digest, bool)>,
         ) {
             let caller = get_caller_address();
             let submitters = self.submitters.entry(inscription_id);
             let submitter = submitters.read(caller);
             assert(caller == submitter, 'Caller does not match submitter');
 
-            let (_, precomputed_tx_hash, _) = self.inscription_locks.read(inscription_id);
-            assert(precomputed_tx_hash == tx_hash, 'Precomputed hash != submitted');
+            let (_, expected_data, amount, expected_address) = self
+                .inscriptions
+                .read(inscription_id);
+
+            // Check that both blocks are included in the Bitcoin blockchain.
+            const register_blocks: felt252 = selector!("register_blocks");
+            const update_canonical_chain: felt252 = selector!("update_canonical_chain");
+            let to = self.utu_relay.read();
+
+            let mut calldata = array![];
+            calldata.append_serde(array![block_header].span());
+            call_contract_syscall(to, register_blocks, calldata.span()).unwrap_syscall();
+
+            let mut calldata = array![];
+            calldata.append_serde(block_height);
+            calldata.append_serde(block_height);
+            calldata.append_serde(block_header.hash());
+            calldata.append_serde(height_proof);
+
+            call_contract_syscall(to, update_canonical_chain, calldata.span()).unwrap_syscall();
+
+            let mut calldata = array![];
+            calldata.append_serde(array![prev_block_header].span());
+            call_contract_syscall(to, register_blocks, calldata.span()).unwrap_syscall();
+
+            let mut calldata = array![];
+            calldata.append_serde(prev_block_height);
+            calldata.append_serde(prev_block_height);
+            calldata.append_serde(prev_block_header.hash());
+            calldata.append_serde(prev_height_proof);
+
+            call_contract_syscall(to, update_canonical_chain, calldata.span()).unwrap_syscall();
+
+            // Check that the tweaked public key contains the script that allows the receiver to
+            // unlock and send the inscription in the future.
+            assert(
+                extract_p2tr_tweaked_pubkey(pk_script) == expected_address,
+                'Unexpected address in pk_script',
+            );
+
+            // Check that the transfer transaction input points to the previous transaction id.
+            let previous_tx_hash_from_output: Digest = *tx.inputs[0].previous_output.txid;
+            assert(
+                previous_tx_hash_from_output == hex_to_hash_rev(prev_tx_hash),
+                'Unexpected previous tx id.',
+            );
+
+            // Check that the transfer transaction has 2 inputs and 2 outputs.
+            assert(tx.inputs.len() == 2, 'Wrong number of tx inputs');
+            assert(tx.outputs.len() == 2, 'Wrong number of tx outputs');
+
+            // Check that the creation transaction has 1 input and 1 output.
+            assert(prev_tx.inputs.len() == 1, 'Wrong number of prev tx inputs');
+            assert(prev_tx.outputs.len() == 1, 'Wrong number of prev tx outputs');
+
+            // Check that the transfer of the UTXO containing the inscriptions has the minimum dust
+            // value.
+            assert(
+                *tx.inputs[0].previous_output.data.value == 546_u64, 'Unexpected value in input',
+            );
+
+            // Check that the full amount of the dust satoshis have been transferred to the expected
+            // address.
+            assert(*tx.outputs[0].value == 546_u64, 'Unexpected value in output');
+
+            // Check that the length of the witness stack equals to 3 elements.
+            let deref_witness = *prev_tx.inputs[0].witness;
+            assert(deref_witness.len() == 3, 'Wrong # of witness elements');
+
+            // Check that the second field of the witness stack in the linked UTXO contains the
+            // correct inscription.
+            let witness_data = to_hex(prev_tx.inputs[0].witness[1]);
+            assert(witness_data == expected_data, 'The inscribed data is wrong');
 
             const selector: felt252 = selector!("prove_inclusion");
-            let to = self.relay_address.read();
+            let to = self.tx_inclusion.read();
+
+            // Check the inclusion of the transfer transaction
             let mut calldata = array![];
             calldata.append_serde(tx);
             calldata.append_serde(block_height);
@@ -250,7 +355,21 @@ mod Orderbook {
 
             call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
 
-            // TODO: assert that the witness data contains the requested inscription
+            // Check the inclusion of the creation transaction
+            let mut calldata = array![];
+            calldata.append_serde(prev_tx);
+            calldata.append_serde(prev_block_height);
+            calldata.append_serde(prev_block_header);
+            calldata.append_serde(prev_inclusion_proof);
+
+            call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
+
+            // Send the reward amount to the submitter
+            let escrow_address = get_contract_address();
+            if (currency_fee == 'STRK'.into()) {
+                let strk_token = self.strk_token.read();
+                strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
+            }
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
             self
@@ -265,10 +384,14 @@ mod Orderbook {
         /// Executed once when the Orderbook contract is deployed. Used to set
         /// initial values for contract storage variables for the fee tokens.
         fn initializer(
-            ref self: ContractState, strk_token: ContractAddress, relay_address: ContractAddress,
+            ref self: ContractState,
+            strk_token: ContractAddress,
+            tx_inclusion: ContractAddress,
+            utu_relay: ContractAddress,
         ) {
             self.strk_token.write(ERC20ABIDispatcher { contract_address: strk_token });
-            self.relay_address.write(relay_address);
+            self.tx_inclusion.write(tx_inclusion);
+            self.utu_relay.write(utu_relay);
         }
     }
 }
