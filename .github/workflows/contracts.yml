@@ -38,7 +38,7 @@ jobs:
       - name: Set up SNForge
         uses: foundry-rs/setup-snfoundry@v3
         with:
-          starknet-foundry-version: "0.34.0"
+          starknet-foundry-version: "0.36.0"
 
       - name: Run tests and generate report
         run: snforge test
