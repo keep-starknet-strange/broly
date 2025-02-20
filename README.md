@@ -19,7 +19,7 @@ Broly is a decentralized Bitcoin inscription service that uses Starknet for orde
 
 ## Why Broly? 
 
-Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. All they need is a Bitcoin and a Starknet wallet extension. They broadcast their request transaction to Starknet. The data is stored in the Broly contract. A user running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the requester's Bitcoin address. The `inscribor` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution. 
+Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. TTT All they need is a Bitcoin and a Starknet wallet extension. They broadcast their request transaction to Starknet. The data is stored in the Broly contract. A user running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the requester's Bitcoin address. The `inscribor` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution. 
 
 Try [Broly](https://www.broly-btc.com/)!
 
