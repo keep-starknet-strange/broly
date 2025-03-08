@@ -274,7 +274,8 @@ mod Orderbook {
             //     .inscriptions
             //     .read(inscription_id);
 
-            let (_, expected_data, amount, expected_address) = self.query_inscription(inscription_id);
+            let (_, expected_data, amount, expected_address) = self
+                .query_inscription(inscription_id);
 
             // Check that the tweaked public key contains the script that allows the receiver to
             // unlock and send the inscription in the future.
