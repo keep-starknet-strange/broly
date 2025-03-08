@@ -15,7 +15,7 @@ use onchain::broly_utils::{constants, erc20_utils, taproot_utils};
 use utils::{hex::{from_hex, hex_to_hash_rev}, hash::{Digest, DigestImpl}};
 use utu_relay::{
     interfaces::{IUtuRelayDispatcher, IUtuRelayDispatcherTrait, HeightProof},
-    bitcoin::block::{BlockHeaderTrait, BlockHashImpl, BlockHashTrait},
+    bitcoin::block::{BlockHeader, BlockHeaderTrait, BlockHashImpl, BlockHashTrait},
     bitcoin::coinbase::get_coinbase_data,
 };
 
@@ -202,7 +202,6 @@ fn test_cancel_inscription_works() {
         .request_inscription(test_data, test_taproot_address, 'STRK'.into(), 10);
 
     start_cheat_caller_address_global(orderbook_dispatcher.contract_address);
-    // TODO: is this the correct way to set permissions?
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
     stop_cheat_caller_address_global();
 
@@ -374,13 +373,13 @@ fn test_extract_p2tr_address_works() {
 
 #[test]
 fn test_submit_inscription_works() {
-    let (orderbook_dispatcher, token_dispatcher, tx_inclusion, _utu) = setup();
+    let (orderbook_dispatcher, token_dispatcher, tx_inclusion, utu) = setup();
 
     let test_taproot_address: ByteArray =
         "bc1p6h7srce4arywqss8aafu3h46zmwcugxy0y7wpv3psn09v82yg7pqn9sc28";
     let test_data: ByteArray =
         "20aa2b0b50292c3b2fa1eefb846f0bc9957142f2f143f9f3619ae74dae2f68caf2ac0063036f7264010109696d6167652f706e6701020100004d360189504e470d0a1a0a0000000d494844520000000a0000000a08060000008d32cfbd000000097048597300000b1300000b1301009a9c180000000774494d4507e50c190f2b07f0fb7e270000001d69545874436f6d6d656e7400000000004372656174656420776974682047494d50642e6507000000c04944415428cf7d91310a02411085bf7322084216c31243fb20e206c806d0ccc6c256306882c90818685d0b059c8004a2b031b0085fd127d75cbb43cae7579589be7d3d22bd898c8e03e2374d98a13300934f18a05ead58c89620a16584e05e44553a992e31f85a30d0a9fe1b6acb44bf709f335cec398bc0cda90360f3301ca18397b28032de5e003823048173c180730b41c4b2ad839be82cd000ced66347bfb08751dd134c928d1a003d6cd15764c5370a65eb90000000049454e44ae4260868";
-
+        
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     let id = orderbook_dispatcher
@@ -539,7 +538,7 @@ fn test_submit_inscription_works() {
     let height_proof = Option::Some(
         HeightProof {
             header: block_883305,
-            coinbase_raw_tx: coinbase_raw_tx_segwit,
+            coinbase_raw_tx: coinbase_raw_tx_segwit.clone(),
             merkle_branch: merkle_branch,
         },
     );
@@ -674,7 +673,7 @@ fn test_submit_inscription_works() {
     let prev_height_proof = Option::Some(
         HeightProof {
             header: block_883300,
-            coinbase_raw_tx: prev_coinbase_raw_tx_segwit,
+            coinbase_raw_tx: prev_coinbase_raw_tx_segwit.clone(),
             merkle_branch: prev_merkle_branch,
         },
     );
@@ -685,7 +684,21 @@ fn test_submit_inscription_works() {
 
     let prev_block_header = block_883300;
     let prev_inclusion_proof = prev_siblings;
-    let prev_tx_hash = "63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758";
+    let prev_tx_hash: ByteArray = "63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758";
+
+    let block_headers: Array<BlockHeader> = array![block_header, prev_block_header];
+    utu.register_blocks(block_headers.span());
+
+    let block_883300_hash = hex_to_hash_rev(
+        "000000000000000000003014df89bab44479dc5961c8bda471c53cb80e7573cd"
+    );
+
+    let block_883305_hash = hex_to_hash_rev(
+        "000000000000000000016e1c96f759f93d3f2ed26d5941a8b933da94408937fb"
+    );
+
+    utu.update_canonical_chain(883300, 883300, block_883300_hash, prev_height_proof);
+    utu.update_canonical_chain(883305, 883305, block_883305_hash, height_proof);
 
     let script = array![
         0x51,
@@ -724,8 +737,24 @@ fn test_submit_inscription_works() {
         0x82,
     ];
 
+
+    let height_proof = Option::Some(
+        HeightProof {
+            header: block_883305,
+            coinbase_raw_tx: coinbase_raw_tx_segwit,
+            merkle_branch: merkle_branch,
+        },
+    );
+
+    let prev_height_proof = Option::Some(
+        HeightProof {
+            header: block_883300,
+            coinbase_raw_tx: prev_coinbase_raw_tx_segwit,
+            merkle_branch: prev_merkle_branch,
+        },
+    );
+
     start_cheat_caller_address_global(orderbook_dispatcher.contract_address);
-    // TODO: is this the correct way to set permissions?
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
     start_cheat_block_timestamp(tx_inclusion, 1_739_277_179 + 3600); // submit after one hour
