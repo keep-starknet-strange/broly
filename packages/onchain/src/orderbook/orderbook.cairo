@@ -16,7 +16,7 @@ mod Orderbook {
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_number};
     use starknet::{SyscallResultTrait, syscalls::call_contract_syscall};
     use utils::hash::Digest;
-    use utu_relay::bitcoin::block::{BlockHeader, BlockHashImpl, BlockHashTrait};
+    use utu_relay::bitcoin::block::{BlockHeader, BlockHashImpl};
     use utu_relay::interfaces::HeightProof;
 
     #[storage]
@@ -123,6 +123,7 @@ mod Orderbook {
                         sender: caller, recipient: escrow_address, amount: submitter_fee,
                     );
             }
+            // TODO: check increment
             let id = self.new_inscription_id.read();
             self
                 .inscriptions
@@ -269,38 +270,12 @@ mod Orderbook {
             let submitter = submitters.read(caller);
             assert(caller == submitter, 'Caller does not match submitter');
 
+            // let (_, expected_data, amount, expected_address) = self
+            //     .inscriptions
+            //     .read(inscription_id);
+
             let (_, expected_data, amount, expected_address) = self
-                .inscriptions
-                .read(inscription_id);
-
-            // Check that both blocks are included in the Bitcoin blockchain.
-            const register_blocks: felt252 = selector!("register_blocks");
-            const update_canonical_chain: felt252 = selector!("update_canonical_chain");
-            let to = self.utu_relay.read();
-
-            let mut calldata = array![];
-            calldata.append_serde(array![block_header].span());
-            call_contract_syscall(to, register_blocks, calldata.span()).unwrap_syscall();
-
-            let mut calldata = array![];
-            calldata.append_serde(block_height);
-            calldata.append_serde(block_height);
-            calldata.append_serde(block_header.hash());
-            calldata.append_serde(height_proof);
-
-            call_contract_syscall(to, update_canonical_chain, calldata.span()).unwrap_syscall();
-
-            let mut calldata = array![];
-            calldata.append_serde(array![prev_block_header].span());
-            call_contract_syscall(to, register_blocks, calldata.span()).unwrap_syscall();
-
-            let mut calldata = array![];
-            calldata.append_serde(prev_block_height);
-            calldata.append_serde(prev_block_height);
-            calldata.append_serde(prev_block_header.hash());
-            calldata.append_serde(prev_height_proof);
-
-            call_contract_syscall(to, update_canonical_chain, calldata.span()).unwrap_syscall();
+                .query_inscription(inscription_id);
 
             // Check that the tweaked public key contains the script that allows the receiver to
             // unlock and send the inscription in the future.
@@ -340,8 +315,9 @@ mod Orderbook {
 
             // Check that the second field of the witness stack in the linked UTXO contains the
             // correct inscription.
-            let witness_data = to_hex(prev_tx.inputs[0].witness[1]);
-            assert(witness_data == expected_data, 'The inscribed data is wrong');
+            let witness_data = deref_witness[1];
+            let witness_data_hex = to_hex(witness_data);
+            assert(witness_data_hex == expected_data, 'The inscribed data is wrong');
 
             const selector: felt252 = selector!("prove_inclusion");
             let to = self.tx_inclusion.read();
@@ -365,10 +341,9 @@ mod Orderbook {
             call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
 
             // Send the reward amount to the submitter
-            let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
+                strk_token.transfer(recipient: caller, amount: amount);
             }
 
             self.inscription_statuses.write(inscription_id, Status::Closed);

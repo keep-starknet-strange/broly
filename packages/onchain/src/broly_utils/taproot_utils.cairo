@@ -91,6 +91,25 @@ pub fn hex_to_hash_rev(hex_string: ByteArray) -> Digest {
     }
 }
 
+// TODO: remove
+/// Gets bytes from hex (base16).
+pub fn from_hex(hex_string: ByteArray) -> ByteArray {
+    let num_characters = hex_string.len();
+    assert!(num_characters & 1 == 0, "Invalid hex string length");
+
+    let mut bytes: ByteArray = Default::default();
+    let mut i = 0;
+
+    while i != num_characters {
+        let hi = hex_char_to_nibble(hex_string[i]);
+        let lo = hex_char_to_nibble(hex_string[i + 1]);
+        bytes.append_byte(hi * 16 + lo);
+        i += 2;
+    };
+
+    bytes
+}
+
 /// Converts bytes to hex (base16).
 pub fn to_hex(data: @ByteArray) -> ByteArray {
     let alphabet: @ByteArray = @"0123456789abcdef";
