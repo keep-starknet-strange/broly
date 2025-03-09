@@ -2,7 +2,7 @@ import {
     BitcoinProvider,
     BitcoinProxiedRpcProvider,
     UtuProvider,
-  } from "bitcoin-on-starknet";
+  } from "../src";
 import { Account, RpcProvider } from "starknet";
 import dotenv from 'dotenv';
 
@@ -39,13 +39,19 @@ async function main() {
 
         // Generate synchronization transactions for Starknet
         // These ensure the Bitcoin state is properly reflected on Starknet
-        const prevSyncTransactions = await utuProvider.getSyncTxs(
+        interface SyncTransaction {
+            contractAddress: string;
+            selector: string;
+            calldata: string[];
+        }
+
+        const prevSyncTransactions: SyncTransaction[] = await utuProvider.getSyncTxs(
             starknetProvider,
             header.height,
             0n
         );
     
-        const syncTransactions = await utuProvider.getSyncTxs(
+        const syncTransactions: SyncTransaction[] = await utuProvider.getSyncTxs(
             starknetProvider,
             pastHeader.height,
             0n
@@ -62,21 +68,21 @@ async function main() {
         
         //   Sync the chain before interacting with our contract
         //   Register blocks & update canonical chain 
-        for (const tx in prevSyncTransactions) {
+        for (const tx of prevSyncTransactions) {
             const result = await account.execute({ 
-            contractAddress: prevSyncTransactions[tx].contractAddress,
-            entrypoint: checkEntrypoint(prevSyncTransactions[tx].selector),
-            calldata: prevSyncTransactions[0].calldata
+                contractAddress: tx.contractAddress,
+                entrypoint: checkEntrypoint(tx.selector),
+                calldata: tx.calldata
             });
     
             await starknetProvider.waitForTransaction(result.transaction_hash);
         }
     
-        for (const tx in syncTransactions) {
+        for (const tx of syncTransactions) {
             const result = await account.execute({ 
-            contractAddress: syncTransactions[tx].contractAddress,
-            entrypoint: checkEntrypoint(syncTransactions[tx].selector),
-            calldata: syncTransactions[0].calldata
+                contractAddress: tx.contractAddress,
+                entrypoint: checkEntrypoint(tx.selector),
+                calldata: tx.calldata
             });
     
             await starknetProvider.waitForTransaction(result.transaction_hash);

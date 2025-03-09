@@ -3,7 +3,7 @@ import {
   BitcoinProxiedRpcProvider,
   UtuProvider,
   serializedHash,
-} from "bitcoin-on-starknet";
+} from "../src";
 import { Account, CallData, RpcProvider, byteArray } from "starknet";
 import { byteArrayFromHexString, formatFelt, toLittleEndianHex } from "../src/UtuProvider";
 import dotenv from 'dotenv';
