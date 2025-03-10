@@ -123,7 +123,6 @@ mod Orderbook {
                         sender: caller, recipient: escrow_address, amount: submitter_fee,
                     );
             }
-            // TODO: check increment
             let id = self.new_inscription_id.read();
             self
                 .inscriptions
@@ -132,6 +131,7 @@ mod Orderbook {
                     (caller, inscription_data.clone(), submitter_fee, receiving_address.clone()),
                 );
             self.inscription_statuses.write(id, Status::Open);
+            self.new_inscription_id.write(id + 1);
             self
                 .emit(
                     RequestCreated {
@@ -149,8 +149,8 @@ mod Orderbook {
         /// Inputs:
         /// - `inscription_id: felt252`, the ID of the inscription.
         /// Returns:
-        /// - `(ContractAddress, ByteArray, felt252)`, the tuple with the requestor,
-        /// inscribed data and the fee.
+        /// - `(ContractAddress, ByteArray, felt252, ByteArray)`, the tuple with the requestor,
+        /// inscribed data, the fee, and the receiving Bitcoin address.
         fn query_inscription(
             self: @ContractState, inscription_id: u32,
         ) -> (ContractAddress, ByteArray, u256, ByteArray) {
@@ -269,10 +269,6 @@ mod Orderbook {
             let submitters = self.submitters.entry(inscription_id);
             let submitter = submitters.read(caller);
             assert(caller == submitter, 'Caller does not match submitter');
-
-            // let (_, expected_data, amount, expected_address) = self
-            //     .inscriptions
-            //     .read(inscription_id);
 
             let (_, expected_data, amount, expected_address) = self
                 .query_inscription(inscription_id);

@@ -103,6 +103,31 @@ fn test_request_inscription_stored_and_retrieved() {
 }
 
 #[test]
+fn test_index_updates_correctly() {
+    let (orderbook_dispatcher, token_dispatcher, _, _) = setup();
+
+    let test_taproot_address: ByteArray =
+        "bc1p5d7rjq7g6r4jdyhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297";
+    let test_data: ByteArray = "data";
+
+    token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
+
+    orderbook_dispatcher
+        .request_inscription(test_data, test_taproot_address.clone(), 'STRK'.into(), 10);
+
+    let (_, _, amount, _) = orderbook_dispatcher.query_inscription(0);
+    assert_eq!(amount, 10);
+    let (_, _, amount, _) = orderbook_dispatcher.query_inscription(1);
+    assert_eq!(amount, 0);
+
+    orderbook_dispatcher
+        .request_inscription("more_data", test_taproot_address.clone(), 'STRK'.into(), 10);
+
+    let (_, _, amount, _) = orderbook_dispatcher.query_inscription(1);
+    assert_eq!(amount, 10);
+}
+
+#[test]
 #[should_panic]
 fn test_request_inscription_fails_wrong_currency() {
     let (orderbook_dispatcher, token_dispatcher, _, _) = setup();
