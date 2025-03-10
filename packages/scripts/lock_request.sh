@@ -16,15 +16,19 @@ TMP_DIR=$OUTPUT_DIR/tmp/$TIMESTAMP
 mkdir -p $LOG_DIR
 mkdir -p $TMP_DIR
 
-NETWORK=sepolia
-# KEYSTORE_PATH=$WORK_DIR/test.key
-# ACCOUNT_FILE=$WORK_DIR/account.json
+URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 
-# BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x04f68339f949e8307057c3e56f08d4f405f0d0b257c9b4d05ede4143e230bced
+BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x0443574e8fd023b8bb0cc85ab4f17e688ace9d5acf369a50611f2696f088717d
 LOCK_FUNCTION=lock_inscription
-INSCRIPTION_ID=$1
-TX_HASH=$($SCRIPT_DIR/text_to_byte_array.sh "$2")
+ACCOUNT=$1
+INSCRIPTION_ID=$2
 
-echo "Locking inscription request $INSCRIPTION_ID with transaction hash $TX_HASH" > $LOG_DIR/lock_request.log
-echo "starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password '' --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH" >> $LOG_DIR/lock_request.log
-starkli invoke --network $NETWORK --keystore $KEYSTORE_PATH --account $ACCOUNT_FILE --keystore-password "" --watch $BROLY_ORDERBOOK_CONTRACT_ADDRESS $LOCK_FUNCTION $INSCRIPTION_ID $TX_HASH >> $LOG_DIR/lock_request.log
+echo "Locking inscription request $INSCRIPTION_ID" > $LOG_DIR/lock_request.log
+echo "sncast --account $ACCOUNT invoke" >> $LOG_DIR/lock_request.log
+
+sncast --account $ACCOUNT invoke \
+    --url $URL \
+    --contract-address $BROLY_ORDERBOOK_CONTRACT_ADDRESS \
+    --function $LOCK_FUNCTION \
+    --calldata $INSCRIPTION_ID \
+    >> $LOG_DIR/lock_request.log
