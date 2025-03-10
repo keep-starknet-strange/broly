@@ -18,13 +18,13 @@ mkdir -p $TMP_DIR
 
 URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 
-BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x0443574e8fd023b8bb0cc85ab4f17e688ace9d5acf369a50611f2696f088717d
+BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x072ec18edfe884b11ced172ecda723da1951cee9ed093839bcd3caa4f177f5ac
 LOCK_FUNCTION=lock_inscription
 ACCOUNT=$1
 INSCRIPTION_ID=$2
 
 echo "Locking inscription request $INSCRIPTION_ID" > $LOG_DIR/lock_request.log
-echo "sncast --account $ACCOUNT invoke" >> $LOG_DIR/lock_request.log
+echo "sncast --account $ACCOUNT invoke --url $URL --contract-address $BROLY_ORDERBOOK_CONTRACT_ADDRESS --function $LOCK_FUNCTION --calldata $INSCRIPTION_ID" >> $LOG_DIR/lock_request.log
 
 sncast --account $ACCOUNT invoke \
     --url $URL \
