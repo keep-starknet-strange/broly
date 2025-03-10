@@ -73,7 +73,7 @@ async function main() {
                 contractAddress: tx.contractAddress,
                 entrypoint: checkEntrypoint(tx.selector),
                 calldata: tx.calldata
-            });
+            }, { maxFee: "0x1100000000000" });
     
             await starknetProvider.waitForTransaction(result.transaction_hash);
         }
@@ -83,7 +83,7 @@ async function main() {
                 contractAddress: tx.contractAddress,
                 entrypoint: checkEntrypoint(tx.selector),
                 calldata: tx.calldata
-            });
+            }, { maxFee: "0x1100000000000" });
     
             await starknetProvider.waitForTransaction(result.transaction_hash);
         }
