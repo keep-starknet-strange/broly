@@ -65,10 +65,9 @@ mod Orderbook {
     #[derive(Drop, starknet::Event)]
     pub struct RequestCreated {
         #[key]
-        pub id: u32,
+        pub inscription_id: u32,
         #[key]
         pub caller: ContractAddress,
-        pub inscription_data: ByteArray,
         pub receiving_address: ByteArray,
         pub currency_fee: felt252,
         pub submitter_fee: u256,
@@ -77,22 +76,20 @@ mod Orderbook {
     #[derive(Drop, starknet::Event)]
     pub struct RequestCanceled {
         #[key]
-        pub id: u32,
+        pub inscription_id: u32,
         pub currency_fee: felt252,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestLocked {
         #[key]
-        pub id: u32,
-        pub submitter: ContractAddress,
+        pub inscription_id: u32,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct RequestCompleted {
         #[key]
-        pub id: u32,
-        pub submitter: ContractAddress,
+        pub inscription_id: u32,
         pub tx_hash: ByteArray,
     }
 
@@ -135,9 +132,8 @@ mod Orderbook {
             self
                 .emit(
                     RequestCreated {
-                        id: id,
+                        inscription_id: id,
                         caller: caller,
-                        inscription_data: inscription_data,
                         receiving_address: receiving_address,
                         currency_fee: currency_fee,
                         submitter_fee: submitter_fee,
@@ -195,7 +191,10 @@ mod Orderbook {
                 .inscriptions
                 .write(inscription_id, (caller, inscription_data, 0, expected_address));
             self.inscription_statuses.write(inscription_id, Status::Canceled);
-            self.emit(RequestCanceled { id: inscription_id, currency_fee: currency_fee });
+            self
+                .emit(
+                    RequestCanceled { inscription_id: inscription_id, currency_fee: currency_fee },
+                );
         }
 
         /// Called by a submitter. Multiple submitters are allowed to lock the
@@ -224,7 +223,7 @@ mod Orderbook {
 
             self.inscription_statuses.write(inscription_id, Status::Locked);
             self.inscription_locks.write(inscription_id, (submitter, get_block_number()));
-            self.emit(RequestLocked { id: inscription_id, submitter: submitter });
+            self.emit(RequestLocked { inscription_id: inscription_id });
         }
 
         /// Called by a submitter. The fee is transferred to the submitter if
@@ -343,10 +342,7 @@ mod Orderbook {
             }
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
-            self
-                .emit(
-                    RequestCompleted { id: inscription_id, submitter: submitter, tx_hash: tx_hash },
-                );
+            self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
     }
 
