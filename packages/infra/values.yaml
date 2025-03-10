@@ -64,7 +64,7 @@ deployments:
     replicas: 1
     image: brandonjroberts/broly-consumer
   inscriber:
-    replicas: 1
+    replicas: 0
     image: brandonjroberts/broly-inscriber
   indexer:
     replicas: 1
