@@ -29,7 +29,7 @@ async function main() {
       process.env.STARKNET_PRIVATE_KEY as string
     );
     try {
-        const txId = "ccfe4da8d312b18753bbf693e3014cfcfa857cf73f8f822f81a301f4f4f408d5";
+        const txId = process.argv[2];
         const rawTransaction = await bitcoinProvider.getRawTransaction(txId, true);
         const prevTxId = rawTransaction.vin[0].txid;    
         const prevRawTransaction = await bitcoinProvider.getRawTransaction(prevTxId, true);
