@@ -35,8 +35,8 @@ async function main() {
     // Fetch Bitcoin inscription submission calldata
 
     // `tx_hash`
-    const txId = "ccfe4da8d312b18753bbf693e3014cfcfa857cf73f8f822f81a301f4f4f408d5";
-    console.log("tx_hash: ", txId);
+    const txId = process.argv[2];
+    console.log("tx_hash:", txId);
     
     // Get raw transaction
     const rawTransaction = await bitcoinProvider.getRawTransaction(txId, true);
