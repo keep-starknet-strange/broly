@@ -19,19 +19,9 @@ Broly is a decentralized Bitcoin inscription service that uses Starknet for orde
 
 ## Why Broly? 
 
-Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. All they need is a Bitcoin and a Starknet wallet extension. They broadcast their request transaction to Starknet. The data is stored in the Broly contract. A user running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the requester's Bitcoin address. The `inscribor` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution. 
+Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user (requester) without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. All the `Requester` needs is a Bitcoin and a Starknet wallet extension. The Requester needs `STRK` on Starknet, but does not need any `BTC` on the Bitcoin network. The `Requester` broadcasts the request transaction to Starknet with data. The data is stored in the Broly contract. A `Submitter` running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the `Requester`'s Bitcoin address. The `Submitter` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution, transaction inclusion in the block, and the inclusion of the block in the canonical chain.
 
 Try [Broly](https://www.broly-btc.com/)!
-
-### Dependencies
-
-`raito`: A provable [Bitcoin light client](https://github.com/keep-starknet-strange/raito) written in Cairo. 
-
-`shinigami`: A [Bitcoin script VM](https://github.com/keep-starknet-strange/shinigami), aka Bitcoin Execution Engine in Cairo. 
-
-`utu_relay`: A [smart contract](https://github.com/lfglabs-dev/utu_relay) that enables secure verification of Bitcoin transactions and events, and bridges Bitcoin data to Starknet. 
-
-Kudos to the [Exploration](https://github.com/keep-starknet-strange) team and [LFG](https://github.com/lfglabs-dev) labs for the effort!
 
 ## Architecture
 
@@ -77,18 +67,37 @@ flowchart TB
 
 ## Flow
 
-1. User connects both Bitcoin [Xverse](https://www.xverse.app/) and [Starknet](https://www.argent.xyz/) Argent or [Braavos](https://braavos.app/) wallets
-2. User creates an inscription order:
-   - Specifies inscription content and reward amount
-   - Order is created on Starknet orderbook
-   - Funds are locked in the contract
-3. Inscribor service:
-   - Monitors pending orders
-   - Creates Bitcoin inscriptions
-   - Triggers reward release on successful inscription
-4. User receives inscription, inscribor receives reward
+1. `Requester` connects both Bitcoin [Xverse](https://www.xverse.app/) and Starknet [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) wallets
+2. `Requester` creates an inscription order:
+   - Specifies inscription content (data) as image (PNG), message (text), or GIF.
+   - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
+   - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
+   - Order is created and stored in the Broly contract.
+   - `Requester`'s funds are locked in the Broly contract.
+   - An event with the `inscription_id` and `receiving_address` is emitted. 
+   - The open request info is stored in the Broly database and is visible on the website at `https://www.broly-btc.com/request/{inscription_id}`.
+3. Locking script: 
+   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:  `bash ./packages/scripts/lock_request.sh {inscription_id}` where `inscription_id` is the ID of the open order. 
+   - An event with the `inscription_id` and `receiving_address` is emitted. 
+   - Order status changes to `Locked` on Broly website and in the Broly contract.
+   - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
+   - The `Requester` cannot cancel the inscription if the lock has not expired. 
+   - Another `Submitter` can only lock the inscription again if the lock has expired. 
+3. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
+   - Create or restore a Bitcoin address. Usage: `ord wallet create --help` or `ord wallet restore --help`.
+   - Allows `Submitter` to create the Bitcoin inscription. Usage: `ord wallet inscribe [OPTIONS] --fee-rate <FEE_RATE> <--delegate <DELEGATE>|--file <FILE>>`.
+   - Allows Submitter to transfer Bitcoin inscription to `Requester`'s Bitcoin address. Usage: `ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>`.
+4. `bitcoin-on-starknet.js` package:
+   - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
+   - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
+   - Serializes it for `submit_inscription` to the Broly contract on Starknet.
+   - Triggers `STRK` reward release to the `Submitter` on successful inscription.
+   - Order status changes to `Closed` on Broly website and in the Broly contract. 
+5. Verification process: 
 
-## Getting Started
+5. `Requester` owns the inscription on Bitcoin, `Submitter` receives reward on Starknet. 
+
+## Running Broly locally for tests and development
 
 1. Run the app
 
@@ -108,31 +117,40 @@ docker compose build
 docker compose up
 ```
 
-2. Run the proof-utils package
+## For a `Requester`: Interacting with Broly as a user in one click
 
-```bash
-cd packages/proof-utils
-pnpm add -D typescript ts-node
-pnpm run build 
-node dist/index.js
-```
+Head to the [Broly website](https://www.broly-btc.com/). 
+Ensure that you have a Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) with funds (on https://sepolia.starkscan.co/ testnet, where the Broly contract is currently deployed).
 
-The script will print the serialized transaction hex.
+## For a `Submitter`: Interacting with the scripts to lock and submit transactions on Starknet 
+
+Lock an inscription:
+`bash ./packages/scripts/lock_request.sh {inscription_id}`
+
+Register blocks and update canonical chain by passing the `bitcoin_tx_hash` of the inscription transaction hash: 
+`bash ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}`
+
+`bash ./packages/scripts/lock_request.sh {inscription_id}` where `inscription_id` is the ID of the open order
 
 ## Project Structure
 
 ```text
 broly/
 ├── apps/
-│   ├── web/               # Frontend React application
-│   └── backend/           # REST API service
+│   ├── web/                      # Frontend React application
+│   └── backend/                  # REST API service
 ├── packages/
-│   ├── inscribor/         # Bitcoin inscription service
-│   ├── onchain/           # Starknet smart contracts
-│   ├── scripts/           # Deployment & Testing scripts
-│   └── indexer/           # Starknet contract indexing
+│   ├── onchain/                  # Starknet smart contracts
+│   ├── scripts/                  # Deployment & Testing scripts
+│   └── indexer/                  # Starknet contract indexing
+│   └── infra/                    # Deployment configs
+│   └── regtest/                  # Scripts for Bitcoin regtest testnet
+│   └── bitcoin-on-starknet.js/   # Bitcoin data scripts
+├── .github/
+│   ├── workflows/                # GitHub workflows
 ├── package.json
 └── turbo.json
+└── docker-compose.yml
 ```
 
 ## Technology Stack
@@ -151,9 +169,7 @@ broly/
   - Cairo (Starknet)
   - Scarb
 - Inscribor:
-  - Node.js
-  - BitcoinJS-lib
-  - Starknet.js
+  - `ord` command-line wallet
 
 ## Components
 
@@ -171,18 +187,24 @@ broly/
 - Status tracking endpoints
 - Order history
 
-### Smart Contracts (onchain)
+### Smart Contracts (onchain) and dependencies
 
-- Orderbook contract
+- Broly (Orderbook) contract
 - Transaction inclusion
-- Payment handling
+- Utu Relay contract
+- Raito light client
 
 ### Inscribor Service
 
-- Order monitoring
+- `ord` CLI scripts
 - Bitcoin inscription creation
 - Transaction verification
 - Starknet interaction for reward release
+
+## Credits 
+
+   - The verification of Bitcoin transactions is possible thanks to the [Exploration Team](https://github.com/keep-starknet-strange) at Starkware. [Raito](https://github.com/keep-starknet-strange/raito), a Bitcoin light client written in Cairo, and `shinigami`: A [Bitcoin script VM](https://github.com/keep-starknet-strange/shinigami), aka Bitcoin Execution Engine written in Cairo. 
+   - The verification of the transaction inclusion in the block and maintaining the canonical chain is possible thanks to the [LFG labs](https://github.com/lfglabs-dev) team and their work on [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds).
 
 ## License
 
