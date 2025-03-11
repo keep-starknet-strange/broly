@@ -17,6 +17,10 @@ Broly is a decentralized Bitcoin inscription service that uses Starknet for orde
 
 ---
 
+## Disclaimer 
+
+This codebase is an experimental PoC as part of Bitcoin explorations at StarkWare, and has not undergone a professional audit. 
+
 ## Why Broly? 
 
 Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. With Broly, a user (requester) without any funds on Bitcoin can get their data inscribed on Bitcoin for a `STRK` fee. All the `Requester` needs is a Bitcoin and a Starknet wallet extension. The Requester needs `STRK` on Starknet, but does not need any `BTC` on the Bitcoin network. The `Requester` broadcasts the request transaction to Starknet with data. The data is stored in the Broly contract. A `Submitter` running the `inscribor` service can pick up the request, inscribe the data on Bitcoin, and transfer it to the `Requester`'s Bitcoin address. The `Submitter` can submit the creation and transfer transactions to the Broly contract on Starknet, and get the full verification of the correctness of the transaction execution, transaction inclusion in the block, and the inclusion of the block in the canonical chain.
@@ -249,6 +253,7 @@ flowchart TB
 
    - The verification of Bitcoin transactions is possible thanks to the [Exploration Team](https://github.com/keep-starknet-strange) at Starkware. [Raito](https://github.com/keep-starknet-strange/raito), a Bitcoin light client written in Cairo, and `shinigami`: A [Bitcoin script VM](https://github.com/keep-starknet-strange/shinigami), aka Bitcoin Execution Engine written in Cairo. 
    - The verification of the transaction inclusion in the block and maintaining the canonical chain is possible thanks to the [LFG labs](https://github.com/lfglabs-dev) team and their work on [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds).
+   - The debugging of the verification flow was possible thanks to the [Walnut](https://github.com/walnuthq) team and their transaction debugger. 
 
 ## License
 
