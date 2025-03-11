@@ -179,6 +179,7 @@ function InscriptionForm(props: any) {
       <div className="relative py-2 flex flex-col gap-4 justify-center items-center w-full">
         {!props.taprootAddress && (
           <button
+            type="button"
             className="button__secondary--gradient button__secondary text-2xl"
             onClick={props.bitcoinWallet.connectWallet}
           >
@@ -186,12 +187,13 @@ function InscriptionForm(props: any) {
           </button>
         )}
         {props.taprootAddress && (
-          <div
+          <button
+            type="button"
             className="buttonlike__primary--gradient buttonlike__primary"
             onClick={props.bitcoinWallet.disconnectWallet}
           >
             Linked BTC Wallet : {taprootAddressShort}
-          </div>
+          </button>
         )}
         <button
           type="submit"
