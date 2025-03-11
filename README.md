@@ -39,15 +39,17 @@ Try [Broly](https://www.broly-btc.com/)!
    - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
    - Order is created and stored in the Broly contract.
    - `Requester`'s funds are locked in the Broly contract.
-   - An event with the `inscription_id` and `receiving_address` is emitted. 
+   - A `RequestCreated` event with the `inscription_id`, `caller`, `receiving_address`, and `fee` is emitted. 
    - The open request info is stored in the Broly database and is visible on the website at `https://www.broly-btc.com/request/{inscription_id}`.
+   - The Requester is able to cancel the request and get the funds back. 
+   - A `RequestCanceled` event with the `inscription_id` is emitted. 
 3. Locking script: 
    - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:  
    ```
    bash ./packages/scripts/lock_request.sh {inscription_id}
    ```
    where `inscription_id` is the ID of the open order. 
-   - An event with the `inscription_id` and `receiving_address` is emitted. 
+   - A `RequestLocked` event with the `inscription_id` is emitted. 
    - Order status changes to `Locked` on Broly website and in the Broly contract.
    - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
@@ -75,6 +77,7 @@ Try [Broly](https://www.broly-btc.com/)!
    - Serializes it for `submit_inscription` to the Broly contract on Starknet.
    - Triggers `STRK` reward release to the `Submitter` on successful inscription.
    - Order status changes to `Closed` on Broly website and in the Broly contract. 
+   - A `RequestCompleted` event with `tx_hash` and `inscription_id` is emitted. 
 5. Verification process: 
 
 5. `Requester` owns the inscription on Bitcoin, `Submitter` receives reward on Starknet. 
