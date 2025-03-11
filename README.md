@@ -42,16 +42,33 @@ Try [Broly](https://www.broly-btc.com/)!
    - An event with the `inscription_id` and `receiving_address` is emitted. 
    - The open request info is stored in the Broly database and is visible on the website at `https://www.broly-btc.com/request/{inscription_id}`.
 3. Locking script: 
-   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:  `bash ./packages/scripts/lock_request.sh {inscription_id}` where `inscription_id` is the ID of the open order. 
+   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:  
+   ```
+   bash ./packages/scripts/lock_request.sh {inscription_id}
+   ```
+   where `inscription_id` is the ID of the open order. 
    - An event with the `inscription_id` and `receiving_address` is emitted. 
    - Order status changes to `Locked` on Broly website and in the Broly contract.
    - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
    - Another `Submitter` can only lock the inscription again if the lock has expired. 
 3. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
-   - Create or restore a Bitcoin address. Usage: `ord wallet create --help` or `ord wallet restore --help`.
-   - Allows `Submitter` to create the Bitcoin inscription. Usage: `ord wallet inscribe [OPTIONS] --fee-rate <FEE_RATE> <--delegate <DELEGATE>|--file <FILE>>`.
-   - Allows Submitter to transfer Bitcoin inscription to `Requester`'s Bitcoin address. Usage: `ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>`.
+   - Create or restore a Bitcoin address. Usage: 
+   ```bash
+   ord wallet create --help
+   ``` 
+   or 
+   ```bash
+   ord wallet restore --help
+   ```
+   - Allows `Submitter` to create the Bitcoin inscription. Usage: 
+   ```bash
+   ord wallet inscribe [OPTIONS] --fee-rate <FEE_RATE> <--delegate <DELEGATE>|--file <FILE>>
+   ```
+   - Allows `Submitter` to transfer Bitcoin inscription to `Requester`'s Bitcoin address. Usage: 
+   ```bash
+   ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
+   ```
 4. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
