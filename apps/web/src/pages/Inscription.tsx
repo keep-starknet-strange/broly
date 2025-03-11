@@ -35,6 +35,19 @@ function Inscription(_props: any) {
 
   // TODO: Move inscription query up to parent component
   // TODO: Links on owner, block#, id, ...
+  // TODO: Like, share, save buttons support
+  //          <div className="flex flex-row h-full items-center justify-center gap-2">
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>
+  //            </button>
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png" alt="Like"/>
+  //            </button>
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://icons.iconarchive.com/icons/colebemis/feather/256/bookmark-icon.png" alt="Bookmark"/>
+  //            </button>
+  //          </div>
+
   return (
     <div className="flex flex-row w-full h-full">
     {inscription === undefined ? (
@@ -88,17 +101,6 @@ function Inscription(_props: any) {
               >
                 Ordiscan
               </button>
-              <div className="flex flex-row h-full items-center justify-center gap-2">
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>
-                </button>
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png" alt="Like"/>
-                </button>
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://icons.iconarchive.com/icons/colebemis/feather/256/bookmark-icon.png" alt="Bookmark"/>
-                </button>
-              </div>
             </div>
           </div>
         </div>

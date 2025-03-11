@@ -10,6 +10,14 @@ function InscriptionForm(props: any) {
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [taprootAddressShort, setTaprootAddressShort] = useState("");
+  useEffect(() => {
+    if (props.taprootAddress) {
+      const taprootAddressShort = props.taprootAddress.slice(0, 6) + "..." + props.taprootAddress.slice(-6);
+      setTaprootAddressShort(taprootAddressShort);
+    }
+  }, [props.taprootAddress]);
+
   const { address } = useAccount()
 
   useEffect(() => {
@@ -168,10 +176,26 @@ function InscriptionForm(props: any) {
           />
         )}
       </div>
-      <div className="relative py-2">
+      <div className="relative py-2 flex flex-col gap-4 justify-center items-center w-full">
+        {!props.taprootAddress && (
+          <button
+            className="button__secondary--gradient button__secondary text-2xl"
+            onClick={props.bitcoinWallet.connectWallet}
+          >
+            Link Xverse
+          </button>
+        )}
+        {props.taprootAddress && (
+          <div
+            className="buttonlike__primary--gradient buttonlike__primary"
+            onClick={props.bitcoinWallet.disconnectWallet}
+          >
+            Linked BTC Wallet : {taprootAddressShort}
+          </div>
+        )}
         <button
           type="submit"
-          className={`button--gradient button__primary text-2xl ${
+          className={`button--gradient button__primary text-2xl w-min ${
             !props.taprootAddress || !props.isStarknetConnected
               ? "button__primary--disabled"
               : (selectedOption === "Image" && uploadedImage) || selectedOption === "Message"

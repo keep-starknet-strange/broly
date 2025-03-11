@@ -172,7 +172,6 @@ body {
 .button__primary--disabled {
   background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-light));
   border: 1px solid var(--color-tertiary-dull-dark);
-  cursor: not-allowed;
   color: #a0a0a0;
 }
 

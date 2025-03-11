@@ -13,7 +13,6 @@ import orderbook_abi from './abi/orderbook.abi.json';
 
 import Home from './pages/Home'
 import Inscriptions from './pages/Inscriptions'
-import Collection from './pages/Collection'
 import Info from './pages/Info'
 import Inscription from './pages/Inscription'
 import Request from './pages/Request'
@@ -178,10 +177,10 @@ function App() {
     setCalls([orderbookContract.populate('cancel_inscription', calldata)])
   }
 
+// TODO:  { name: 'Collections', path: '/collection', component: Collection },
   const [tabs, _setTabs] = useState([
     { name: 'Home', path: '/', component: Home as any },
     { name: 'Inscriptions', path: '/inscriptions', component: Inscriptions },
-    { name: 'Collections', path: '/collection', component: Collection },
     { name: 'Info', path: '/info', component: Info }
   ])
   const tabProps = {

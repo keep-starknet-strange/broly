@@ -6,6 +6,21 @@ import InscriptionProperty from "../components/inscription/Property";
 import { getInscriptionRequest } from "../api/inscriptions";
 
 function Request(props: any) {
+  // TODO: Like, share, and save buttons support
+  //        <div className="flex flex-row mx-2 mr-8 px-2 h-12 items-center justify-between">
+  //          <div className="flex flex-row h-full items-center justify-center gap-2">
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>
+  //            </button>
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png" alt="Like"/>
+  //            </button>
+  //            <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
+  //              <img className="h-6" src="https://icons.iconarchive.com/icons/colebemis/feather/256/bookmark-icon.png" alt="Bookmark"/>
+  //            </button>
+  //          </div>
+  //        </div>
+
   // TODO: Implement unique request features: ie cancel, accept, reject, bid, other info, ...
   const { id } = useParams<{ id: string }>();
 
@@ -113,19 +128,6 @@ function Request(props: any) {
               <div className="flex flex-row w-full h-12 items-center px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">ID</h4>
                 <p className="text-lg text__color--primary">{inscription.inscription_id}</p>
-              </div>
-            </div>
-            <div className="flex flex-row mx-2 mr-8 px-2 h-12 items-center justify-between">
-              <div className="flex flex-row h-full items-center justify-center gap-2">
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://static-00.iconduck.com/assets.00/share-ios-fill-icon-1610x2048-1l65jt3c.png" alt="Share"/>
-                </button>
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png" alt="Like"/>
-                </button>
-                <button className="button__circle--gradient button__circle w-fit flex flex-col justify-center items-center">
-                  <img className="h-6" src="https://icons.iconarchive.com/icons/colebemis/feather/256/bookmark-icon.png" alt="Bookmark"/>
-                </button>
               </div>
             </div>
           </div>
