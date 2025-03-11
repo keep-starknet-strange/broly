@@ -37,6 +37,7 @@ async function main() {
     // `tx_hash`
     const txId = process.argv[2];
     console.log("tx_hash:", txId);
+    const inscriptionId = process.argv[3];
     
     // Get raw transaction
     const rawTransaction = await bitcoinProvider.getRawTransaction(txId, true);
@@ -75,7 +76,7 @@ async function main() {
     // Prepare calldata for `submit_transaction` function
 
     var calldata: String[] = [];
-    calldata.push("0x0"); // inscription id
+    calldata.push(inscriptionId); // inscription id
     calldata.push("0x5354524b"); // currency fee
     const compiledTxIdArray = CallData.compile(
       byteArray.byteArrayFromString(txId.toString())
@@ -398,9 +399,7 @@ async function main() {
       calldata.push(direction ? "0x1" : "0x0"); // Direction (bool)
     });
     
-    const brolyAddress = "0x0443574e8fd023b8bb0cc85ab4f17e688ace9d5acf369a50611f2696f088717d";
-
-  
+    const brolyAddress = "0x036de17bd062d18153cba8cc4e70a9f7875abbb0397879033e7608b36b293eed";
 
     const submitCall = {
       contractAddress: brolyAddress, // Broly contract
@@ -409,9 +408,6 @@ async function main() {
       calldata: calldata,
     };
     
-    // TODO: remove, needed only for tests
-
-
     await account.execute(submitCall, { maxFee: "0x1100000000000" });
 
   } catch (error) {
