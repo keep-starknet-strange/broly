@@ -31,9 +31,10 @@ Try [Broly](https://www.broly-btc.com/)!
 
 ## Flow
 
-1. `Requester` connects both Bitcoin [Xverse](https://www.xverse.app/) and Starknet [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) wallets
+1. `Requester` connects Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/). Click `Login` in the top right corner. 
 2. `Requester` creates an inscription order:
    - Specifies inscription content (data) as image (PNG), message (text), or GIF.
+   - Clicks `Inscribe` and connects pop up Bitcoin [Xverse](https://www.xverse.app/) wallet.
    - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
    - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
    - Order is created and stored in the Broly contract.
