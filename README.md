@@ -26,7 +26,7 @@ Try [Broly](https://www.broly-btc.com/)!
 ## Diagram 
 
 <div align="center">
-  <img src="apps/web/public/images/broly-diagram.png" alt="broly-diagram" height="320"/>
+  <img src="apps/web/public/images/broly-diagram.png" alt="broly-diagram" height="400"/>
 </div>
 
 ## Flow
