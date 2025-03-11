@@ -102,13 +102,13 @@ docker compose up
 ## For a `Requester`: Interacting with Broly as a user in one click
 
 Head to the [Broly website](https://www.broly-btc.com/). 
-Ensure that you have a Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) with funds (on https://sepolia.starkscan.co/ testnet, where the Broly contract is currently deployed).
+Ensure that you have a Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) with funds (on https://sepolia.starkscan.co/ testnet, where the Broly contract is currently deployed). Choose Image/Message/Gif, upload your inscription data, approve the transaction and wait for a `Submitter` to complete your request. 
 
 ## For a `Submitter`: Interacting with the scripts to lock and submit transactions on Starknet 
 
 Run
 ```
-cp ./packages/bitcoin-on-starknet.js/scripts/.env.example ./packages/bitcoin-on-starknet.js/scripts/.env
+cp ./packages/bitcoin-on-starknet.js/.env.example ./packages/bitcoin-on-starknet.js/.env
 ```
 
 Install [Starknet foundry](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html). 
