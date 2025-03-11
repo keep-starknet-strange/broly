@@ -225,6 +225,8 @@ flowchart TB
     subgraph Starknet
         OB[Orderbook Contract]
         TI[Tx Inclusion]
+        UR[Utu Relay]
+        RA[Raito]
     end
 
     subgraph Bitcoin
@@ -234,6 +236,7 @@ flowchart TB
     subgraph Inscribor
         IS[Inscription Service]
         OM[Order Monitor]
+        ORD[Ordinals CLI]
     end
 
     UI --> API
@@ -241,11 +244,13 @@ flowchart TB
     UI <--> SW
     API --> DB
     SW <--> OB
-    IS --> BTC
+    ORD --> BTC
     OM --> OB
     OB --> TI
-    API --> IS
-    IS --> API
+    TI <--> UR
+    UR <--> RA
+    API --> OM
+    OM --> IS
     IS --> OB
 ```
 
