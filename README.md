@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="apps/web/public/images/logo-high.png" alt="broly-logo" height="220"/>
+  <img src="apps/web/public/images/logo-high.png" alt="broly-logo" height="320"/>
 
   # B.R.O.L.Y.
   ***Bitcoin Registry Orchestrates Like Yesterday***
