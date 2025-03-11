@@ -23,47 +23,11 @@ Broly is a showcase of the power of Starknet brought to the Bitcoin ecosystem. W
 
 Try [Broly](https://www.broly-btc.com/)!
 
-## Architecture
+## Diagram 
 
-```mermaid
-flowchart TB
-    subgraph Frontend
-        UI[React UI]
-        BW[Bitcoin Wallet]
-        SW[Starknet Wallet]
-    end
-
-    subgraph Backend
-        API[REST API]
-        DB[(Database)]
-    end
-
-    subgraph Starknet
-        OB[Orderbook Contract]
-        TI[Tx Inclusion]
-    end
-
-    subgraph Bitcoin
-        BTC[Bitcoin Network]
-    end
-
-    subgraph Inscribor
-        IS[Inscription Service]
-        OM[Order Monitor]
-    end
-
-    UI --> API
-    UI <--> BW
-    UI <--> SW
-    API --> DB
-    SW <--> OB
-    IS --> BTC
-    OM --> OB
-    OB --> TI
-    API --> IS
-    IS --> API
-    IS --> OB
-```
+<div align="center">
+  <img src="apps/web/public/images/broly-diagram.png" alt="broly-diagram" height="220"/>
+</div>
 
 ## Flow
 
@@ -200,6 +164,48 @@ broly/
 - Bitcoin inscription creation
 - Transaction verification
 - Starknet interaction for reward release
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend
+        UI[React UI]
+        BW[Bitcoin Wallet]
+        SW[Starknet Wallet]
+    end
+
+    subgraph Backend
+        API[REST API]
+        DB[(Database)]
+    end
+
+    subgraph Starknet
+        OB[Orderbook Contract]
+        TI[Tx Inclusion]
+    end
+
+    subgraph Bitcoin
+        BTC[Bitcoin Network]
+    end
+
+    subgraph Inscribor
+        IS[Inscription Service]
+        OM[Order Monitor]
+    end
+
+    UI --> API
+    UI <--> BW
+    UI <--> SW
+    API --> DB
+    SW <--> OB
+    IS --> BTC
+    OM --> OB
+    OB --> TI
+    API --> IS
+    IS --> API
+    IS --> OB
+```
 
 ## Credits 
 
