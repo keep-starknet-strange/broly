@@ -106,13 +106,30 @@ Ensure that you have a Starknet wallet extension: [Argent](https://www.argent.xy
 
 ## For a `Submitter`: Interacting with the scripts to lock and submit transactions on Starknet 
 
+Run
+```
+cp ./packages/bitcoin-on-starknet.js/scripts/.env.example ./packages/bitcoin-on-starknet.js/scripts/.env
+```
+
+Install [Starknet foundry](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html). 
+[Create](https://foundry-rs.github.io/starknet-foundry/starknet/account.html#creating-and-deploying-accounts) a Starknet account using `sncast`. The name of the account will be passed to the scripts that interact with Starknet, and the address and private key for the Starknet provider environment variables. 
+
 Lock an inscription:
-`bash ./packages/scripts/lock_request.sh {inscription_id}`
+```
+bash ./packages/scripts/lock_request.sh {SN_account_name} {inscription_id}
+```
+
+Create an account and get a Bitcoin endpoint and a key at [Quicknode](https://www.quicknode.com/). Fill out the Bitcoin environment variables. 
 
 Register blocks and update canonical chain by passing the `bitcoin_tx_hash` of the inscription transaction hash: 
-`bash ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}`
+```
+bash ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}
+```
 
-`bash ./packages/scripts/lock_request.sh {inscription_id}` where `inscription_id` is the ID of the open order
+```
+bash ./packages/scripts/lock_request.sh {inscription_id}
+``` 
+where `inscription_id` is the ID of the open order.
 
 ## Project Structure
 
