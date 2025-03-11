@@ -10,13 +10,14 @@ import { useAccount } from "@starknet-react/core";
 function Account(props: any) {
   const { address } = useAccount();
   const [shortAddress, setShortAddress] = useState("");
-  const [username, setUsername] = useState("");
-  const [usernameInput, setUsernameInput] = useState("");
   useEffect(() => {
     if (address) {
       setShortAddress(address.slice(0, 6) + "..." + address.slice(-4));
     }
   }, [address]);
+  /*
+  const [username, setUsername] = useState("");
+  const [usernameInput, setUsernameInput] = useState("");
   const bitcoinConnectionsTypes = ["Wallet", "Manual"];
   const [bitcoinConnectionType, setBitcoinConnectionType] = useState(bitcoinConnectionsTypes[0]);
   const [bitcoinAddress, setBitcoinAddress] = useState("");
@@ -27,6 +28,7 @@ function Account(props: any) {
       setShortBitcoinAddress(bitcoinAddress.slice(0, 6) + "..." + bitcoinAddress.slice(-4));
     }
   }, [bitcoinAddress]);
+  */
   useEffect(() => {
     if (address) {
       // TODO: Query username from address
@@ -156,6 +158,79 @@ function Account(props: any) {
 
   // TODO: Button to create new request if no requests are open
   // TODO: shadow and arrow on rhs of scrollable div
+  // TODO: Username support
+  //        {(username && username.length > 0) ? (
+  //          <div className="flex flex-row items-center gap-4 ml-4 h-10">
+  //            <h1 className="text-xl font-bold">{username}</h1>
+  //            <button className="button__none" onClick={() => setUsername("")}>
+  //              <img src="/icons/edit2.png" alt="verified" className="w-4 h-4" />
+  //            </button>
+  //          </div>
+  //        ) : (
+  //          <div className="flex flex-row items-center gap-2">
+  //            <input
+  //              type="text"
+  //              placeholder="Username"
+  //              className="input__primary flex-grow"
+  //              value={usernameInput}
+  //              onChange={(e) => setUsernameInput(e.target.value)}
+  //            />
+  //            <button className="button__none" onClick={() => setUsername(usernameInput)}>
+  //              <img src="/icons/check.png" alt="save" className="w-6 h-6" />
+  //            </button>
+  //          </div>
+  //        )}
+  // TODO: Bitcoin address link support
+  //      {(bitcoinAddress && bitcoinAddress.length > 0) ? (
+  //        <div className="flex flex-row items-center gap-4 h-10">
+  //          <img src="/icons/bitcoin.webp" alt="Bitcoin" className="w-8 h-8 ml-4" />
+  //          <p className="text-md font-bold">{shortBitcoinAddress}</p>
+  //          <button className="button__none" onClick={() => setBitcoinAddress("")}>
+  //            <img src="/icons/edit2.png" alt="verified" className="w-4 h-4" />
+  //          </button>
+  //        </div>
+  //      ) : (
+  //        <div className="flex flex-row gap-2 items-center">
+  //          <img src="/icons/bitcoin.webp" alt="Bitcoin" className="w-8 h-8 ml-4" />
+  //          <div className="flex flex-col gap-2 flex-grow">
+  //            <div className="flex flex-row items-center gap-2 bg-[var(--color-primary-o5)] rounded-[1.5rem] p-1">
+  //              {bitcoinConnectionsTypes.map((type) => (
+  //                <button
+  //                  key={type}
+  //                  className={`w-full h-8 ${bitcoinConnectionType === type ? "Form__selection--selected" : "Form__selection"}`}
+  //                  onClick={() => setBitcoinConnectionType(type)}
+  //                >
+  //                  {type}
+  //                </button>
+  //              ))}
+  //            </div>
+  //            {bitcoinConnectionType === "Wallet" && (
+  //              <div className="flex flex-row items-center justify-center gap-2 w-full h-8">
+  //                <button className="buttonlike__primary buttonlike__primary--gradient text-center">
+  //                  Link Xverse
+  //                </button>
+  //              </div>
+  //            )}
+  //            {bitcoinConnectionType === "Manual" && (
+  //              <div className="flex flex-row items-center gap-2 h-8">
+  //                <input
+  //                  type="text"
+  //                  placeholder="Bitcoin Address"
+  //                  className="input__primary flex-grow"
+  //                  value={bitcoinAddressInput}
+  //                  onChange={(e) => setBitcoinAddressInput(e.target.value)}
+  //                  onKeyPress={(e) => {
+  //                    if (e.key === "Enter") {
+  //                      setBitcoinAddress(bitcoinAddressInput);
+  //                    }
+  //                  }
+  //                }
+  //                />
+  //              </div>
+  //            )}
+  //          </div>
+  //        </div>
+  //      )}
   return (
     <div className="w-full flex flex-col h-max">
       <div className="bg__color--tertiary w-full flex flex-row p-4">
@@ -172,81 +247,10 @@ function Account(props: any) {
           </div>
         </div>
         <div className="flex flex-col gap-2 p-2 w-[20rem] relative">
-          {(username && username.length > 0) ? (
-            <div className="flex flex-row items-center gap-4 ml-4 h-10">
-              <h1 className="text-xl font-bold">{username}</h1>
-              <button className="button__none" onClick={() => setUsername("")}>
-                <img src="/icons/edit2.png" alt="verified" className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-row items-center gap-2">
-              <input
-                type="text"
-                placeholder="Username"
-                className="input__primary flex-grow"
-                value={usernameInput}
-                onChange={(e) => setUsernameInput(e.target.value)}
-              />
-              <button className="button__none" onClick={() => setUsername(usernameInput)}>
-                <img src="/icons/check.png" alt="save" className="w-6 h-6" />
-              </button>
-            </div>
-          )}
           <div className="flex flex-row items-center gap-4 ml-4">
             <img src="/icons/starknet.webp" alt="Starknet" className="w-8 h-8" />
             <p className="text-md font-bold flex-1">{shortAddress}</p>
           </div>
-          {(bitcoinAddress && bitcoinAddress.length > 0) ? (
-            <div className="flex flex-row items-center gap-4 h-10">
-              <img src="/icons/bitcoin.webp" alt="Bitcoin" className="w-8 h-8 ml-4" />
-              <p className="text-md font-bold">{shortBitcoinAddress}</p>
-              <button className="button__none" onClick={() => setBitcoinAddress("")}>
-                <img src="/icons/edit2.png" alt="verified" className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-row gap-2 items-center">
-              <img src="/icons/bitcoin.webp" alt="Bitcoin" className="w-8 h-8 ml-4" />
-              <div className="flex flex-col gap-2 flex-grow">
-                <div className="flex flex-row items-center gap-2 bg-[var(--color-primary-o5)] rounded-[1.5rem] p-1">
-                  {bitcoinConnectionsTypes.map((type) => (
-                    <button
-                      key={type}
-                      className={`w-full h-8 ${bitcoinConnectionType === type ? "Form__selection--selected" : "Form__selection"}`}
-                      onClick={() => setBitcoinConnectionType(type)}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-                {bitcoinConnectionType === "Wallet" && (
-                  <div className="flex flex-row items-center justify-center gap-2 w-full h-8">
-                    <button className="buttonlike__primary buttonlike__primary--gradient text-center">
-                      Link Xverse
-                    </button>
-                  </div>
-                )}
-                {bitcoinConnectionType === "Manual" && (
-                  <div className="flex flex-row items-center gap-2 h-8">
-                    <input
-                      type="text"
-                      placeholder="Bitcoin Address"
-                      className="input__primary flex-grow"
-                      value={bitcoinAddressInput}
-                      onChange={(e) => setBitcoinAddressInput(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          setBitcoinAddress(bitcoinAddressInput);
-                        }
-                      }
-                    }
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
       {requests && requests.length > 0 && (
