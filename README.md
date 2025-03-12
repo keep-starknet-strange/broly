@@ -52,7 +52,7 @@ Try [Broly](https://www.broly-btc.com/)!
    - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:
 
    ```
-   bash ./packages/scripts/lock_request.sh {inscription_id}
+   bash ./packages/scripts/lock_request.sh {SN_account_name} {inscription_id}
    ```
    where `inscription_id` is the ID of the open order.
    - A `RequestLocked` event with the `inscription_id` is emitted. 
