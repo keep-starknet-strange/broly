@@ -61,8 +61,7 @@ Try [Broly](https://www.broly-btc.com/)!
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
    - Another `Submitter` can only lock the inscription again if the lock has expired. 
    - Note that the Starknet wallet used to lock the inscription must be the same as the Starknet wallet used to submit the inscription. 
-5.1 Manual inscriptions can be done on [Ordiscan](https://ordiscan.com/inscribe) by connecting a Bitcoin wallet and uploading the image/GIF or copying the text. The data and the Taproot compatible Bitcoin address of the `Requester` can be copied directly from the inscription's page on Broly at `https://www.broly-btc.com/request/{inscription_id}`. The inclusion of the transaction in a Bitcoin block should take ~10 minutes. Once the transaction is confirmed, it will become visible in the Xverse wallet in the `Collectibles` section. From there, the `Submitter` can send it in one click to the `Requester`. The transaction hash of the transfer (not the creation transaction) is needed to prove on Starknet that the inscription has been done correctly.
-5.2 `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
+5. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
    - Create or restore a Bitcoin address. Usage: 
    ```bash
    ord wallet create --help
@@ -80,6 +79,7 @@ Try [Broly](https://www.broly-btc.com/)!
    ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
    ```
    - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
+   - Manual inscriptions can be done on [Ordiscan](https://ordiscan.com/inscribe) by connecting a Bitcoin wallet and uploading the image/GIF or copying the text. The data and the Taproot compatible Bitcoin address of the `Requester` can be copied directly from the inscription's page on Broly at `https://www.broly-btc.com/request/{inscription_id}`. The inclusion of the transaction in a Bitcoin block should take ~10 minutes. Once the transaction is confirmed, it will become visible in the Xverse wallet in the `Collectibles` section. From there, the `Submitter` can send it in one click to the `Requester`. The transaction hash of the transfer (not the creation transaction) is needed to prove on Starknet that the inscription has been done correctly.
 6. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
@@ -134,11 +134,11 @@ Create an account and get a Bitcoin endpoint and a key at [Quicknode](https://ww
 
 Register blocks and update canonical chain by passing the `bitcoin_tx_hash` of the inscription transaction hash: 
 ```
-bash ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}
+bun run ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}
 ```
 
 ```
-bash ./packages/scripts/lock_request.sh {inscription_id}
+bun run ./packages/bitcoin-on-starknet.js/scripts/index.ts {bitcoin_tx_hash} {inscription_id}
 ``` 
 where `inscription_id` is the ID of the open order.
 
