@@ -79,6 +79,7 @@ Try [Broly](https://www.broly-btc.com/)!
    ```bash
    ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
    ```
+   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
 6. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
