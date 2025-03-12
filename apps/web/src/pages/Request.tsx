@@ -4,6 +4,7 @@ import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionStatus from "../components/inscription/Status";
 import InscriptionProperty from "../components/inscription/Property";
 import { getInscriptionRequest } from "../api/inscriptions";
+import copy from "../../public/icons/copy.png";
 
 function Request(props: any) {
   // TODO: Like, share, and save buttons support
@@ -115,11 +116,19 @@ function Request(props: any) {
             <div className="flex flex-col m-2 mr-8 px-2 py-2 bg__color--tertiary-dull border-2 border-[var(--color-primary-light)] rounded-lg">
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">From</h4>
-                <p className="text-lg text__color--primary">{requesterFormatted}</p>
+                <div className="flex flex-row">
+                  <p className="text-lg text__color--primary">{requesterFormatted}</p>
+                  <img className="h-[1.5rem] ml-2 cursor-pointer" src={copy} alt="Copy"
+                    onClick={() => navigator.clipboard.writeText(inscription.requester)} />
+                </div>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">To</h4>
-                <p className="text-lg text__color--primary">{recipientFormatted}</p>
+                <div className="flex flex-row">
+                  <p className="text-lg text__color--primary">{recipientFormatted}</p>
+                  <img className="h-[1.5rem] ml-2 cursor-pointer" src={copy} alt="Copy"
+                    onClick={() => navigator.clipboard.writeText(inscription.bitcoin_address)} />
+                </div>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Fee</h4>
