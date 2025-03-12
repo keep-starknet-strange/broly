@@ -36,7 +36,8 @@ Try [Broly](https://www.broly-btc.com/)!
 ## Flow
 
 1. `Requester` connects Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/). Click `Login` in the top right corner. 
-2. `Requester` creates an inscription order:
+2. `Requester` gets `STRK` testnet tokens from the Starknet Foundation [faucet](https://starknet-faucet.vercel.app/). 
+3. `Requester` creates an inscription order:
    - Specifies inscription content (data) as image (PNG), message (text), or GIF.
    - Clicks `Inscribe` and connects pop up Bitcoin [Xverse](https://www.xverse.app/) wallet.
    - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
@@ -47,8 +48,9 @@ Try [Broly](https://www.broly-btc.com/)!
    - The open request info is stored in the Broly database and is visible on the website at `https://www.broly-btc.com/request/{inscription_id}`.
    - The Requester is able to cancel the request and get the funds back. 
    - A `RequestCanceled` event with the `inscription_id` is emitted. 
-3. Locking script: 
-   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:  
+4. Locking script: 
+   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:
+   
    ```
    bash ./packages/scripts/lock_request.sh {inscription_id}
    ```
@@ -58,7 +60,7 @@ Try [Broly](https://www.broly-btc.com/)!
    - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
    - Another `Submitter` can only lock the inscription again if the lock has expired. 
-3. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
+5. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
    - Create or restore a Bitcoin address. Usage: 
    ```bash
    ord wallet create --help
@@ -75,16 +77,15 @@ Try [Broly](https://www.broly-btc.com/)!
    ```bash
    ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
    ```
-4. `bitcoin-on-starknet.js` package:
+6. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
    - Serializes it for `submit_inscription` to the Broly contract on Starknet.
    - Triggers `STRK` reward release to the `Submitter` on successful inscription.
    - Order status changes to `Closed` on Broly website and in the Broly contract. 
    - A `RequestCompleted` event with `tx_hash` and `inscription_id` is emitted. 
-5. Verification process: 
 
-5. `Requester` owns the inscription on Bitcoin, `Submitter` receives reward on Starknet. 
+7. `Requester` owns the inscription on Bitcoin, `Submitter` receives reward on Starknet. 
 
 ## Running Broly locally for tests and development
 
