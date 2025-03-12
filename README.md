@@ -50,17 +50,19 @@ Try [Broly](https://www.broly-btc.com/)!
    - A `RequestCanceled` event with the `inscription_id` is emitted. 
 4. Locking script: 
    - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:
-   
+
    ```
    bash ./packages/scripts/lock_request.sh {inscription_id}
    ```
-   where `inscription_id` is the ID of the open order. 
+   where `inscription_id` is the ID of the open order.
    - A `RequestLocked` event with the `inscription_id` is emitted. 
    - Order status changes to `Locked` on Broly website and in the Broly contract.
    - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
    - Another `Submitter` can only lock the inscription again if the lock has expired. 
-5. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
+   - Note that the Starknet wallet used to lock the inscription must be the same as the Starknet wallet used to submit the inscription. 
+5.1 Manual inscriptions can be done on [Ordiscan](https://ordiscan.com/inscribe) by connecting a Bitcoin wallet and uploading the image/GIF or copying the text. The data and the Taproot compatible Bitcoin address of the `Requester` can be copied directly from the inscription's page on Broly at `https://www.broly-btc.com/request/{inscription_id}`. The inclusion of the transaction in a Bitcoin block should take ~10 minutes. Once the transaction is confirmed, it will become visible in the Xverse wallet in the `Collectibles` section. From there, the `Submitter` can send it in one click to the `Requester`. The transaction hash of the transfer (not the creation transaction) is needed to prove on Starknet that the inscription has been done correctly.
+5.2 `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
    - Create or restore a Bitcoin address. Usage: 
    ```bash
    ord wallet create --help
