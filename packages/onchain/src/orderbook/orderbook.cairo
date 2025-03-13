@@ -311,7 +311,13 @@ mod Orderbook {
             // Check that the second field of the witness stack in the linked UTXO contains the
             // correct inscription.
             let witness_data = deref_witness[1];
-            let witness_data_hex = to_hex(witness_data);
+
+            let mut dest: ByteArray = Default::default();
+            // TODO: add the extra bytes on the frontend instead if possible to sign with Xverse.
+            for i in 35..witness_data.len() {
+                dest.append_byte(witness_data[i]);
+            };
+            let witness_data_hex = to_hex(@dest);
             assert(witness_data_hex == expected_data, 'The inscribed data is wrong');
 
             const selector: felt252 = selector!("prove_inclusion");
