@@ -1,15 +1,58 @@
 import { useState, useEffect } from "react";
-import { useAccount } from '@starknet-react/core'
+import { useAccount } from '@starknet-react/core';
 import "../DropButton.css";
 import "./Form.css";
+import { Buffer } from "buffer";
+
+function prepareInscription(marker: string, version: Buffer, contentType: string, control: Buffer, payloadData: Buffer): string {
+  const opcodeIf = Buffer.from([0x63]);
+  const markerBuffer = Buffer.from(marker, "ascii");
+  const markerPush = Buffer.concat([Buffer.from([markerBuffer.length]), markerBuffer]);
+  const contentTypeBuffer = Buffer.from(contentType, "ascii");
+  const contentTypePush = Buffer.concat([Buffer.from([contentTypeBuffer.length]), contentTypeBuffer]);
+  const opcodeEndIf = Buffer.from([0x68]);
+  const inscriptionScript = Buffer.concat([
+    opcodeIf,
+    markerPush,
+    version,
+    contentTypePush,
+    control,
+    payloadData,
+    opcodeEndIf,
+  ]);
+  return inscriptionScript.toString("hex");
+}
+
+function prepareTextInscription(text: string): string {
+  const marker = "ord";
+  const version = Buffer.from([0x01, 0x01]);
+  const contentType = "text/plain;charset=utf-8";
+  const control = Buffer.from("010201000001", "hex");
+  const payloadData = Buffer.from(text, "utf8");
+  return prepareInscription(marker, version, contentType, control, payloadData);
+}
+
+function prepareImageInscription(imageBuffer: Buffer): string {
+  const marker = "ord";
+  const version = Buffer.from([0x01, 0x01]);
+  const contentType = "image/png";
+  const control = Buffer.from("010201000001", "hex");
+  return prepareInscription(marker, version, contentType, control, imageBuffer);
+}
+
+function prepareGifInscription(gifBuffer: Buffer): string {
+  const marker = "ord";
+  const version = Buffer.from([0x01, 0x01]);
+  const contentType = "image/gif";
+  const control = Buffer.from("010201000001", "hex");
+  return prepareInscription(marker, version, contentType, control, gifBuffer);
+}
 
 function InscriptionForm(props: any) {
   const dropOptions = ["Image", "Message", "Gif"];
-  // const dropOptions = ["Image", "Gif", "Message"];
   const [selectedOption, setSelectedOption] = useState(dropOptions[0]);
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
   const [taprootAddressShort, setTaprootAddressShort] = useState("");
   useEffect(() => {
     if (props.taprootAddress) {
@@ -17,32 +60,26 @@ function InscriptionForm(props: any) {
       setTaprootAddressShort(taprootAddressShort);
     }
   }, [props.taprootAddress]);
-
-  const { address } = useAccount()
-
+  const { address } = useAccount();
   useEffect(() => {
     setTimeout(() => {
       setErrorMessage("");
     }, 500);
   }, [address, props.taprootAddress]);
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  
     let dataToInscribe = "";
     if (!address) {
       setErrorMessage("Please login to inscribe");
       props.starknetWallet.connectWallet();
       return;
     }
-  
     const taprootAddress = props.taprootAddress;
     if (!taprootAddress) {
       setErrorMessage("Please link your Bitcoin Wallet (Xverse)");
       props.bitcoinWallet.connectWallet();
       return;
     }
-
     if (selectedOption === "Image") {
       if (!uploadedImage) {
         setErrorMessage("Please upload an image");
@@ -56,7 +93,25 @@ function InscriptionForm(props: any) {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-      dataToInscribe = base64Image;
+      const base64String = base64Image.split(",")[1];
+      const imageBuffer = Buffer.from(base64String, "base64");
+      dataToInscribe = prepareImageInscription(imageBuffer);
+    } else if (selectedOption === "Gif") {
+      if (!uploadedImage) {
+        setErrorMessage("Please upload a GIF");
+        return;
+      }
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      const base64Gif = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      const base64String = base64Gif.split(",")[1];
+      const gifBuffer = Buffer.from(base64String, "base64");
+      dataToInscribe = prepareGifInscription(gifBuffer);
     } else if (selectedOption === "Message") {
       const textAreaElement = document.querySelector<HTMLTextAreaElement>(".Form__textarea");
       dataToInscribe = textAreaElement?.value || "";
@@ -64,12 +119,9 @@ function InscriptionForm(props: any) {
         setErrorMessage("Please enter a message to inscribe");
         return;
       }
+      dataToInscribe = prepareTextInscription(dataToInscribe);
     }
-  
-    // inscriptionData = window.location.origin + "/inscriptions/" + imagePath;
-  
     setErrorMessage("");
-    // TODO: Use a backend route to estimate the inscription cost
     const inscriptionSize = dataToInscribe.length;
     const constantTxSize = 1000;
     const lenientScalingFactor = 1.1;
@@ -83,16 +135,13 @@ function InscriptionForm(props: any) {
     const btcToStrkData = await btcToStrkResponse.json();
     const btcToStrk = btcToStrkData.STRK;
     const inscribeCostEstimateStrk = incribeCostEstimate * btcToStrk / btcToSat;
-    // TODO: STRK to u256 strk ( * 10^18? )
     await props.requestInscriptionCall(dataToInscribe, taprootAddress, "STRK", inscribeCostEstimateStrk);
     props.setIsInscribing(true);
-  }
-  
+  };
   const handleImageUpload = (e: any) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0];
-      // Check image size
       const imageObj = new Image();
       imageObj.src = URL.createObjectURL(image);
       imageObj.onload = () => {
@@ -113,13 +162,10 @@ function InscriptionForm(props: any) {
       setErrorMessage("");
       setUploadedImage(URL.createObjectURL(image));
     }
-  }
-
+  };
   const handleImgDrag = (e: any) => {
     e.preventDefault();
-  }
-
-  // TODO: disabled button b4 input
+  };
   return (
     <form className="flex flex-col items-center justify-center w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[35%] px-8 py-4 gap-2 bg-[var(--color-tertiary-dark)] rounded-xl shadow-xl" onSubmit={handleSubmit}>
       <div className="flex flex-row items-center justify-around gap-2 w-full bg-[var(--color-primary)] rounded-[1.5rem] p-1">
@@ -127,9 +173,7 @@ function InscriptionForm(props: any) {
           <button
             key={index}
             type="button"
-            className={`w-full h-8 ${
-              selectedOption === option ? "Form__selection--selected" : "Form__selection"
-            }`}
+            className={`w-full h-8 ${selectedOption === option ? "Form__selection--selected" : "Form__selection"}`}
             onClick={() => setSelectedOption(option)}
           >
             {option}
@@ -137,14 +181,9 @@ function InscriptionForm(props: any) {
         ))}
       </div>
       <div className="flex-grow Form__input h-[35vh]">
-        {selectedOption === "Image" ? (
+        {(selectedOption === "Image" || selectedOption === "Gif") ? (
           <div>
-            <label
-              className="text-xl Form__image"
-              htmlFor="image"
-              onDrop={handleImageUpload}
-              onDragOver={handleImgDrag}
-            >
+            <label className="text-xl Form__image" htmlFor="image" onDrop={handleImageUpload} onDragOver={handleImgDrag}>
               {uploadedImage ? (
                 <div className="flex flex-col items-center justify-center w-full h-full gap-1 relative">
                   <img src={uploadedImage} alt="uploaded" className="w-[80%] h-[80%] object-contain" style={{ imageRendering: "pixelated" }} />
@@ -155,63 +194,39 @@ function InscriptionForm(props: any) {
               ) : (
                 <div className="flex flex-col items-center justify-center w-full h-full gap-1">
                   <img src="/icons/upload.png" alt="plus" className="w-6 h-6" />
-                  <p className="text-xl">Upload an image</p>
+                  <p className="text-xl">Upload an image or gif</p>
                   <p className="text-sm">Max 50kB</p>
                 </div>
               )}
             </label>
-            <input
-              style={{ display: "none" }}
-              type="file"
-              name="image"
-              id="image"
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
+            <input style={{ display: "none" }} type="file" name="image" id="image" accept="image/*" onChange={handleImageUpload} />
           </div>
         ) : (
-          <textarea
-            className="text-lg Form__textarea"
-            placeholder="Enter a message to inscribe..."
-          />
+          <textarea className="text-lg Form__textarea" placeholder="Enter a message to inscribe..." />
         )}
       </div>
       <div className="relative py-2 flex flex-col gap-4 justify-center items-center w-full">
         {!props.taprootAddress && (
-          <button
-            type="button"
-            className="button__secondary--gradient button__secondary text-2xl"
-            onClick={props.bitcoinWallet.connectWallet}
-          >
+          <button type="button" className="button__secondary--gradient button__secondary text-2xl" onClick={props.bitcoinWallet.connectWallet}>
             Link Xverse
           </button>
         )}
         {props.taprootAddress && (
-          <button
-            type="button"
-            className="buttonlike__primary--gradient buttonlike__primary"
-            onClick={props.bitcoinWallet.disconnectWallet}
-          >
+          <button type="button" className="buttonlike__primary--gradient buttonlike__primary" onClick={props.bitcoinWallet.disconnectWallet}>
             Linked BTC Wallet : {taprootAddressShort}
           </button>
         )}
         <button
           type="submit"
-          className={`button--gradient button__primary text-2xl w-min ${
-            !props.taprootAddress || !props.isStarknetConnected
-              ? "button__primary--disabled"
-              : (selectedOption === "Image" && uploadedImage) || selectedOption === "Message"
-                ? "button__primary--pinging"
-                : "button__primary--disabled"
-          }`}
+          className={`button--gradient button__primary text-2xl w-min ${!props.taprootAddress || !props.isStarknetConnected ? "button__primary--disabled" : (selectedOption === "Image" && uploadedImage) || (selectedOption === "Gif" && uploadedImage) || selectedOption === "Message" ? "button__primary--pinging" : "button__primary--disabled"}`}
         >
           Inscribe
         </button>
         {errorMessage && (
           <div className="absolute bottom-[-1rem] transform -translate-x-1/2 left-1/2">
-          <p className="text-red-500 text-md text-center text-nowrap">
-            {errorMessage}
-          </p>
+            <p className="text-red-500 text-md text-center text-nowrap">
+              {errorMessage}
+            </p>
           </div>
         )}
       </div>
