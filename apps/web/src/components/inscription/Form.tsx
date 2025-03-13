@@ -2,50 +2,86 @@ import { useState, useEffect } from "react";
 import { useAccount } from '@starknet-react/core';
 import "../DropButton.css";
 import "./Form.css";
-import { Buffer } from "buffer";
 
-function prepareInscription(marker: string, version: Buffer, contentType: string, control: Buffer, payloadData: Buffer): string {
-  const opcodeIf = Buffer.from([0x63]);
-  const markerBuffer = Buffer.from(marker, "ascii");
-  const markerPush = Buffer.concat([Buffer.from([markerBuffer.length]), markerBuffer]);
-  const contentTypeBuffer = Buffer.from(contentType, "ascii");
-  const contentTypePush = Buffer.concat([Buffer.from([contentTypeBuffer.length]), contentTypeBuffer]);
-  const opcodeEndIf = Buffer.from([0x68]);
-  const inscriptionScript = Buffer.concat([
+function prepareInscription(marker: string, version: Uint8Array, contentType: string, control: Uint8Array, payloadData: Uint8Array): string {
+  const opcodeIf = new Uint8Array([0x63]);
+  const markerBuffer = new TextEncoder().encode(marker);
+  const markerPush = concatArrays(new Uint8Array([markerBuffer.length]), markerBuffer);
+  const contentTypeBuffer = new TextEncoder().encode(contentType);
+  const contentTypePush = concatArrays(new Uint8Array([contentTypeBuffer.length]), contentTypeBuffer);
+  const opcodeEndIf = new Uint8Array([0x68]);
+  const inscriptionScript = concatArrays(
     opcodeIf,
     markerPush,
     version,
     contentTypePush,
     control,
     payloadData,
-    opcodeEndIf,
-  ]);
-  return inscriptionScript.toString("hex");
+    opcodeEndIf
+  );
+  return hexEncode(inscriptionScript);
 }
 
 function prepareTextInscription(text: string): string {
   const marker = "ord";
-  const version = Buffer.from([0x01, 0x01]);
+  const version = new Uint8Array([0x01, 0x01]);
   const contentType = "text/plain;charset=utf-8";
-  const control = Buffer.from("010201000001", "hex");
-  const payloadData = Buffer.from(text, "utf8");
+  const control = hexDecode("010201000001");
+  const payloadData = new TextEncoder().encode(text);
   return prepareInscription(marker, version, contentType, control, payloadData);
 }
 
-function prepareImageInscription(imageBuffer: Buffer): string {
+function prepareImageInscription(imageBuffer: Uint8Array): string {
   const marker = "ord";
-  const version = Buffer.from([0x01, 0x01]);
+  const version = new Uint8Array([0x01, 0x01]);
   const contentType = "image/png";
-  const control = Buffer.from("010201000001", "hex");
+  const control = hexDecode("010201000001");
   return prepareInscription(marker, version, contentType, control, imageBuffer);
 }
 
-function prepareGifInscription(gifBuffer: Buffer): string {
+function prepareGifInscription(gifBuffer: Uint8Array): string {
   const marker = "ord";
-  const version = Buffer.from([0x01, 0x01]);
+  const version = new Uint8Array([0x01, 0x01]);
   const contentType = "image/gif";
-  const control = Buffer.from("010201000001", "hex");
+  const control = hexDecode("010201000001");
   return prepareInscription(marker, version, contentType, control, gifBuffer);
+}
+
+// Helper functions
+function concatArrays(...arrays: Uint8Array[]): Uint8Array {
+  let totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+  let result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (let arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }
+  return result;
+}
+
+function hexEncode(array: Uint8Array): string {
+  return Array.from(array)
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function hexDecode(hex: string): Uint8Array {
+  let bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return new Uint8Array(bytes);
+}
+
+function base64ToArrayBuffer(base64: string): Uint8Array {
+  const binaryString = atob(base64); // Decodes the base64 string to binary
+  const length = binaryString.length;
+  const bytes = new Uint8Array(length);
+
+  for (let i = 0; i < length; i++) {
+    bytes[i] = binaryString.charCodeAt(i); // Converts each character to byte
+  }
+  return bytes;
 }
 
 function InscriptionForm(props: any) {
@@ -54,18 +90,21 @@ function InscriptionForm(props: any) {
   const [uploadedImage, setUploadedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [taprootAddressShort, setTaprootAddressShort] = useState("");
+
   useEffect(() => {
     if (props.taprootAddress) {
       const taprootAddressShort = props.taprootAddress.slice(0, 6) + "..." + props.taprootAddress.slice(-6);
       setTaprootAddressShort(taprootAddressShort);
     }
   }, [props.taprootAddress]);
+
   const { address } = useAccount();
   useEffect(() => {
     setTimeout(() => {
       setErrorMessage("");
     }, 500);
   }, [address, props.taprootAddress]);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     let dataToInscribe = "";
@@ -80,6 +119,7 @@ function InscriptionForm(props: any) {
       props.bitcoinWallet.connectWallet();
       return;
     }
+
     if (selectedOption === "Image") {
       if (!uploadedImage) {
         setErrorMessage("Please upload an image");
@@ -94,7 +134,7 @@ function InscriptionForm(props: any) {
         reader.readAsDataURL(blob);
       });
       const base64String = base64Image.split(",")[1];
-      const imageBuffer = Buffer.from(base64String, "base64");
+      const imageBuffer = base64ToArrayBuffer(base64String);
       dataToInscribe = prepareImageInscription(imageBuffer);
     } else if (selectedOption === "Gif") {
       if (!uploadedImage) {
@@ -110,7 +150,7 @@ function InscriptionForm(props: any) {
         reader.readAsDataURL(blob);
       });
       const base64String = base64Gif.split(",")[1];
-      const gifBuffer = Buffer.from(base64String, "base64");
+      const gifBuffer = base64ToArrayBuffer(base64String);
       dataToInscribe = prepareGifInscription(gifBuffer);
     } else if (selectedOption === "Message") {
       const textAreaElement = document.querySelector<HTMLTextAreaElement>(".Form__textarea");
@@ -138,6 +178,7 @@ function InscriptionForm(props: any) {
     await props.requestInscriptionCall(dataToInscribe, taprootAddress, "STRK", inscribeCostEstimateStrk);
     props.setIsInscribing(true);
   };
+
   const handleImageUpload = (e: any) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
@@ -163,9 +204,11 @@ function InscriptionForm(props: any) {
       setUploadedImage(URL.createObjectURL(image));
     }
   };
+
   const handleImgDrag = (e: any) => {
     e.preventDefault();
   };
+
   return (
     <form className="flex flex-col items-center justify-center w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[35%] px-8 py-4 gap-2 bg-[var(--color-tertiary-dark)] rounded-xl shadow-xl" onSubmit={handleSubmit}>
       <div className="flex flex-row items-center justify-around gap-2 w-full bg-[var(--color-primary)] rounded-[1.5rem] p-1">
@@ -234,17 +277,4 @@ function InscriptionForm(props: any) {
   );
 }
 
-/*
-        <select
-          className="text-lg Form__select"
-          value={selectedOption}
-          onChange={(e) => setSelectedOption(e.target.value)}
-        >
-          {dropOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-*/
 export default InscriptionForm;
