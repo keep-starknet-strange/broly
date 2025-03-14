@@ -28,7 +28,7 @@ function prepareTextInscription(text: string): string {
   const marker = "ord";
   const version = new Uint8Array([0x01, 0x01]);
   const contentType = "text/plain;charset=utf-8";
-  const control = hexDecode("010201000001");
+  const control = hexDecode("0102010000");
   const payloadData = new TextEncoder().encode(text);
   return prepareInscription(marker, version, contentType, control, payloadData);
 }
