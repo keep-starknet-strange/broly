@@ -10,12 +10,14 @@ function prepareInscription(marker: string, version: Uint8Array, contentType: st
   const contentTypeBuffer = new TextEncoder().encode(contentType);
   const contentTypePush = concatArrays(new Uint8Array([contentTypeBuffer.length]), contentTypeBuffer);
   const opcodeEndIf = new Uint8Array([0x68]);
+  const payloadPush = new Uint8Array([payloadData.length]);
   const inscriptionScript = concatArrays(
     opcodeIf,
     markerPush,
     version,
     contentTypePush,
     control,
+    payloadPush,
     payloadData,
     opcodeEndIf
   );
