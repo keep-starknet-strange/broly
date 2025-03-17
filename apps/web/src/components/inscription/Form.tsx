@@ -37,7 +37,7 @@ function prepareImageInscription(imageBuffer: Uint8Array): string {
   const marker = "ord";
   const version = new Uint8Array([0x01, 0x01]);
   const contentType = "image/png";
-  const control = hexDecode("010201000001");
+  const control = hexDecode("0102010000");
   return prepareInscription(marker, version, contentType, control, imageBuffer);
 }
 
@@ -45,7 +45,7 @@ function prepareGifInscription(gifBuffer: Uint8Array): string {
   const marker = "ord";
   const version = new Uint8Array([0x01, 0x01]);
   const contentType = "image/gif";
-  const control = hexDecode("010201000001");
+  const control = hexDecode("0102010000");
   return prepareInscription(marker, version, contentType, control, gifBuffer);
 }
 
