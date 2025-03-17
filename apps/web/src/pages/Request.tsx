@@ -4,6 +4,7 @@ import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionStatus from "../components/inscription/Status";
 import InscriptionProperty from "../components/inscription/Property";
 import { getInscriptionRequest } from "../api/inscriptions";
+import { parseBitcoinInscriptionData } from "../components/inscription/utils";
 import copy from "../../public/icons/copy.png";
 
 function Request(props: any) {
@@ -30,7 +31,16 @@ function Request(props: any) {
     const fetchRequest = async () => {
       const result = await getInscriptionRequest(id as string);
       if (result && result.data) {
-        setInscription(result.data);
+        if (result.data.inscription_data) {
+          try {
+            const { type, inscriptionData } = parseBitcoinInscriptionData(result.data.inscription_data);
+            setInscription({ ...result.data, type, inscription_data: inscriptionData });
+          } catch (e) {
+            console.error("Error parsing inscription_data:", e);
+          }
+        } else {
+          setInscription(result.data);
+        }
       }
     }
 

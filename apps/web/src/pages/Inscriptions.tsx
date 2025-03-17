@@ -6,7 +6,8 @@ import { getNewInscriptions, getOpenInscriptionRequests } from "../api/inscripti
 import { Pagination } from "../components/Pagination";
 
 function Inscriptions(props: any) {
-  const filters = ["Hot", "New", "Rare"];
+  const filters: any[] = [];
+  //const filters = ["Hot", "New", "Rare"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const defaultInscriptions: any[] = [];
@@ -26,7 +27,7 @@ function Inscriptions(props: any) {
   useEffect(() => {
     const fetchInscriptions = async () => {
       let result;
-      if (activeFilter === "Hot") {
+      if (activeFilter === "Hot" || activeFilter === undefined) {
         result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
         // TODO: result = await getHotInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
       } else if (activeFilter === "New") {
@@ -103,6 +104,7 @@ function Inscriptions(props: any) {
 
   // TODO: Button to create new request if no requests are open
   // TODO: shadow and arrow on rhs of scrollable div
+  // TODO: <input type="text" placeholder="Search..." className="input__search w-40 sm:w-64 mr-1 relative"/>
   return (
     <div className="w-full flex flex-col h-max">
       {requests && requests.length > 0 && (
@@ -111,12 +113,12 @@ function Inscriptions(props: any) {
           <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
             {requests.map((request, index) => {
               return (
-                <div className="" key={index}>
+                <div className="z-[10]" key={index}>
                   <InscriptionRequestView key={request.inscription_id} inscription={request} />
                 </div>
               );
             })}
-            <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center">
+            <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center z-[10]">
               <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
             </NavLink>
           </div>
@@ -126,7 +128,6 @@ function Inscriptions(props: any) {
         <div className="w-full flex flex-row items-center justify-between">
           <h1 className="text-md sm:text-xl font-bold px-2 sm:px-4">All Inscriptions</h1>
           <div className="flex flex-row items-center mr-2 sm:mr-6 gap-1 sm:gap-3 md:gap-4">
-            <input type="text" placeholder="Search..." className="input__search w-40 sm:w-64 mr-1 relative"/>
             {filters.map((filter) => (
               <button
                 key={filter}
