@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import InscriptionLargeView from "../components/inscription/LargeView";
 import InscriptionProperty from "../components/inscription/Property";
+import { parseBitcoinInscriptionData } from "../components/inscription/utils";
 import { getInscription } from "../api/inscriptions";
 
 function Inscription(_props: any) {
@@ -12,7 +13,16 @@ function Inscription(_props: any) {
     const fetchInscription = async () => {
       const result = await getInscription(id);
       if (result && result.data) {
-        setInscription(result.data);
+        if (result.data.inscription_data) {
+          try {
+            const { type, inscriptionData } = parseBitcoinInscriptionData(result.data.inscription_data);
+            setInscription({ ...result.data, type, inscription_data: inscriptionData });
+          } catch (e) {
+            console.error("Error parsing inscription_data:", e);
+          }
+        } else {
+          setInscription(result.data);
+        }
       }
     }
     try {

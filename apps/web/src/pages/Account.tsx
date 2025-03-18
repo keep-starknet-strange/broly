@@ -35,7 +35,8 @@ function Account(props: any) {
     }
   }, [address]);
 
-  const filters = ["Collection", "Liked", "Saved"];
+  const filters: any[] = [];
+  //const filters = ["Collection", "Liked", "Saved"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const defaultInscriptions: any[] = [];
@@ -259,12 +260,12 @@ function Account(props: any) {
           <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
             {requests.map((request, index) => {
               return (
-                <div className="" key={index}>
+                <div className="z-[10]" key={index}>
                   <InscriptionRequestView key={request.inscription_id} inscription={request} />
                 </div>
               );
             })}
-            <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center">
+            <NavLink to="/" className="z-[10] button--gradient button__circle flex flex-col items-center justify-center">
               <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
             </NavLink>
           </div>
