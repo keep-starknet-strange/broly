@@ -12,26 +12,26 @@ importers:
         specifier: ^1.7.0
         version: 1.7.0
       '@starknet-react/core':
-        specifier: ^3.6.3
+        specifier: ^3.7.2
         version: 3.7.2(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)
       react-use-websocket:
         specifier: ^4.13.0
         version: 4.13.0
       starknet:
-        specifier: ^6.11.0
+        specifier: ^6.23.1
         version: 6.23.1
       starknetkit:
         specifier: ^2.6.1
         version: 2.6.1(starknet@6.23.1)(typescript@5.8.2)(zod@3.24.2)
     devDependencies:
       eslint:
-        specifier: ^8.57.0
+        specifier: ^8.57.1
         version: 8.57.1
       prettier:
-        specifier: ^3.2.5
+        specifier: ^3.5.3
         version: 3.5.3
       turbo:
-        specifier: ^2.3.1
+        specifier: ^2.4.4
         version: 2.4.4
 
   apps/web:
