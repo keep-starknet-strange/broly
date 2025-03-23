@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@scure/btc-signer':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@starknet-react/core':
         specifier: ^3.6.3
         version: 3.7.2(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)
@@ -33,6 +36,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@scure/btc-signer':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@starknet-react/chains':
         specifier: ^3.1.1
         version: 3.1.2
@@ -862,6 +868,9 @@ packages:
 
   '@scure/bip39@1.5.4':
     resolution: {integrity: sha512-TFM4ni0vKvCfBpohoh+/lY05i9gRbSwXWngAsF4CABQxoaOHijxuaZ2R6cStDQ5CHtHO9aGJTr4ksVJASRRyMA==}
+
+  '@scure/btc-signer@1.7.0':
+    resolution: {integrity: sha512-GqwwBp05GLTJQ1Ja6am64GhDSFqKJrFbavMt/UZF4pNn/gXbZUcuWjJA4g7qtOudW1MGRYkIO5JsPWi6JmSoQw==}
 
   '@scure/starknet@1.1.0':
     resolution: {integrity: sha512-83g3M6Ix2qRsPN4wqLDqiRZ2GBNbjVWfboJE/9UjfG+MHr6oDSu/CWgy8hsBSJejr09DkkL+l0Ze4KVrlCIdtQ==}
@@ -2208,6 +2217,9 @@ packages:
   merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
+
+  micro-packed@0.7.2:
+    resolution: {integrity: sha512-HJ/u8+tMzgrJVAl6P/4l8KGjJSA3SCZaRb1m4wpbovNScCSmVOGUYbkkcoPPcknCHWPpRAdjy+yqXqyQWf+k8g==}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -3907,6 +3919,13 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.1
       '@scure/base': 1.2.4
+
+  '@scure/btc-signer@1.7.0':
+    dependencies:
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.4
+      micro-packed: 0.7.2
 
   '@scure/starknet@1.1.0':
     dependencies:
@@ -5907,6 +5926,10 @@ snapshots:
   merge-stream@2.0.0: {}
 
   merge2@1.4.1: {}
+
+  micro-packed@0.7.2:
+    dependencies:
+      '@scure/base': 1.2.4
 
   micromatch@4.0.8:
     dependencies:
