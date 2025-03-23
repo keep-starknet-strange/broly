@@ -185,7 +185,7 @@ mod Orderbook {
             let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
+                strk_token.transfer(recipient: caller, amount: amount);
             }
             self
                 .inscriptions
