@@ -1,87 +1,100 @@
 import { useState, useEffect } from "react";
 import { useAccount } from '@starknet-react/core';
+import { Buffer } from 'buffer';
 import "../DropButton.css";
 import "./Form.css";
+import { Script } from '@scure/btc-signer';
 
-function prepareInscription(marker: string, version: Uint8Array, contentType: string, control: Uint8Array, payloadData: Uint8Array): string {
-  const opcodeIf = new Uint8Array([0x63]);
-  const markerBuffer = new TextEncoder().encode(marker);
-  const markerPush = concatArrays(new Uint8Array([markerBuffer.length]), markerBuffer);
-  const contentTypeBuffer = new TextEncoder().encode(contentType);
-  const contentTypePush = concatArrays(new Uint8Array([contentTypeBuffer.length]), contentTypeBuffer);
-  const opcodeEndIf = new Uint8Array([0x68]);
-  const payloadPush = new Uint8Array([payloadData.length]);
-  const inscriptionScript = concatArrays(
-    opcodeIf,
-    markerPush,
-    version,
-    contentTypePush,
-    control,
-    payloadPush,
-    payloadData,
-    opcodeEndIf
-  );
-  return hexEncode(inscriptionScript);
+if (typeof window !== 'undefined' && !window.Buffer) {
+  (window as any).Buffer = Buffer;
+}
+
+const tags = {
+  contentType: 1,
+  pointer: 2,
+  parent: 3,
+  metadata: 5,
+  metaprotocol: 7,
+  contentEncoding: 9,
+  delegate: 11,
+  rune: 13,
+};
+
+function chunkData(data: Uint8Array, chunkSize: number): Uint8Array[] {
+  const chunks: Uint8Array[] = [];
+  let offset = 0;
+  while (offset < data.length) {
+    const size = Math.min(chunkSize, data.length - offset);
+    chunks.push(data.slice(offset, offset + size));
+    offset += size;
+  }
+  return chunks;
+}
+
+function prepareInscription(
+  marker: string,
+  contentType: string,
+  payloadData: Uint8Array
+): string {
+  const script = Script.encode([
+    // TODO: check if it is better to omit "OP_0" here, or in the orderbook contract check
+    "IF",
+    new TextEncoder().encode(marker),
+    new Uint8Array([tags.contentType]),
+    new TextEncoder().encode(contentType),
+    new Uint8Array([0x02]),
+    new Uint8Array([0x00]),
+    "OP_0",
+    ...chunkData(payloadData, 520),
+    "ENDIF",
+  ] as any);
+  return Buffer.from(script).toString("hex");
 }
 
 function prepareTextInscription(text: string): string {
-  const marker = "ord";
-  const version = new Uint8Array([0x01, 0x01]);
-  const contentType = "text/plain;charset=utf-8";
-  const control = hexDecode("0102010000");
-  const payloadData = new TextEncoder().encode(text);
-  return prepareInscription(marker, version, contentType, control, payloadData);
+  return prepareInscription(
+    "ord",
+    "text/plain;charset=utf-8",
+    new TextEncoder().encode(text)
+  );
 }
 
 function prepareImageInscription(imageBuffer: Uint8Array): string {
-  const marker = "ord";
-  const version = new Uint8Array([0x01, 0x01]);
-  const contentType = "image/png";
-  const control = hexDecode("0102010000");
-  return prepareInscription(marker, version, contentType, control, imageBuffer);
+  return prepareInscription(
+    "ord",
+    "image/png",
+    imageBuffer
+  );
 }
 
 function prepareGifInscription(gifBuffer: Uint8Array): string {
-  const marker = "ord";
-  const version = new Uint8Array([0x01, 0x01]);
-  const contentType = "image/gif";
-  const control = hexDecode("0102010000");
-  return prepareInscription(marker, version, contentType, control, gifBuffer);
+  return prepareInscription(
+    "ord",
+    "image/gif",
+    gifBuffer
+  );
 }
 
-// Helper functions
-function concatArrays(...arrays: Uint8Array[]): Uint8Array {
-  let totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
-  let result = new Uint8Array(totalLength);
-  let offset = 0;
-  for (let arr of arrays) {
-    result.set(arr, offset);
-    offset += arr.length;
+export function hexDecode(hex: string): Uint8Array {
+  const bytes: number[] = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substring(i, i + 2), 16));
   }
-  return result;
+  return new Uint8Array(bytes);
 }
 
-function hexEncode(array: Uint8Array): string {
+export function hexEncode(array: Uint8Array): string {
   return Array.from(array)
     .map(byte => byte.toString(16).padStart(2, "0"))
     .join("");
 }
 
-function hexDecode(hex: string): Uint8Array {
-  let bytes = [];
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes.push(parseInt(hex.substr(i, 2), 16));
-  }
-  return new Uint8Array(bytes);
-}
-
-function base64ToArrayBuffer(base64: string): Uint8Array {
-  const binaryString = atob(base64); // Decodes the base64 string to binary
+export function base64ToArrayBuffer(base64: string): Uint8Array {
+  const binaryString = atob(base64);
   const length = binaryString.length;
   const bytes = new Uint8Array(length);
-
   for (let i = 0; i < length; i++) {
-    bytes[i] = binaryString.charCodeAt(i); // Converts each character to byte
+    bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes;
 }

@@ -182,10 +182,9 @@ mod Orderbook {
             assert(status != Status::Canceled, 'The inscription is canceled');
             assert(status != Status::Closed, 'The inscription has been closed');
 
-            let escrow_address = get_contract_address();
             if (currency_fee == 'STRK'.into()) {
                 let strk_token = self.strk_token.read();
-                strk_token.transfer_from(sender: escrow_address, recipient: caller, amount: amount);
+                strk_token.transfer(recipient: caller, amount: amount);
             }
             self
                 .inscriptions
@@ -286,9 +285,9 @@ mod Orderbook {
                 'Unexpected previous tx id.',
             );
 
-            // Check that the transfer transaction has 2 inputs and 2 outputs.
+            // Check that the transfer transaction has 2 inputs, and 1 or 2 outputs.
             assert(tx.inputs.len() == 2, 'Wrong number of tx inputs');
-            assert(tx.outputs.len() == 2, 'Wrong number of tx outputs');
+            assert(tx.outputs.len() == 2 || tx.outputs.len() == 1, 'Wrong number of tx outputs');
 
             // Check that the creation transaction has 1 input and 1 output.
             assert(prev_tx.inputs.len() == 1, 'Wrong number of prev tx inputs');

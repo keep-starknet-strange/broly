@@ -7,16 +7,21 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "turbo": "^2.3.1"
+    "@types/node": "^22.13.12",
+    "eslint": "^8.57.1",
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4"
   },
   "packageManager": "pnpm@8.15.6",
   "name": "with-vite",
   "dependencies": {
-    "@starknet-react/core": "^3.6.3",
+    "@scure/btc-signer": "^1.7.0",
+    "@starknet-react/core": "^3.7.2",
+    "buffer": "^6.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-use-websocket": "^4.13.0",
-    "starknet": "^6.11.0",
+    "starknet": "^6.23.1",
     "starknetkit": "^2.6.1"
   }
 }
