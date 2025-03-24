@@ -10,7 +10,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@scure/btc-signer": resolve(__dirname, "node_modules/@scure/btc-signer/esm/index.js")
+      "@scure/btc-signer": resolve(__dirname, "node_modules/@scure/btc-signer/esm/index.js"),
+      buffer: resolve(__dirname, "node_modules/buffer/")
     }
-  }
+  },
+  define: {
+    global: 'window',
+    Buffer: 'window.Buffer'
+  },
 })
