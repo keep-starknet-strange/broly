@@ -1,5 +1,8 @@
-setup .env w/ STARKNET_KEYSTORE=$HOME/.starkli-sepolia/starkli-keystore.json
-              STARKNET_ACCOUNT=$HOME/.starkli-sepolia/starkli-account.json
+### Deploy the contract ( Mock contract )
+-----------------------
+setup .env w/ starkli account:
+STARKNET_KEYSTORE=$HOME/.starkli-sepolia/starkli-keystore.json
+STARKNET_ACCOUNT=$HOME/.starkli-sepolia/starkli-account.json
 
 source .env
 
@@ -11,22 +14,58 @@ deploy broly orderbook to sepolia
 copy abis to frontend
   cat packages/onchain/target/dev/onchain_OrderbookMock.contract_class.json| jq '.abi' > apps/web/src/abi/orderbook.abi.json
 
-build prod docker images w/ new version & push to docker hub
-   Update docker version in packages/infra/Chart.yaml if needed
-   Update contracts in values.yaml
+
+### Setup the backend
+-----------------------
+If needed:
+  Change all brandonjroberts instances in the following files to your docker hub username
+  - Makefile
+  - packages/infra/values.yaml
+
+Build the prod docker images and push to docker hub
+   Update appVersion in packages/infra/Chart.yaml
+   Update brolyOrderbookContract in values.yaml
    commit and merge changes
    make docker-build
    make docker-push
 
-apply changes to cloud
-   cloud console
-   clone / pull latest
-   If full reset
-     make helm-uninstall
-     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-install
-  else
-     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
+Apply changes to the cloud backend
+   1. GCP Cloud console
+   2. Kubernetes engine
+   3. Connect to cluster
+   4. Run `kubens broly-sepolia`
+   5. Clone / pull latest changes in `broly` repo
+   6. If full reset ( new contract )
+     - Run `make helm-uninstall`
+     - Run the following command with Apibara AUTH_TOKEN and setup credentials
+       ```
+       POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-install
+       ```
+     If not full reset ( only changed backend code )
+     - Run the following command with Apibara AUTH_TOKEN and setup credentials
+       ```
+       POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
+       ```
+   7. Check everything is starting up with `kubectl get all`
+   8. After postgres starts up run:
+     - `kubectl get all` & note the pod name of the postgres pod
+     - `kubectl cp apps/backend/postgres/init.sql podname:/home`
+     - `kubectl exec -it podname -- bash`
+     - `psql -U broly-user -d broly-db -f /home/init.sql`
+   9. Check if ingress was created with `kubectl get ingress`
+     - If no ingress, run
+       ```
+       POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
+       ```
+   10. Ensure everything starts up ( all pods are running )
 
+Change frontend contract addresses/configs in vercel
+  Change VITE_BROLY_CONTRACT_ADDRESS
+  Redepoloy vercel FE
+
+
+### Extra commands ( if needed )
+-----------------------
 copy account over to inscriber
   mkdir account
   account/account.json
@@ -42,6 +81,7 @@ do bitcoin regtest / ord setup
   kubectl exec -it pod/update-pod-name bash
   echo <address> > /root/ord.addr
 
+Reset postgres & indexer
   kubectl cp apps/backend/postgres/init.sql pod:/home
     kubectl exec -it pod/pod-name bash
     psql -U broly-user -d broly-db -f /home/init.sql
@@ -49,7 +89,3 @@ do bitcoin regtest / ord setup
     kubectl delete deployment.apps/redis
     kubectl delete deployment.apps/indexer
     POSTGRES_PASSWORD=test AUTH_TOKEN=dna_abc BITCOIN_USER=user BITCOIN_PASSWORD=password make helm-upgrade
-
-change frontend contract addresses/configs in vercel
-  VITE_BROLY_CONTRACT_ADDRESS
-Redepoloy vercel FE
