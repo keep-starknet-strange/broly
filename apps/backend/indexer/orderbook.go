@@ -295,7 +295,7 @@ func processRequestCompletedEvent(event IndexerEventWithTransaction) {
 		return
 	}
 	// Remove 0x and surrounding spaces
-	txHashTrimmed := strings.ReplaceAll(txHashStr[2:], " ", "")
+	txHashTrimmed := strings.ReplaceAll(txHashStr, " ", "")
 	// TODO: Multi inscription
 	txIndex := 0
 

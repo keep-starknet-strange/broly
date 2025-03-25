@@ -281,7 +281,7 @@ mod Orderbook {
             // Check that the transfer transaction input points to the previous transaction id.
             let previous_tx_hash_from_output: Digest = *tx.inputs[0].previous_output.txid;
             assert(
-                previous_tx_hash_from_output == hex_to_hash_rev(prev_tx_hash),
+                previous_tx_hash_from_output == hex_to_hash_rev(prev_tx_hash.clone()),
                 'Unexpected previous tx id.',
             );
 
@@ -347,7 +347,7 @@ mod Orderbook {
             }
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
-            self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
+            self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: prev_tx_hash });
         }
     }
 
