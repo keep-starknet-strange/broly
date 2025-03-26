@@ -399,7 +399,7 @@ async function main() {
       calldata.push(direction ? "0x1" : "0x0"); // Direction (bool)
     });
     
-    const brolyAddress = "0x0067ca41c915b667946b2af68251b541439049100cf44d2961a02463215a79de";
+    const brolyAddress = "0x00eb978fc1f6be290dbe2020db8e8b748d26925801ed79e904e12bfc5ce3582e";
 
     const submitCall = {
       contractAddress: brolyAddress, // Broly contract
