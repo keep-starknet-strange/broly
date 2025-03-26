@@ -295,14 +295,13 @@ mod Orderbook {
 
             // Check that the transfer of the UTXO containing the inscriptions has the minimum dust
             // value.
-            assert(
-                *tx.inputs[0].previous_output.data.value >= 546_u64, 'Value in input too small',
-            );
+            assert(*tx.inputs[0].previous_output.data.value >= 546_u64, 'Value in input too small');
 
             // Check that the full amount of the dust satoshis have been transferred to the expected
             // address.
             assert(
-                *tx.outputs[0].value == *tx.inputs[0].previous_output.data.value, 'Mismatch input output values'
+                *tx.outputs[0].value == *tx.inputs[0].previous_output.data.value,
+                'Mismatch input output values',
             );
 
             // Check that the length of the witness stack equals to 3 elements.
