@@ -196,8 +196,8 @@ mod Orderbook {
                 );
         }
 
-        /// Called by a submitter. Multiple submitters are allowed to lock the
-        /// inscription simultaneously. The fee will be received only by the
+        /// Called by a submitter. Any submitter is allowed to lock the inscription
+        /// unless its status is `Locked`. The fee will be received only by the
         /// submitter that will actually create the inscription on Bitcoin.
         /// Assert that the inscription has not been closed yet. If there is a
         /// prior lock on the inscription, X blocks have to pass before a new
@@ -295,13 +295,14 @@ mod Orderbook {
 
             // Check that the transfer of the UTXO containing the inscriptions has the minimum dust
             // value.
-            assert(
-                *tx.inputs[0].previous_output.data.value == 546_u64, 'Unexpected value in input',
-            );
+            assert(*tx.inputs[0].previous_output.data.value >= 546_u64, 'Value in input too small');
 
             // Check that the full amount of the dust satoshis have been transferred to the expected
             // address.
-            assert(*tx.outputs[0].value == 546_u64, 'Unexpected value in output');
+            assert(
+                *tx.outputs[0].value == *tx.inputs[0].previous_output.data.value,
+                'Mismatch input output values',
+            );
 
             // Check that the length of the witness stack equals to 3 elements.
             let deref_witness = *prev_tx.inputs[0].witness;
