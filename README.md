@@ -134,11 +134,11 @@ Create an account and get a Bitcoin endpoint and a key at [Quicknode](https://ww
 
 Register blocks and update canonical chain by passing the `bitcoin_tx_hash` of the inscription transaction hash: 
 ```
-bun run ./packages/bitcoin-on-starknet.js/scripts/syncTransactions.ts {bitcoin_tx_hash}
+bun run ./packages/bitcoin-on-starknet.js/scripts/updateCanonicalChain.ts {bitcoin_tx_hash}
 ```
 
 ```
-bun run ./packages/bitcoin-on-starknet.js/scripts/index.ts {bitcoin_tx_hash} {inscription_id}
+bun run ./packages/bitcoin-on-starknet.js/scripts/submitInscription.ts {bitcoin_tx_hash} {inscription_id}
 ``` 
 where `inscription_id` is the ID of the open order.
 
