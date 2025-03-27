@@ -38,7 +38,7 @@ Try [Broly](https://www.broly-btc.com/)!
 1. `Requester` connects Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/). Click `Login` in the top right corner. 
 2. `Requester` gets `STRK` testnet tokens from the Starknet Foundation [faucet](https://starknet-faucet.vercel.app/). 
 3. `Requester` creates an inscription order:
-   - Specifies inscription content (data) as image (PNG), message (text), or GIF.
+   - Specifies inscription content (data) as message (text) or a set of predefined emojis.
    - Clicks `Inscribe` and connects pop up Bitcoin [Xverse](https://www.xverse.app/) wallet.
    - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
    - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
@@ -48,6 +48,7 @@ Try [Broly](https://www.broly-btc.com/)!
    - The open request info is stored in the Broly database and is visible on the website at `https://www.broly-btc.com/request/{inscription_id}`.
    - The Requester is able to cancel the request and get the funds back. 
    - A `RequestCanceled` event with the `inscription_id` is emitted. 
+   - It is not possible to predict how fast an inscription and a transfer transaction will be included in a Bitcoin block. Even though Starknet L2 is blazing fast and cheap, this is not the case with Bitcoin in 2025. It's strong security properties require waiting for a miner to pick up a transaction, include it in a block, do the proof of work, and submit it to the blockchain. The `Requester` has to wait for the `Submitter` to get at least 1 confirmation for each transaction. For 2 sequential transactions (you can send the inscription only after it has been insribed) it may take between 15 minutes and over an hour.
 4. Locking script: 
    - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:
 
@@ -257,6 +258,13 @@ flowchart TB
     OM --> IS
     IS --> OB
 ```
+
+## Future development
+
+  - `Fraud detection`: will be implemented for the Utu Relay contract. A user who is aware of a longer chain with more proof of work needs to be able to override a false block. 
+  - `ZK proofs`: currently the inscribed data is stored onchain, and it is passed for verification inside the serialized Bitcoin transaction. The issue with it is that a large enough image in calldata can easily fill up the block. The solution is to have a ZK proof that the data is included in the witness field of the Bitcoin transaction. 
+  - `Configurable security parameters`: a `Requester` needs to be able to set the number of confirmations that the transfer transaction got. Currently it's accepted if there is one or more confirmations.
+  - `Configurable fees`: currently the `STRK` fee is calculated automatically based on the `STRK`/`BTC` price. In the future a `Requester` will be able to add `STRK` to incentivize the `Submitter`. 
 
 ## Credits 
 
