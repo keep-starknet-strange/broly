@@ -38,7 +38,7 @@ Try [Broly](https://www.broly-btc.com/)!
 1. `Requester` connects Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/). Click `Login` in the top right corner. 
 2. `Requester` gets `STRK` testnet tokens from the Starknet Foundation [faucet](https://starknet-faucet.vercel.app/). 
 3. `Requester` creates an inscription order:
-   - Specifies inscription content (data) as image (PNG), message (text), or GIF.
+   - Specifies inscription content (data) as message (text) or a set of predefined emojis.
    - Clicks `Inscribe` and connects pop up Bitcoin [Xverse](https://www.xverse.app/) wallet.
    - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
    - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
