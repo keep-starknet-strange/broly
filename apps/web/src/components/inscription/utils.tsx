@@ -1,39 +1,62 @@
+import { Script } from '@scure/btc-signer';
+
 export const hexToString = (hex: string) => {
-  let str = '';
-  for (let i = 0; i < hex.length; i += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  const bytes = hexToBytes(hex);
+  const decoder = new TextDecoder("utf-8");
+  return decoder.decode(bytes);
+};
+
+export const hexToBytes = (hex: string) => {
+  const length = hex.length / 2;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
   }
-  return str;
-}
+  return bytes;
+};
+
 export const hexToInt = (hex: string) => {
   return parseInt(hex, 16);
-}
+};
 
 export const typesMap: { [key: string]: string } = {
   "text/plain;charset=utf-8": "text",
   "text/plain": "text",
-  "image/png": "image",
-  "image/jpeg": "image",
-  "image/gif": "image",
-  "image/webp": "image"
 };
 
 export const parseBitcoinInscriptionData = (data: string) => {
   let type = "unknown";
   let inscriptionData = "";
-  const expectedStart = "63036f7264"; // "OP_IF OP_PUSH ord"
-  if (!data.startsWith(expectedStart)) {
-    console.error("Invalid inscription data format");
-    return { type, inscriptionData };
+
+  if (data.startsWith("63036f7264")) { // "OP_IF OP_PUSH ord"
+    const bytes = hexToBytes(data);
+    
+    // Decode the script
+    const script = Script.decode(bytes);
+    console.log('Decoded script:', script);
+    
+    // The script should contain:
+    // 1. OP_IF
+    // 2. "ord" push
+    // 3. Type length push
+    // 4. Type string push
+    // 5. Content length push
+    // 6. Content push
+    // 7. OP_ENDIF
+    
+    const typeBytes = script[3] as Uint8Array;
+    const typeString = hexToString(Array.from(typeBytes).map(b => b.toString(16).padStart(2, '0')).join(''));
+    type = typesMap[typeString] || "unknown";
+    
+    const contentBytes = script[7] as Uint8Array;
+    inscriptionData = hexToString(Array.from(contentBytes).map(b => b.toString(16).padStart(2, '0')).join(''));
+    
+    console.log('Final content:', inscriptionData);
+  } else if (data.includes(":")) {
+    const [typeStr, ...contentParts] = data.split(":");
+    type = typeStr;
+    inscriptionData = contentParts.join(":");
   }
-  // Remove the prefix
-  data = data.slice(expectedStart.length + 4); // Remove expectedStart + tag
-  const typeLength = hexToInt(data.slice(0, 2)); // Get the length of the type string
-  const typeString = hexToString(data.slice(2, 2 + typeLength * 2)); // Extract the type string
-  type = typesMap[typeString] || "unknown"; // Map to the known types
-  data = data.slice(2 + typeLength * 2); // Remove the type string from the data
-  data = data.slice(10); // Remove other metadata
-  const inscriptionDataLength = hexToInt(data.slice(0, 2)); // Get the length of the inscription data
-  inscriptionData = hexToString(data.slice(2, 2 + inscriptionDataLength * 2)); // Extract the inscription data
+
   return { type, inscriptionData };
 }
