@@ -71,15 +71,21 @@ Try [Broly](https://www.broly-btc.com/)!
    ```bash
    ord wallet restore --help
    ```
-   - Allows `Submitter` to create the Bitcoin inscription. Usage: 
+   - Allows `Submitter` to create the Bitcoin inscription and send it to the `Requester` destination address. Usage: 
    ```bash
-   ord wallet inscribe [OPTIONS] --fee-rate <FEE_RATE> <--delegate <DELEGATE>|--file <FILE>>
+   ord \
+   --bitcoin-rpc-username bitcoin \
+   --bitcoin-rpc-password password \
+   --bitcoin-rpc-url http://33.333.333.333:8332 \
+   wallet --name my_wallet inscribe \
+   --file file.txt \
+   --fee-rate 1 \
+   --destination bc1address \
+   --postage 546sat
    ```
-   - Allows `Submitter` to transfer Bitcoin inscription to `Requester`'s Bitcoin address. Usage: 
-   ```bash
-   ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
-   ```
-   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
+   The minimum postage expected by Broly is 546 satoshis, but it's possible to send more. To make sure there is enough Bitcoin to pay for fees, it is possible to send Bitcoin directly to the taproot address of the `Submitter` using any Bitcoin wallet. `ord` CLI will not see nested SegWit Bitcoin balance. `ord wallet balance` will show native SegWit (taproot) Bitcoin as `cardinals`. The `fee-rate` is satoshis per byte, it can be increased to make it more attractive for miners.
+   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node, or to use RPC access to a running node provider. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
+   - In order to use `ord`, the server must be running and the Bitcoin blockchain must be fully indexed to use ordinals. For usage run `ord server --help`. Syncing the database take a prohibitively long amount of time, and it is recommended to download the [presynced database](https://ordstuff.info/) to start syncing from a recent block.
    - Manual inscriptions can be done on [Ordiscan](https://ordiscan.com/inscribe) by connecting a Bitcoin wallet and uploading the image/GIF or copying the text. The data and the Taproot compatible Bitcoin address of the `Requester` can be copied directly from the inscription's page on Broly at `https://www.broly-btc.com/request/{inscription_id}`. The inclusion of the transaction in a Bitcoin block should take ~10 minutes. Once the transaction is confirmed, it will become visible in the Xverse wallet in the `Collectibles` section. From there, the `Submitter` can send it in one click to the `Requester`. The transaction hash of the transfer (not the creation transaction) is needed to prove on Starknet that the inscription has been done correctly.
 6. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
