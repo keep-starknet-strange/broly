@@ -64,6 +64,7 @@ function Account(props: any) {
       } else if (activeFilter === "Rare") {
         console.log("TODO: get rare inscriptions");
       } else {
+        if (!address) return;
         result = await getMyInscriptions(address.slice(2), inscriptionsPagination.pageLength, inscriptionsPagination.page);
       }
       if (result && result.data) {
@@ -97,6 +98,7 @@ function Account(props: any) {
 
   useEffect(() => {
     const fetchRequests = async () => {
+      if (!address) return;
       const result = await getMyOpenInscriptionRequests(address.slice(2), requestPagination.pageLength, requestPagination.page);
       if (result && result.data) {
         if (requestPagination.page === 1) {
