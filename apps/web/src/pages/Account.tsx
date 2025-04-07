@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import InscriptionView from "../components/inscription/View";
 import InscriptionRequestView from "../components/inscription/RequestView";
-import { getNewInscriptions, getOpenInscriptionRequests } from "../api/inscriptions";
+import { getNewInscriptions, getMyOpenInscriptionRequests, getMyInscriptions } from "../api/inscriptions";
 import { Pagination } from "../components/Pagination";
 import "../components/inscription/View.css";
 import { useAccount } from "@starknet-react/core";
@@ -56,13 +56,15 @@ function Account(props: any) {
   useEffect(() => {
     const fetchInscriptions = async () => {
       let result;
+      // TODO: getMyXXX
       if (activeFilter === "Hot") {
         result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
-        // TODO: result = await getHotInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
       } else if (activeFilter === "New") {
         result = await getNewInscriptions(inscriptionsPagination.pageLength, inscriptionsPagination.page);
       } else if (activeFilter === "Rare") {
         console.log("TODO: get rare inscriptions");
+      } else {
+        result = await getMyInscriptions(address.slice(2), inscriptionsPagination.pageLength, inscriptionsPagination.page);
       }
       if (result && result.data) {
         if (inscriptionsPagination.page === 1) {
@@ -95,7 +97,7 @@ function Account(props: any) {
 
   useEffect(() => {
     const fetchRequests = async () => {
-      const result = await getOpenInscriptionRequests(requestPagination.pageLength, requestPagination.page);
+      const result = await getMyOpenInscriptionRequests(address.slice(2), requestPagination.pageLength, requestPagination.page);
       if (result && result.data) {
         if (requestPagination.page === 1) {
           setRequests(result.data);

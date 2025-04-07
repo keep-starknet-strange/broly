@@ -57,6 +57,25 @@ function Inscription(_props: any) {
   //              <img className="h-6" src="https://icons.iconarchive.com/icons/colebemis/feather/256/bookmark-icon.png" alt="Bookmark"/>
   //            </button>
   //          </div>
+  const [hiroApiResponse, setHiroApiResponse] = useState<{genesis_block_height: number, genesis_timestamp: number, number: number, sat_rarity: string}>({ genesis_block_height: 0, genesis_timestamp: 0, number: 0, sat_rarity: 'Unknown'})
+  const [genesisTimestamp, setGenesisTimestamp] = useState<Date>(new Date(0));
+  useEffect(() => {
+    const fetchHiroApiResponse = async () => {
+      try {
+        const response = await fetch(`https://api.hiro.so/ordinals/v1/inscriptions/${inscription.tx_hash}i${inscription.tx_index}`)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setHiroApiResponse(data);
+        const genesisTimestamp = new Date(data.genesis_timestamp);
+        setGenesisTimestamp(genesisTimestamp);
+      } catch (error) {
+        console.error("Error fetching Hiro API response:", error);
+      }
+    };
+    fetchHiroApiResponse();
+  }, [inscription]);
 
   return (
     <div className="flex flex-row w-full h-full">
@@ -92,12 +111,16 @@ function Inscription(_props: any) {
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Sat #</h4>
-                <p className="text-lg text__color--primary">{inscription.sat_number}</p>
+                <p className="text-lg text__color--primary">{hiroApiResponse.number}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Minted</h4>
-                <p className="text-lg text__color--primary mr-4">{inscription.minted_block}</p>
-                <p className="text-sm text__color--primary">{inscription.minted.toString()}</p>
+                <p className="text-lg text__color--primary mr-4">{hiroApiResponse.genesis_block_height}</p>
+                <p className="text-sm text__color--primary">{genesisTimestamp.toLocaleString()}</p>
+              </div>
+              <div className="flex flex-row w-full h-12 items-center border-b-2 border-[var(--color-primary-light)] px-2">
+                <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">Rarity</h4>
+                <p className="text-lg text__color--primary">{hiroApiResponse.sat_rarity}</p>
               </div>
               <div className="flex flex-row w-full h-12 items-center px-2">
                 <h4 className="text-lg font-bold text__color--primary border-r-2 border-[var(--color-primary-light)] w-[5rem] pr-2 mr-2">ID</h4>

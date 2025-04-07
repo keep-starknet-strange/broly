@@ -148,7 +148,9 @@ function InscriptionForm(props: any) {
     props.setIsInscribing(true);
   };
 
-  const emojis = ["🤩", "😊", "😢", "😎", "🎉", "🔥", "💯", "😍", "😂", "🥳", "😜", "🤔", "🤯", "👑"];
+  const emojis = ["🤩", "😊", "😢", "😎", "🎉", "🔥", "💯", "😍", "😂", "🥳", "😜", "🤔", "🤯", "👑", "🧡", "🤍", "🖤", "🤗", "😇", "😈", "👻",
+    "💔", "💪", "✨", "🌈", "🌟", "🚀", "🌍", "🍕", "🍔", "🍣", "🍩", "🍪", "🍉", "🍓",
+    "🍇", "🍉", "🍌", "🍍", "🥑", "🥥", "🥭", "🍒", "🍋", "🍊", "🥝", "🥭", "🍑"];
 
   const handleEmojiClick = (emoji: string) => {
     setSelectedEmoji(emoji); 
@@ -173,7 +175,7 @@ function InscriptionForm(props: any) {
           <button
             key={index}
             type="button"
-            className={`w-full h-8 ${selectedOption === option ? "Form__selection--selected" : "Form__selection"}`}
+            className={`w-full h-[2.4rem] ${selectedOption === option ? "Form__selection--selected" : "Form__selection"}`}
             onClick={() => setSelectedOption(option)}
           >
             {option}
@@ -188,10 +190,13 @@ function InscriptionForm(props: any) {
             onKeyDown={handleBackspace}
           />
         ) : (
-          <div className="flex gap-2">
+          <div className="flex gap-2 p-1 flex-wrap justify-center items-center h-full">
             {selectedEmoji ? (
-              <div className="selected-emoji">
-                <span className="text-3xl">{selectedEmoji}</span>
+              <div
+                className="flex items-center justify-center w-full h-full"
+                onClick={() => setSelectedEmoji("")}
+              >
+                <span className="text-6xl">{selectedEmoji}</span>
               </div>
             ) : (
               emojis.map((emoji, index) => (
@@ -199,7 +204,7 @@ function InscriptionForm(props: any) {
                   key={index}
                   type="button"
                   onClick={() => handleEmojiClick(emoji)}
-                  className="text-3xl"
+                  className="text-3xl hover:scale-110 transition-transform duration-200 ease-in-out"
                 >
                   {emoji}
                 </button>

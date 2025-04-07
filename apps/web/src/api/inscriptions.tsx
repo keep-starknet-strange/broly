@@ -43,6 +43,13 @@ export const getOpenInscriptionRequests = async (pageLength: number, page: numbe
   );
 }
 
+export const getMyOpenInscriptionRequests = async (address: string, pageLength: number, page: number) => {
+  if (useMock) return mockResponse(mockRequestViews);
+  return await fetchWrapper(
+    `inscriptions/get-my-open-requests?address=${address}&pageLength=${pageLength}&page=${page}`
+  );
+}
+
 export const getInscriptionRequests = async (pageLength: number, page: number) => {
   if (useMock) return mockResponse(mockRequestViews);
   return await fetchWrapper(

@@ -1,3 +1,7 @@
+import twitter from "../../public/icons/twitter.png";
+import telegram from "../../public/icons/telegram.png";
+import github from "../../public/icons/github.png";
+
 function Info(_props: any) {
   // TODO: Diagrams
   return (
@@ -9,15 +13,15 @@ function Info(_props: any) {
         <div className="flex flex-row items-center justify-center gap-2 py-1">
           <a href="https://github.com/keep-starknet-strange/broly" target="_blank" rel="noreferrer" className="w-12 h-12 flex items-center justify-center rounded-full
             hover:scale-105 transition-transform duration-200 ease-in-out">
-            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="github" className="w-8 h-8" />
+            <img src={github} alt="github" className="w-8 h-8" />
           </a>
-          <a href="https://x.com/BrandonR505" target="_blank" rel="noreferrer" className="w-12 h-12 flex items-center justify-center rounded-full
+          <a href="https://x.com/StarkwareLtd" target="_blank" rel="noreferrer" className="w-12 h-12 flex items-center justify-center rounded-full
             hover:scale-105 transition-transform duration-200 ease-in-out">
-            <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/x-social-media-black-icon.png" alt="twitter" className="w-8 h-8" />
+            <img src={twitter} alt="twitter" className="w-8 h-8" />
           </a>
           <a href="https://t.me/ShinigamiStarknet" target="_blank" rel="noreferrer" className="w-12 h-12 flex items-center justify-center rounded-full
             hover:scale-105 transition-transform duration-200 ease-in-out">
-            <img src="https://static.vecteezy.com/system/resources/previews/031/737/167/non_2x/telegram-icon-telegram-social-media-logo-free-png.png" alt="telegram" className="w-12 h-12" />
+            <img src={telegram} alt="telegram" className="w-8 h-8" />
           </a>
         </div>
       </div>
