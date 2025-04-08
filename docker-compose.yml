@@ -116,7 +116,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - CONFIG_PATH=/configs/config.yaml
-      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x00eb978fc1f6be290dbe2020db8e8b748d26925801ed79e904e12bfc5ce3582e
+      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x01888434b64e6b81488bc7b3a7148aa5fccc695591225351227a4314da6a64d5
   inscriber:
     build:
       dockerfile: apps/backend/Dockerfile.inscriber
@@ -133,7 +133,7 @@ services:
       - SCRIPT_CONFIG_PATH=/configs/script-config.yaml
       - KEYSTORE_PATH=/app/account/test.key
       - ACCOUNT_FILE=/app/account/account.json
-      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x00eb978fc1f6be290dbe2020db8e8b748d26925801ed79e904e12bfc5ce3582e
+      - BROLY_ORDERBOOK_CONTRACT_ADDRESS=0x01888434b64e6b81488bc7b3a7148aa5fccc695591225351227a4314da6a64d5
       - BITCOIN_RPC_URL=http://broly-regtest-1:18443
       - BITCOIN_RPC_USER=user
       - BITCOIN_RPC_PASSWORD=password
@@ -149,7 +149,7 @@ services:
     links:
       - backend
     environment:
-      - BROLY_CONTRACT_ADDRESS=0x00eb978fc1f6be290dbe2020db8e8b748d26925801ed79e904e12bfc5ce3582e
+      - BROLY_CONTRACT_ADDRESS=0x01888434b64e6b81488bc7b3a7148aa5fccc695591225351227a4314da6a64d5
       - AUTH_TOKEN=${APIBARA_AUTH_TOKEN}
       - CONSUMER_TARGET_URL=http://broly-consumer-1:8081/consume-indexer-msg
       - APIBARA_STREAM_URL=https://sepolia.starknet.a5a.ch
@@ -168,7 +168,7 @@ services:
       - backend
     environment:
       - VITE_STRK_CONTRACT_ADDRESS=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d
-      - VITE_BROLY_CONTRACT_ADDRESS=0x00eb978fc1f6be290dbe2020db8e8b748d26925801ed79e904e12bfc5ce3582e
+      - VITE_BROLY_CONTRACT_ADDRESS=0x01888434b64e6b81488bc7b3a7148aa5fccc695591225351227a4314da6a64d5
       - VITE_USE_MOCK=false
       - VITE_BACKEND_URL=https://api.broly-btc.com
     volumes:

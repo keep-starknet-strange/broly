@@ -185,18 +185,12 @@ mod OrderbookMock {
             inscription_id: u32,
             currency_fee: felt252,
             tx_hash: ByteArray,
-            prev_tx_hash: ByteArray,
             tx: Transaction,
-            prev_tx: Transaction,
             pk_script: Array<u8>,
             block_height: u64,
-            prev_block_height: u64,
             block_header: BlockHeader,
-            prev_block_header: BlockHeader,
             height_proof: Option<HeightProof>,
-            prev_height_proof: Option<HeightProof>,
             inclusion_proof: Array<(Digest, bool)>,
-            prev_inclusion_proof: Array<(Digest, bool)>,
         ) {
             let status = self.inscription_status.read(inscription_id);
             assert!(status == INSCRIPTION_LOCKED);
