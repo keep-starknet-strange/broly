@@ -31,11 +31,7 @@ async function main() {
     try {
         const txId = process.argv[2];
         const rawTransaction = await bitcoinProvider.getRawTransaction(txId, true);
-        const prevTxId = rawTransaction.vin[0].txid;    
-        const prevRawTransaction = await bitcoinProvider.getRawTransaction(prevTxId, true);
-
         const header = await bitcoinProvider.getBlockHeader(rawTransaction.blockhash);
-        const pastHeader = await bitcoinProvider.getBlockHeader(prevRawTransaction.blockhash);
 
         // Generate synchronization transactions for Starknet
         // These ensure the Bitcoin state is properly reflected on Starknet
@@ -44,40 +40,24 @@ async function main() {
             selector: string;
             calldata: string[];
         }
-
-        const prevSyncTransactions: SyncTransaction[] = await utuProvider.getSyncTxs(
-            starknetProvider,
-            header.height,
-            0n
-        );
     
         const syncTransactions: SyncTransaction[] = await utuProvider.getSyncTxs(
             starknetProvider,
-            pastHeader.height,
+            header.height,
             0n
         );
     
         // Helper function for utu relay selectors
         const checkEntrypoint = (entrypoint: string): string => {
             if (entrypoint == "0x00afd92eeac2cdc892d6323dd051eaf871b8d21df8933ce111c596038eb3afd3") {
-            return "register_blocks";
+                return "register_blocks";
             } else if (entrypoint == "0x02e486c87262b6abbb9f00f150fe22bd3fa5568adb9524d7c4f9f4e38ca17529") {
-            return "update_canonical_chain";
+                return "update_canonical_chain";
             } else { return entrypoint };
         };
         
         //   Sync the chain before interacting with our contract
         //   Register blocks & update canonical chain 
-        for (const tx of prevSyncTransactions) {
-            const result = await account.execute({ 
-                contractAddress: tx.contractAddress,
-                entrypoint: checkEntrypoint(tx.selector),
-                calldata: tx.calldata
-            }, { maxFee: "0x1100000000000" });
-    
-            await starknetProvider.waitForTransaction(result.transaction_hash);
-        }
-    
         for (const tx of syncTransactions) {
             const result = await account.execute({ 
                 contractAddress: tx.contractAddress,
