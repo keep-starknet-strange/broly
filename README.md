@@ -38,7 +38,7 @@ Try [Broly](https://www.broly-btc.com/)!
 1. `Requester` connects Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/). Click `Login` in the top right corner. 
 2. `Requester` gets `STRK` testnet tokens from the Starknet Foundation [faucet](https://starknet-faucet.vercel.app/). 
 3. `Requester` creates an inscription order:
-   - Specifies inscription content (data) as message (text) or a set of predefined emojis.
+   - Specifies inscription content (data) as message (text) or from a set of predefined emojis.
    - Clicks `Inscribe` and connects pop up Bitcoin [Xverse](https://www.xverse.app/) wallet.
    - Reward amount in `STRK` is calculated automatically based on `BTC` / `STRK` price.
    - Bitcoin Taproot compatible address is automatically fetched from Xverse connected wallet.
@@ -71,16 +71,20 @@ Try [Broly](https://www.broly-btc.com/)!
    ```bash
    ord wallet restore --help
    ```
-   - Allows `Submitter` to create the Bitcoin inscription. Usage: 
+   - Allows `Submitter` to make the Bitcoin inscription. Usage: 
    ```bash
-   ord wallet inscribe [OPTIONS] --fee-rate <FEE_RATE> <--delegate <DELEGATE>|--file <FILE>>
+   ord \
+   --bitcoin-rpc-username <USERNAME> \
+   --bitcoin-rpc-password <PASSWORD> \
+   --bitcoin-rpc-url http://127.0.0.1:8332 \
+   wallet --name <NAME> \
+   inscribe --file <FILE> \
+   --fee-rate <FEE_RATE> \
+   --destination <TAPROOT ADDRESS> \ 
+   --postage 546sat
    ```
-   - Allows `Submitter` to transfer Bitcoin inscription to `Requester`'s Bitcoin address. Usage: 
-   ```bash
-   ord wallet send [OPTIONS] --fee-rate <FEE_RATE> <ADDRESS> <ASSET>
-   ```
-   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
-   - Manual inscriptions can be done on [Ordiscan](https://ordiscan.com/inscribe) by connecting a Bitcoin wallet and uploading the image/GIF or copying the text. The data and the Taproot compatible Bitcoin address of the `Requester` can be copied directly from the inscription's page on Broly at `https://www.broly-btc.com/request/{inscription_id}`. The inclusion of the transaction in a Bitcoin block should take ~10 minutes. Once the transaction is confirmed, it will become visible in the Xverse wallet in the `Collectibles` section. From there, the `Submitter` can send it in one click to the `Requester`. The transaction hash of the transfer (not the creation transaction) is needed to prove on Starknet that the inscription has been done correctly.
+   The `ord` wallet doing the inscription must have a UTXO that has enough satoshis for the postage and for the fee. Send BTC to the taproot compatible wallet starting with `bc1`. The receiver address has to be passed with the `destination` flag and `postage` is the satoshis that will be sent in the same UTXO. The minimum `postage` value is 546sat, `fee-rate` is satoshis per byte. Replace the `bitcoin-rpc-url` with the node's URL. 
+   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node, or use RPC connection. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
 6. `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.

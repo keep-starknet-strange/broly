@@ -232,36 +232,24 @@ mod Orderbook {
         /// - `inscription_id: felt252`, the ID of the inscription being locked.
         /// - `currency_fee: felt252`, the token that the user paid the submitter fee in.
         /// - `tx_hash: ByteArray`, the hash of the creation transaction on Bitcoin.
-        /// - `prev_tx_hash: ByteArray`, the hash of the transfer transaction on Bitcoin.
         /// - `tx: Transaction`, the `Transaction` structure with the creation details.
-        /// - `prev_tx: Transaction`, the `Transaction` structure with the transfer details.
         /// - `pk_script: Array<u8>`, the unlocking script in the output referencing the
         /// inscription.
         /// - `block_height: u64`, the number of the block that contains the transfer tx.
-        /// - `prev_block_height: u64`, the number of the block that contains the creation tx.
         /// - `block_header: BlockHeader`, the header of the block that contains the transfer tx.
-        /// - `prev_block_header: BlockHeader`, the header of the block that contains the creation
-        /// tx.
         /// - `inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the transfer tx.
-        /// - `prev_inclusion_proof: Array<(Digest, bool)>`, the inclusion leaves for the creation
         /// tx.
         fn submit_inscription(
             ref self: ContractState,
             inscription_id: u32,
             currency_fee: felt252,
             tx_hash: ByteArray,
-            prev_tx_hash: ByteArray,
             tx: Transaction,
-            prev_tx: Transaction,
             pk_script: Array<u8>,
             block_height: u64,
-            prev_block_height: u64,
             block_header: BlockHeader,
-            prev_block_header: BlockHeader,
             height_proof: Option<HeightProof>,
-            prev_height_proof: Option<HeightProof>,
             inclusion_proof: Array<(Digest, bool)>,
-            prev_inclusion_proof: Array<(Digest, bool)>,
         ) {
             let caller = get_caller_address();
             let submitters = self.submitters.entry(inscription_id);
@@ -278,42 +266,24 @@ mod Orderbook {
                 'Unexpected address in pk_script',
             );
 
-            // Check that the transfer transaction input points to the previous transaction id.
-            let previous_tx_hash_from_output: Digest = *tx.inputs[0].previous_output.txid;
-            assert(
-                previous_tx_hash_from_output == hex_to_hash_rev(prev_tx_hash.clone()),
-                'Unexpected previous tx id.',
-            );
-
-            // Check that the transfer transaction has 2 inputs, and 1 or 2 outputs.
-            assert(tx.inputs.len() == 2, 'Wrong number of tx inputs');
-            assert(tx.outputs.len() == 2 || tx.outputs.len() == 1, 'Wrong number of tx outputs');
-
-            // Check that the creation transaction has 1 input and 1 output.
-            assert(prev_tx.inputs.len() == 1, 'Wrong number of prev tx inputs');
-            assert(prev_tx.outputs.len() == 1, 'Wrong number of prev tx outputs');
+            // Check that the inscription transaction has 1 input and 1 output.
+            assert(tx.inputs.len() == 1, 'Wrong number of prev tx inputs');
+            assert(tx.outputs.len() == 1, 'Wrong number of prev tx outputs');
 
             // Check that the transfer of the UTXO containing the inscriptions has the minimum dust
             // value.
             assert(*tx.inputs[0].previous_output.data.value >= 546_u64, 'Value in input too small');
 
-            // Check that the full amount of the dust satoshis have been transferred to the expected
-            // address.
-            assert(
-                *tx.outputs[0].value == *tx.inputs[0].previous_output.data.value,
-                'Mismatch input output values',
-            );
-
             // Check that the length of the witness stack equals to 3 elements.
-            let deref_witness = *prev_tx.inputs[0].witness;
+            let deref_witness = *tx.inputs[0].witness;
             assert(deref_witness.len() == 3, 'Wrong # of witness elements');
 
-            // Check that the second field of the witness stack in the linked UTXO contains the
+            // Check that the second field of the witness stack in the input contains the
             // correct inscription.
             let witness_data = deref_witness[1];
 
             let mut dest: ByteArray = Default::default();
-            // TODO: add the extra bytes on the frontend instead if possible to sign with Xverse.
+
             for i in 35..witness_data.len() {
                 dest.append_byte(witness_data[i]);
             };
@@ -323,21 +293,12 @@ mod Orderbook {
             const selector: felt252 = selector!("prove_inclusion");
             let to = self.tx_inclusion.read();
 
-            // Check the inclusion of the transfer transaction
+            // Check the inclusion of the inscription transaction
             let mut calldata = array![];
             calldata.append_serde(tx);
             calldata.append_serde(block_height);
             calldata.append_serde(block_header);
             calldata.append_serde(inclusion_proof);
-
-            call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
-
-            // Check the inclusion of the creation transaction
-            let mut calldata = array![];
-            calldata.append_serde(prev_tx);
-            calldata.append_serde(prev_block_height);
-            calldata.append_serde(prev_block_header);
-            calldata.append_serde(prev_inclusion_proof);
 
             call_contract_syscall(to, selector, calldata.span()).unwrap_syscall();
 
@@ -348,7 +309,7 @@ mod Orderbook {
             }
 
             self.inscription_statuses.write(inscription_id, Status::Closed);
-            self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: prev_tx_hash });
+            self.emit(RequestCompleted { inscription_id: inscription_id, tx_hash: tx_hash });
         }
     }
 

@@ -1,7 +1,7 @@
 [
   {
     "type": "impl",
-    "name": "OrderbookMockImpl",
+    "name": "OrderbookImpl",
     "interface_name": "onchain::orderbook::interface::IOrderbook"
   },
   {
@@ -217,6 +217,48 @@
     ]
   },
   {
+    "type": "struct",
+    "name": "core::array::Span::<utils::hash::Digest>",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<utils::hash::Digest>"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "utu_relay::interfaces::HeightProof",
+    "members": [
+      {
+        "name": "header",
+        "type": "utu_relay::bitcoin::block::BlockHeader"
+      },
+      {
+        "name": "coinbase_raw_tx",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "merkle_branch",
+        "type": "core::array::Span::<utils::hash::Digest>"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::option::Option::<utu_relay::interfaces::HeightProof>",
+    "variants": [
+      {
+        "name": "Some",
+        "type": "utu_relay::interfaces::HeightProof"
+      },
+      {
+        "name": "None",
+        "type": "()"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "onchain::orderbook::interface::IOrderbook",
     "items": [
@@ -271,10 +313,6 @@
           {
             "name": "inscription_id",
             "type": "core::integer::u32"
-          },
-          {
-            "name": "tx_hash",
-            "type": "core::byte_array::ByteArray"
           }
         ],
         "outputs": [],
@@ -289,6 +327,10 @@
             "type": "core::integer::u32"
           },
           {
+            "name": "currency_fee",
+            "type": "core::felt252"
+          },
+          {
             "name": "tx_hash",
             "type": "core::byte_array::ByteArray"
           },
@@ -297,12 +339,20 @@
             "type": "consensus::types::transaction::Transaction"
           },
           {
+            "name": "pk_script",
+            "type": "core::array::Array::<core::integer::u8>"
+          },
+          {
             "name": "block_height",
             "type": "core::integer::u64"
           },
           {
             "name": "block_header",
             "type": "utu_relay::bitcoin::block::BlockHeader"
+          },
+          {
+            "name": "height_proof",
+            "type": "core::option::Option::<utu_relay::interfaces::HeightProof>"
           },
           {
             "name": "inclusion_proof",
@@ -323,7 +373,7 @@
         ],
         "outputs": [
           {
-            "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u256)"
+            "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u256, core::byte_array::ByteArray)"
           }
         ],
         "state_mutability": "view"
@@ -339,7 +389,7 @@
         ],
         "outputs": [
           {
-            "type": "(core::starknet::contract_address::ContractAddress, core::byte_array::ByteArray, core::integer::u64)"
+            "type": "(core::starknet::contract_address::ContractAddress, core::integer::u64)"
           }
         ],
         "state_mutability": "view"
@@ -353,12 +403,20 @@
       {
         "name": "strk_token",
         "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "tx_inclusion",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "utu_relay",
+        "type": "core::starknet::contract_address::ContractAddress"
       }
     ]
   },
   {
     "type": "event",
-    "name": "onchain::orderbook::mock::OrderbookMock::RequestCreated",
+    "name": "onchain::orderbook::orderbook::Orderbook::RequestCreated",
     "kind": "struct",
     "members": [
       {
@@ -390,7 +448,7 @@
   },
   {
     "type": "event",
-    "name": "onchain::orderbook::mock::OrderbookMock::RequestCanceled",
+    "name": "onchain::orderbook::orderbook::Orderbook::RequestCanceled",
     "kind": "struct",
     "members": [
       {
@@ -407,7 +465,19 @@
   },
   {
     "type": "event",
-    "name": "onchain::orderbook::mock::OrderbookMock::RequestLocked",
+    "name": "onchain::orderbook::orderbook::Orderbook::RequestLocked",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "inscription_id",
+        "type": "core::integer::u32",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "onchain::orderbook::orderbook::Orderbook::RequestCompleted",
     "kind": "struct",
     "members": [
       {
@@ -424,44 +494,27 @@
   },
   {
     "type": "event",
-    "name": "onchain::orderbook::mock::OrderbookMock::RequestCompleted",
-    "kind": "struct",
-    "members": [
-      {
-        "name": "inscription_id",
-        "type": "core::integer::u32",
-        "kind": "key"
-      },
-      {
-        "name": "tx_hash",
-        "type": "core::byte_array::ByteArray",
-        "kind": "data"
-      }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "onchain::orderbook::mock::OrderbookMock::Event",
+    "name": "onchain::orderbook::orderbook::Orderbook::Event",
     "kind": "enum",
     "variants": [
       {
         "name": "RequestCreated",
-        "type": "onchain::orderbook::mock::OrderbookMock::RequestCreated",
+        "type": "onchain::orderbook::orderbook::Orderbook::RequestCreated",
         "kind": "nested"
       },
       {
         "name": "RequestCanceled",
-        "type": "onchain::orderbook::mock::OrderbookMock::RequestCanceled",
+        "type": "onchain::orderbook::orderbook::Orderbook::RequestCanceled",
         "kind": "nested"
       },
       {
         "name": "RequestLocked",
-        "type": "onchain::orderbook::mock::OrderbookMock::RequestLocked",
+        "type": "onchain::orderbook::orderbook::Orderbook::RequestLocked",
         "kind": "nested"
       },
       {
         "name": "RequestCompleted",
-        "type": "onchain::orderbook::mock::OrderbookMock::RequestCompleted",
+        "type": "onchain::orderbook::orderbook::Orderbook::RequestCompleted",
         "kind": "nested"
       }
     ]

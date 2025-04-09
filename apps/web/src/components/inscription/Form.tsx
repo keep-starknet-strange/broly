@@ -42,8 +42,9 @@ function prepareInscription(
     new TextEncoder().encode(marker),
     new Uint8Array([tags.contentType]),
     new TextEncoder().encode(contentType),
-    new Uint8Array([0x02]),
-    new Uint8Array([0x00]),
+    // TODO: check below
+    // new Uint8Array([0x02]),
+    // new Uint8Array([0x00]),
     "OP_0",
     ...(payloadData.length > 520 ? chunkData(payloadData, 520) : [payloadData]),
     "ENDIF",
@@ -149,8 +150,8 @@ function InscriptionForm(props: any) {
   };
 
   const emojis = ["🤩", "😊", "😢", "😎", "🎉", "🔥", "💯", "😍", "😂", "🥳", "😜", "🤔", "🤯", "👑", "🧡", "🤍", "🖤", "🤗", "😇", "😈", "👻",
-    "💔", "💪", "✨", "🌈", "🌟", "🚀", "🌍", "🍕", "🍔", "🍣", "🍩", "🍪", "🍉", "🍓",
-    "🍇", "🍉", "🍌", "🍍", "🥑", "🥥", "🥭", "🍒", "🍋", "🍊", "🥝", "🥭", "🍑"];
+    "💔", "💪", "✨", "🌈", "🌟", "🚀", "🌍", "❄️", "🍕", "🍔", "🍣", "🍩", "🍪", "🥐", "🍭", "🥨", "🌹", "🌻", "🌸",
+    "🍎", "🍉", "🍓", "🍇", "🍉", "🍌", "🍍", "🥑", "🥥", "🫐", "🍒", "🍋", "🍊", "🥝", "🥭", "🍑"];
 
   const handleEmojiClick = (emoji: string) => {
     setSelectedEmoji(emoji); 

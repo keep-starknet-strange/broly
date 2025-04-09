@@ -397,14 +397,14 @@ fn test_extract_p2tr_address_works() {
 }
 
 #[test]
-fn test_submit_inscription_works() {
+fn test_submit_ord_inscription_works() {
     let (orderbook_dispatcher, token_dispatcher, tx_inclusion, utu) = setup();
 
     let test_taproot_address: ByteArray =
-        "bc1p6h7srce4arywqss8aafu3h46zmwcugxy0y7wpv3psn09v82yg7pqn9sc28";
+        "bc1pru8qrjr3agd6h5m0clp7xgs39yq5czh8e3dnfxphcd7szqp9agzqmlj95j";
 
     let test_data: ByteArray =
-        "63036f7264010109696d6167652f706e6701020100004d360189504e470d0a1a0a0000000d494844520000000a0000000a08060000008d32cfbd000000097048597300000b1300000b1301009a9c180000000774494d4507e50c190f2b07f0fb7e270000001d69545874436f6d6d656e7400000000004372656174656420776974682047494d50642e6507000000c04944415428cf7d91310a02411085bf7322084216c31243fb20e206c806d0ccc6c256306882c90818685d0b059c8004a2b031b0085fd127d75cbb43cae7579589be7d3d22bd898c8e03e2374d98a13300934f18a05ead58c89620a16584e05e44553a992e31f85a30d0a9fe1b6acb44bf709f335cec398bc0cda90360f3301ca18397b28032de5e003823048173c180730b41c4b2ad839be82cd000ced66347bfb08751dd134c928d1a003d6cd15764c5370a65eb90000000049454e44ae4260868";
+        "63036f7264010118746578742f706c61696e3b636861727365743d7574662d380005f09f92af0a68";
 
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
@@ -415,7 +415,7 @@ fn test_submit_inscription_works() {
     orderbook_dispatcher.lock_inscription(id);
     stop_cheat_caller_address_global();
 
-    // tx ccfe4da8d312b18753bbf693e3014cfcfa857cf73f8f822f81a301f4f4f408d5
+    // tx 21a0ccbca424f8b104a3c11b1be1824eec307fda809e784bbed79f93cfe56e2d
     let tx = Transaction {
         version: 2_u32,
         is_segwit: true,
@@ -425,13 +425,13 @@ fn test_submit_inscription_works() {
                 sequence: 0xfffffffd,
                 previous_output: OutPoint {
                     txid: hex_to_hash_rev(
-                        "63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758",
+                        "28f7906e42779ef3701fe3c3428c34cd5f9585973e31ca9cba4a8f8f7d76ed29",
                     ),
                     vout: 0_u32,
                     data: TxOut {
-                        value: 546_u64,
+                        value: 1380_u64,
                         pk_script: @from_hex(
-                            "51201f0e01c871ea1babd36fc7c3e3221129014c0ae7cc5b349837c37d010025ea04",
+                            "51208ce2a613b199a969472cd934a1f94eac31895f14f8bdd5b2e3e916e4f546cb5c",
                         ),
                         cached: false,
                     },
@@ -441,33 +441,12 @@ fn test_submit_inscription_works() {
                 },
                 witness: array![
                     from_hex(
-                        "e5a4a1fada12c6765896a2ac1fa9d50be38db565273c76623a2d971f47eaf61f4e1ff7949c33c777351fc845e260935cf03a26e418d2e2c4bf9c31dd4cf0fb9e",
+                        "d6ab9046a996ef39846f3adf6818571537fc9a2655e860f87ee0527c50c8ac51dd023a59048fa703f62dbbf1e8e1f390f5273b41dfadfa97edd52256f29ebd6b",
                     ),
-                ]
-                    .span(),
-            },
-            TxIn {
-                script: @from_hex("160014e7856c9701014deb75a777a4eafd31db4b63252a"),
-                sequence: 0xfffffffd,
-                previous_output: OutPoint {
-                    txid: hex_to_hash_rev(
-                        "f80f183eddc312812158eb3b88f4e668a6ea8f48d16ddb2f4198805e709bdce6",
-                    ),
-                    vout: 2_u32,
-                    data: TxOut {
-                        value: 15630_u64,
-                        pk_script: @from_hex("a914543c330b5c8fa2e4843f0f52ac4a8a3882bbc9bb87"),
-                        cached: false,
-                    },
-                    block_height: Default::default(),
-                    median_time_past: Default::default(),
-                    is_coinbase: false,
-                },
-                witness: array![
                     from_hex(
-                        "304402202ff12329596bb189599e5c622a9dcd12bff22d439047d8f75d3b6443233c3d4202207408c74b032d2b230a1f104028b7a93134815e48361345602c2034d81a032e6f01",
+                        "2075a027e1d370b5adfe7980760c48b945602e94b4a42d93e5976ba0cd9a610777ac0063036f7264010118746578742f706c61696e3b636861727365743d7574662d380005f09f92af0a68",
                     ),
-                    from_hex("03ad555f65db5151ba551d22394c86cca6eee38f1934d30b1aab08e92cb643943c"),
+                    from_hex("c075a027e1d370b5adfe7980760c48b945602e94b4a42d93e5976ba0cd9a610777"),
                 ]
                     .span(),
             },
@@ -475,140 +454,7 @@ fn test_submit_inscription_works() {
             .span(),
         outputs: array![
             TxOut {
-                value: 546_u64,
-                pk_script: @from_hex(
-                    "5120d5fd01e335e8c8e04207ef53c8deba16dd8e20c4793ce0b22184de561d444782",
-                ),
-                cached: false,
-            },
-            TxOut {
-                value: 14694_u64,
-                pk_script: @from_hex("a914543c330b5c8fa2e4843f0f52ac4a8a3882bbc9bb87"),
-                cached: false,
-            },
-        ]
-            .span(),
-        lock_time: 0,
-    };
-
-    let siblings = array![
-        (hex_to_hash_rev("098ba8ee4b85661b1fa5702e3a918fb323667bae2be78a7c9184a3fc6093f2d4"), true),
-        (hex_to_hash_rev("e21627cb03b74ee5d37239cfe43a1aefcde98cb294758952ab792a667dcb4597"), true),
-        (hex_to_hash_rev("1bfdf5e6feb454a7634ff0045ff7e04f41a33332dea1603e2c29c98728d0ea30"), true),
-        (
-            hex_to_hash_rev("b5e6cc1653e28ff52b38eff6055932c2de4e7d77f984bdd403bcf65aad2d018a"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("5f1d916622f1df99b9c657a1c129319260e1adef98e5b7915e9b8aad4a5abc91"),
-            false,
-        ),
-        (hex_to_hash_rev("1269df078fcd91d480071456b827e62b3055f343376149037e94051cae3f3eca"), true),
-        (hex_to_hash_rev("4bce5d72d4125e937ccf7d516505b9251ddf122a79c253d70261cdd27077ef4c"), true),
-        (hex_to_hash_rev("95a6708ae8937de06573ac771f6af0fae7bcd08fd195790136886ce3dfa1fa17"), true),
-        (
-            hex_to_hash_rev("a00e119d3058d7653ffd7cab988fc00dee8dc04059f3b36533e06ab799fa8279"),
-            false,
-        ),
-        (hex_to_hash_rev("a9788db2ccc8f318b86ca31dd6dbd460589dd8b44f7162f24ca39189c61aea74"), true),
-        (
-            hex_to_hash_rev("1ea0d2a54cb53be72065da10fe3da9b80bb708ea020531bae0439d50f7cb5d0e"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("effaa21235c8baa9a06e7e0baa0f52cd461dff2b1a0fca7a563637265bcfe0b6"),
-            false,
-        ),
-    ];
-
-    // Check inclusion of the block containing the transfer transaction.
-    let block_883305 = BlockHeaderTrait::new(
-        538288128_u32, // version (0x2015a000)
-        hex_to_hash_rev(
-            "000000000000000000003067bad6242aa54f30e9342dd8a88dea17827830ef10",
-        ), // prev_block_hash
-        hex_to_hash_rev(
-            "eec8543200a56138974899f232058bb5d305aa197675fea2761e7f6e5a616f9b",
-        ), // merkle_root_hash
-        1739277179_u32, // time
-        0x17027726_u32, // bits
-        3927794448_u32 // nonce
-    );
-
-    // coinbase transaction 5e6a9a077f713c08dc9b0330b0c73a9004a6af691b3a359228ac702f9e4886ea
-    let _coinbase_raw_tx = from_hex(
-        "010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff5803697a0d1b4d696e656420627920416e74506f6f6c3837333a000100b3d87cc5fabe6d6da869f196619989d63435305d7218a8bc6aeb753162afc142629a873c0e130dd51000000000000000659c000038ce000000000000ffffffff06220200000000000017a91442402a28dd61f2718a4b27ae72a4791d5bbdade787f2b1cc120000000017a9145249bdf2c131d43995cff42e8feee293f79297a8870000000000000000266a24aa21a9edea9821c8dc6118039a39104de0fa6fffabb8ac4b4cb9a7bc0ecbe4888fdb769900000000000000002f6a2d434f524501a21cbd3caa4fe89bccd1d716c92ce4533e4d47334e3ecda72cb7961caa4b541b1e322bcfe0b5a0300000000000000000146a12455853415401000d130f0e0e0b041f12001300000000000000002b6a2952534b424c4f434b3a719099d9476e42fec4bd18c537155c6ca00bdab9ac46b5c27b0f0710006e57b70120000000000000000000000000000000000000000000000000000000000000000000000000",
-    );
-
-    // strip off marker flag, number of witness items on stack, length of item
-    let coinbase_raw_tx_segwit = from_hex(
-        "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5803697a0d1b4d696e656420627920416e74506f6f6c3837333a000100b3d87cc5fabe6d6da869f196619989d63435305d7218a8bc6aeb753162afc142629a873c0e130dd51000000000000000659c000038ce000000000000ffffffff06220200000000000017a91442402a28dd61f2718a4b27ae72a4791d5bbdade787f2b1cc120000000017a9145249bdf2c131d43995cff42e8feee293f79297a8870000000000000000266a24aa21a9edea9821c8dc6118039a39104de0fa6fffabb8ac4b4cb9a7bc0ecbe4888fdb769900000000000000002f6a2d434f524501a21cbd3caa4fe89bccd1d716c92ce4533e4d47334e3ecda72cb7961caa4b541b1e322bcfe0b5a0300000000000000000146a12455853415401000d130f0e0e0b041f12001300000000000000002b6a2952534b424c4f434b3a719099d9476e42fec4bd18c537155c6ca00bdab9ac46b5c27b0f0710006e57b700000000",
-    );
-
-    let merkle_branch = array![
-        hex_to_hash_rev("825c43cc5ae057986c84761988d56aeb344239a0e88a895a9f6e3d88d611ddd8"),
-        hex_to_hash_rev("0efcbf6a17f20d82b5033ee9f6cdf8a122a2932b442753c1d9ceb1ea7bb56e82"),
-        hex_to_hash_rev("136df8d82e5d93f5ae8a79c1d9f45f14f2907975a5966a8048969d6af9d02a80"),
-        hex_to_hash_rev("1bf16b452a88aacc6b4e0023d2b08b874e3f71b81559cccdf1ea6b596ac3da40"),
-        hex_to_hash_rev("25fed200499a2c8b912b82a6ba68deb8f6c846b6790f165605b2d7a5d851733b"),
-        hex_to_hash_rev("3c94a63c26e4414869675cd4250fbb32b6c833067c3b07a88d0267c4571b3a42"),
-        hex_to_hash_rev("8e606a716e076c920f02d71c0e2405cdee59b59c55866e2eb2621436fc7b1b0f"),
-        hex_to_hash_rev("cc8fb95143fe9335a64e49da3789b63ec299a6abb4e59dc5e5140c2d50f3b751"),
-        hex_to_hash_rev("5b1217a7a0751d58aa1316584428dcf061e1d6ee3640939bfde709ec5871928b"),
-        hex_to_hash_rev("0018023b8fba00674908b895bbcc3a359d1013518b54881f36f41c88aec11461"),
-        hex_to_hash_rev("1ea0d2a54cb53be72065da10fe3da9b80bb708ea020531bae0439d50f7cb5d0e"),
-        hex_to_hash_rev("effaa21235c8baa9a06e7e0baa0f52cd461dff2b1a0fca7a563637265bcfe0b6"),
-    ]
-        .span();
-
-    let height_proof = Option::Some(
-        HeightProof {
-            header: block_883305,
-            coinbase_raw_tx: coinbase_raw_tx_segwit.clone(),
-            merkle_branch: merkle_branch,
-        },
-    );
-
-    // previous tx 63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758
-    let prev_tx = Transaction {
-        version: 2_u32,
-        is_segwit: true,
-        inputs: array![
-            TxIn {
-                script: @from_hex(""),
-                sequence: 0xffffffff,
-                previous_output: OutPoint {
-                    txid: hex_to_hash_rev(
-                        "f80f183eddc312812158eb3b88f4e668a6ea8f48d16ddb2f4198805e709bdce6",
-                    ),
-                    vout: 0,
-                    data: TxOut {
-                        value: 1185_u64,
-                        pk_script: @from_hex(
-                            "5120ddc12d69a115788e9d002cb5a8146d070ff2d10e4fabc3f19cc732d89d9a4af2",
-                        ),
-                        cached: false,
-                    },
-                    block_height: Default::default(),
-                    median_time_past: Default::default(),
-                    is_coinbase: false,
-                },
-                witness: array![
-                    from_hex(
-                        "fb86c579e25eb63123e6094d994af835cca28889747941018709fbfdd3fa82c174819887de5cd38a7faf00d985c8fa711283f9c033e3a1be7588f742751e7c67",
-                    ),
-                    from_hex(
-                        "20aa2b0b50292c3b2fa1eefb846f0bc9957142f2f143f9f3619ae74dae2f68caf2ac0063036f7264010109696d6167652f706e6701020100004d360189504e470d0a1a0a0000000d494844520000000a0000000a08060000008d32cfbd000000097048597300000b1300000b1301009a9c180000000774494d4507e50c190f2b07f0fb7e270000001d69545874436f6d6d656e7400000000004372656174656420776974682047494d50642e6507000000c04944415428cf7d91310a02411085bf7322084216c31243fb20e206c806d0ccc6c256306882c90818685d0b059c8004a2b031b0085fd127d75cbb43cae7579589be7d3d22bd898c8e03e2374d98a13300934f18a05ead58c89620a16584e05e44553a992e31f85a30d0a9fe1b6acb44bf709f335cec398bc0cda90360f3301ca18397b28032de5e003823048173c180730b41c4b2ad839be82cd000ced66347bfb08751dd134c928d1a003d6cd15764c5370a65eb90000000049454e44ae4260868",
-                    ),
-                    from_hex("c150929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0"),
-                ]
-                    .span(),
-            },
-        ]
-            .span(),
-        outputs: array![
-            TxOut {
-                value: 546_u64,
+                value: 963_u64,
                 pk_script: @from_hex(
                     "51201f0e01c871ea1babd36fc7c3e3221129014c0ae7cc5b349837c37d010025ea04",
                 ),
@@ -619,188 +465,153 @@ fn test_submit_inscription_works() {
         lock_time: 0,
     };
 
-    let prev_siblings = array![
+    let siblings = array![
+        (hex_to_hash_rev("07271f6f1b167c9407e6d80b82ef2b8decb0e954eda99c4041a9911d0f59642d"), true),
         (
-            hex_to_hash_rev("a4476e9298af72e0698e279f0237d2d4aba015a2524137b16bf630db659a215d"),
+            hex_to_hash_rev("09acb057d42d75d9d286646d5e04588868457f1791a0b54a22d44e70a0ceb238"),
             false,
         ),
-        (hex_to_hash_rev("ad83b96f0a60e07e0ff79ab50ac3f743d28b6c07010374623509672d07e4eb8b"), true),
+        (hex_to_hash_rev("a3ac847e4a436316ece0d6eb46c42ae07c56dfcf000f3ecf0dd55c0ef71af17c"), true),
+        (hex_to_hash_rev("29d6fa94034e02a24a3428148be4b417c63699864d2ed512ebf520d11e0d7615"), true),
         (
-            hex_to_hash_rev("1729f1de54e43110143820391c25caf82d69b29cf86bc96999498b3f0ab01319"),
-            false,
-        ),
-        (hex_to_hash_rev("5f0d9ee9f7e3b2cbaad6de59c69871a5dc5e2e8c75bb8c260e00e7c4bc834cb4"), true),
-        (
-            hex_to_hash_rev("837ba96a808a045eb3fcb08515e10c0666e5f83463e7ffb27f042414bab3efa3"),
+            hex_to_hash_rev("a1749d3be54b5c733da052ceac6d0bed531af09ffd2fa8639099f8f8c90f1873"),
             false,
         ),
         (
-            hex_to_hash_rev("3db865de63cfcd3d905e6e3647220b06d0ada1508a9917f42b9259c61fe82d4f"),
+            hex_to_hash_rev("9953ae4563d6c1407327f599aa10ac5aed1146f5e51506f1e538bf4ef6bb2e68"),
+            false,
+        ),
+        (hex_to_hash_rev("2ff427736933ba30f0f8c45e9d7e9eb3b4efc5d0ea8efeba12b9a72745f00436"), true),
+        (hex_to_hash_rev("332786f8193df396c4e63f56648904377b690a9a16d7c0c3990d7f20938c1008"), true),
+        (
+            hex_to_hash_rev("360605677f5fedbb4c1304ed4424c4e669f1f4b2c314d868937f43d09c0d32f0"),
+            false,
+        ),
+        (hex_to_hash_rev("41bdca866b9f32db12e58d3eddbdeb0ac26c7fdc4c7f64c02d0cc4e844a1f512"), true),
+        (
+            hex_to_hash_rev("8b319a82ffb44b3cf24ddb544059c0315707f6fc99a06a521520486d99c8e845"),
             false,
         ),
         (
-            hex_to_hash_rev("74f96affc83300ec204d1dfb946c2dadc92b37afa5bc1c2651bf9ef436eff7fe"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("64a17fbc355d87b3fa78587f19122369cdefb69bc79ca2d885c915819a0ea5a8"),
-            false,
-        ),
-        (hex_to_hash_rev("f217a2a9d1c25f0affdf50ff88759502cfb2665307a41b17d9abb4a5c87a4602"), true),
-        (
-            hex_to_hash_rev("5f5eb5a35aafd777cafb0045cdb87a2d755aab30eef5a198a83c6b4c339c4016"),
-            false,
-        ),
-        (
-            hex_to_hash_rev("6fd8517718faee8ff2dc52cceac15dede8719234e37b4acaa1eb983bffa82d69"),
+            hex_to_hash_rev("87d570336dd9f34fd985aa55917afbe46d2377d177b08d9a4c32250e82b00f69"),
             false,
         ),
     ];
 
-    // Check inclusion of the block containing the creation transaction.
-    let block_883300 = BlockHeaderTrait::new(
-        703045632_u32, // version (0x29e7a000)
+    // Check inclusion of the block containing the transfer transaction.
+    let block_891353 = BlockHeaderTrait::new(
+        1040187392_u32, // version (0x3e000000)
         hex_to_hash_rev(
-            "00000000000000000001e74b07b30360f24c9097caebfda67b2d8ab0fdc01ff4",
+            "00000000000000000000af0b4530d6593e927f90ca820cbb6b0bad1b7b9dfa09",
         ), // prev_block_hash
         hex_to_hash_rev(
-            "2ae6eebe47030e360b0c822dfa440a563564a0e8001f7276e1f06e9e7ecb0e46",
+            "9dbb0920d5ccb81e6ede7f6ad230efa79b67b43fc9b19734cc85225498068309",
         ), // merkle_root_hash
-        1739274835_u32, // time
-        0x17027726_u32, // bits
-        1787480404_u32 // nonce
+        1744034540_u32, // time
+        0x17025105_u32, // bits
+        3677455631_u32 // nonce
     );
 
-    // coinbase transaction db3f1e0ad7ace7fa6ed551147baa74e94f33aab2b61596902359c16879b3069f
-    let _prev_coinbase_raw_tx = from_hex(
-        "020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff3103647a0d04533aab672f466f756e6472792055534120506f6f6c202364726f70676f6c642f1278d9c6ce20000000000000ffffffff0522020000000000002251200f9dab1a72f7c48da8a1df2f913bef649bfc0d77072dffd11329b8048293d7a388bbcb12000000002200207086320071974eef5e72eaa01dd9096e10c0383483855ea6b344259c244f73c20000000000000000266a24aa21a9edbd1c68ccdf460b4425046633bdee5b32ae390715ed33488c58ff5de837dbeb1f00000000000000002f6a2d434f52450158d8efc838d2de558eedeabce631c7dff92c947ae6d18fda214e5b9f350ffc7b6cf3058b9026e76500000000000000002b6a2952534b424c4f434b3aa00c8116ce62a0a432bd6fa88560e7f0b737b5e346b5c27b0f07d00f006e57560120000000000000000000000000000000000000000000000000000000000000000000000000",
+    // coinbase transaction 780739a06ed0912c1a0bc75a597ab6348fb0c7c0ff340b7e2d36d2ec4f99082a
+    let _coinbase_raw_tx = from_hex(
+        "020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff3103d9990d04ecdaf3672f466f756e6472792055534120506f6f6c202364726f70676f6c642f38e68b77000031e461803e00ffffffff0522020000000000002251200f9dab1a72f7c48da8a1df2f913bef649bfc0d77072dffd11329b8048293d7a34f23cc12000000002200207086320071974eef5e72eaa01dd9096e10c0383483855ea6b344259c244f73c20000000000000000266a24aa21a9ed3430ec300b8666e86ca1fafac3dbbfe4f7d2b01303ca6c9b3448aa24a5dd123600000000000000002f6a2d434f524501ba57b8de67e0cf289c1ee39f1f888767003819aae6d18fda214e5b9f350ffc7b6cf3058b9026e76500000000000000002b6a2952534b424c4f434b3ad4142ed49908bee80c7e99b47676776ebb2d60c5a6eaf94ea0da751700714ae50120000000000000000000000000000000000000000000000000000000000000000000000000",
     );
 
     // strip off marker flag, number of witness items on stack, length of item
-    let prev_coinbase_raw_tx_segwit = from_hex(
-        "02000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3103647a0d04533aab672f466f756e6472792055534120506f6f6c202364726f70676f6c642f1278d9c6ce20000000000000ffffffff0522020000000000002251200f9dab1a72f7c48da8a1df2f913bef649bfc0d77072dffd11329b8048293d7a388bbcb12000000002200207086320071974eef5e72eaa01dd9096e10c0383483855ea6b344259c244f73c20000000000000000266a24aa21a9edbd1c68ccdf460b4425046633bdee5b32ae390715ed33488c58ff5de837dbeb1f00000000000000002f6a2d434f52450158d8efc838d2de558eedeabce631c7dff92c947ae6d18fda214e5b9f350ffc7b6cf3058b9026e76500000000000000002b6a2952534b424c4f434b3aa00c8116ce62a0a432bd6fa88560e7f0b737b5e346b5c27b0f07d00f006e575600000000",
+    let coinbase_raw_tx_segwit = from_hex(
+        "02000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3103d9990d04ecdaf3672f466f756e6472792055534120506f6f6c202364726f70676f6c642f38e68b77000031e461803e00ffffffff0522020000000000002251200f9dab1a72f7c48da8a1df2f913bef649bfc0d77072dffd11329b8048293d7a34f23cc12000000002200207086320071974eef5e72eaa01dd9096e10c0383483855ea6b344259c244f73c20000000000000000266a24aa21a9ed3430ec300b8666e86ca1fafac3dbbfe4f7d2b01303ca6c9b3448aa24a5dd123600000000000000002f6a2d434f524501ba57b8de67e0cf289c1ee39f1f888767003819aae6d18fda214e5b9f350ffc7b6cf3058b9026e76500000000000000002b6a2952534b424c4f434b3ad4142ed49908bee80c7e99b47676776ebb2d60c5a6eaf94ea0da751700714ae500000000",
     );
 
-    let prev_merkle_branch = array![
-        hex_to_hash_rev("7f56b7fe570790ac18d85e44a14a4fff3f7d642a589c13f463c211abfd424faa"),
-        hex_to_hash_rev("76e8559e810a05cc75913115013d16947d709ea39c58e5d1cb262779dae5f2ed"),
-        hex_to_hash_rev("e32ef152263e9f5443c2d8ae95405f284decbfaad22918b5c68fea58c611cd28"),
-        hex_to_hash_rev("0f2dc713a2ccad0bad229d851e3d4d6b7abc1bdb8d2675e12624cf5fad284ad7"),
-        hex_to_hash_rev("02f57be11cb8a80787b007fd362b8be2bbef728cf92580b27f050e55667a47ba"),
-        hex_to_hash_rev("1bbd1174a59bc49bf84064b82fe0e94a57624e884d5a9f5cbf0e0d9220acbe8b"),
-        hex_to_hash_rev("c2b9b8cf14e8c8d479a93ec6436bdd68f396308dbb9d78fe9267dcb1ced42104"),
-        hex_to_hash_rev("8585a339c3a47a3a6da68bcbfc7cbf2a7bdeb27eef016809424067adeaaeaca6"),
-        hex_to_hash_rev("c3694c9c984704d2c7202301aeedecee2cb11bff964a8c28a3b444997a1653c1"),
-        hex_to_hash_rev("5f5eb5a35aafd777cafb0045cdb87a2d755aab30eef5a198a83c6b4c339c4016"),
-        hex_to_hash_rev("6fd8517718faee8ff2dc52cceac15dede8719234e37b4acaa1eb983bffa82d69"),
+    let merkle_branch = array![
+        hex_to_hash_rev("3d1d78264e2b2de90165c275998b52b97830b85d301fd5eed25719a8bfa3a9ca"),
+        hex_to_hash_rev("16089ec3ae55da3e9a7c63023e89857353a8dcd1381593f8f41cc4ec2d07de63"),
+        hex_to_hash_rev("7d23cf543001eecc0514e98717f47b78fd2aa6a3af09d9b494c74eb385fcc659"),
+        hex_to_hash_rev("b6eba046604d425a009664252ee798093ddba59c3464265faa5c753a8dcb13e9"),
+        hex_to_hash_rev("1e184238e2ba25dbc174c5e66b456ba739b616a4ee45737b3e4a700831a5537d"),
+        hex_to_hash_rev("97debe886f23b3727a1bb12db576ab4dcd37dd8ade6e8d3c5e15a4a93f9670d6"),
+        hex_to_hash_rev("ba045a0565f8dcb4d386c7f4b2c3bbfe75f4bcc2ea0f3e28b9dba1d5f4ed40ff"),
+        hex_to_hash_rev("c0dc345498e833488e7d9d4f34edd75eb182cd52fcffc34db71fb5af2612591b"),
+        hex_to_hash_rev("0aca0629e0d371fcc1f8ae1477ae4d3be14ec0929b301ef17577021db1d38c30"),
+        hex_to_hash_rev("a4fb29c04d81c2ab2dc82cc8af0121cef97617f3e0f0ced7e53fd9ff64d63384"),
+        hex_to_hash_rev("8b319a82ffb44b3cf24ddb544059c0315707f6fc99a06a521520486d99c8e845"),
+        hex_to_hash_rev("87d570336dd9f34fd985aa55917afbe46d2377d177b08d9a4c32250e82b00f69"),
     ]
         .span();
 
-    let prev_height_proof = Option::Some(
-        HeightProof {
-            header: block_883300,
-            coinbase_raw_tx: prev_coinbase_raw_tx_segwit.clone(),
-            merkle_branch: prev_merkle_branch,
-        },
-    );
-
-    let block_header = block_883305;
-    let inclusion_proof = siblings;
-    let tx_hash: ByteArray = "ccfe4da8d312b18753bbf693e3014cfcfa857cf73f8f822f81a301f4f4f408d5";
-
-    let prev_block_header = block_883300;
-    let prev_inclusion_proof = prev_siblings;
-    let prev_tx_hash: ByteArray =
-        "63c154a3662e417ff76247437f878496b3919e4a597d2e1b0960b05ffabb7758";
-
-    let block_headers: Array<BlockHeader> = array![block_header, prev_block_header];
-    utu.register_blocks(block_headers.span());
-
-    let block_883300_hash = hex_to_hash_rev(
-        "000000000000000000003014df89bab44479dc5961c8bda471c53cb80e7573cd",
-    );
-
-    let block_883305_hash = hex_to_hash_rev(
-        "000000000000000000016e1c96f759f93d3f2ed26d5941a8b933da94408937fb",
-    );
-
-    utu.update_canonical_chain(883300, 883300, block_883300_hash, prev_height_proof);
-    utu.update_canonical_chain(883305, 883305, block_883305_hash, height_proof);
-
-    let script = array![
-        0x51,
-        0x20,
-        0xd5,
-        0xfd,
-        0x01,
-        0xe3,
-        0x35,
-        0xe8,
-        0xc8,
-        0xe0,
-        0x42,
-        0x07,
-        0xef,
-        0x53,
-        0xc8,
-        0xde,
-        0xba,
-        0x16,
-        0xdd,
-        0x8e,
-        0x20,
-        0xc4,
-        0x79,
-        0x3c,
-        0xe0,
-        0xb2,
-        0x21,
-        0x84,
-        0xde,
-        0x56,
-        0x1d,
-        0x44,
-        0x47,
-        0x82,
-    ];
-
     let height_proof = Option::Some(
         HeightProof {
-            header: block_883305,
-            coinbase_raw_tx: coinbase_raw_tx_segwit,
+            header: block_891353,
+            coinbase_raw_tx: coinbase_raw_tx_segwit.clone(),
             merkle_branch: merkle_branch,
         },
     );
 
-    let prev_height_proof = Option::Some(
+    let block_header = block_891353;
+    let inclusion_proof = siblings;
+    let tx_hash: ByteArray = "21a0ccbca424f8b104a3c11b1be1824eec307fda809e784bbed79f93cfe56e2d";
+
+    let block_headers: Array<BlockHeader> = array![block_header];
+    utu.register_blocks(block_headers.span());
+
+    let block_891353_hash = hex_to_hash_rev(
+        "0000000000000000000203ba9259a1d0dcd77d7363e2170249a7efd2ce5082a8",
+    );
+
+    utu.update_canonical_chain(891353, 891353, block_891353_hash, height_proof);
+
+    let script = array![
+        0x51,
+        0x20,
+        0x1f,
+        0x0e,
+        0x01,
+        0xc8,
+        0x71,
+        0xea,
+        0x1b,
+        0xab,
+        0xd3,
+        0x6f,
+        0xc7,
+        0xc3,
+        0xe3,
+        0x22,
+        0x11,
+        0x29,
+        0x01,
+        0x4c,
+        0x0a,
+        0xe7,
+        0xcc,
+        0x5b,
+        0x34,
+        0x98,
+        0x37,
+        0xc3,
+        0x7d,
+        0x01,
+        0x00,
+        0x25,
+        0xea,
+        0x04,
+    ];
+
+    let height_proof = Option::Some(
         HeightProof {
-            header: block_883300,
-            coinbase_raw_tx: prev_coinbase_raw_tx_segwit,
-            merkle_branch: prev_merkle_branch,
+            header: block_891353,
+            coinbase_raw_tx: coinbase_raw_tx_segwit,
+            merkle_branch: merkle_branch,
         },
     );
 
     start_cheat_caller_address_global(orderbook_dispatcher.contract_address);
     token_dispatcher.approve(orderbook_dispatcher.contract_address, 100);
 
-    start_cheat_block_timestamp(tx_inclusion, 1_739_277_179 + 3600); // submit after one hour
+    start_cheat_block_timestamp(tx_inclusion, 1_744_034_540 + 3600); // submit after one hour
     orderbook_dispatcher
         .submit_inscription(
-            id,
-            'STRK',
-            tx_hash,
-            prev_tx_hash,
-            tx,
-            prev_tx,
-            script,
-            883305,
-            883300,
-            block_header,
-            prev_block_header,
-            height_proof,
-            prev_height_proof,
-            inclusion_proof,
-            prev_inclusion_proof,
+            id, 'STRK', tx_hash, tx, script, 891353, block_header, height_proof, inclusion_proof,
         );
     stop_cheat_caller_address_global();
 }
+
