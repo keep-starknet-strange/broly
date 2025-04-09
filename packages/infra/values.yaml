@@ -56,19 +56,19 @@ deployments:
     tag: 14.11-alpine
   backend:
     replicas: 1
-    image: hexy1620/broly-backend
+    image: brandonjroberts/broly-backend
   websockets:
     replicas: 1
-    image: hexy1620/broly-websockets
+    image: brandonjroberts/broly-websockets
   consumer:
     replicas: 1
-    image: hexy1620/broly-consumer
+    image: brandonjroberts/broly-consumer
   inscriber:
     replicas: 0
-    image: hexy1620/broly-inscriber
+    image: brandonjroberts/broly-inscriber
   indexer:
     replicas: 1
-    image: hexy1620/broly-indexer
+    image: brandonjroberts/broly-indexer
   regtest:
     replicas: 1
     image: bitcoin/bitcoin:28.1
@@ -77,7 +77,7 @@ deployments:
     image: brandonjroberts/ord:0.22.2-ca9950a1
   update:
     replicas: 1
-    image: hexy1620/broly-regtest-update
+    image: brandonjroberts/broly-regtest-update
 
 postgres:
   db: broly-db
