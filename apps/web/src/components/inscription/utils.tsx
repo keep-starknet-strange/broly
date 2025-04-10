@@ -48,7 +48,7 @@ export const parseBitcoinInscriptionData = (data: string) => {
     const typeString = hexToString(Array.from(typeBytes).map(b => b.toString(16).padStart(2, '0')).join(''));
     type = typesMap[typeString] || "unknown";
     
-    const contentBytes = script[7] as Uint8Array;
+    const contentBytes = script[5] as Uint8Array;
     inscriptionData = hexToString(Array.from(contentBytes).map(b => b.toString(16).padStart(2, '0')).join(''));
     
     console.log('Final content:', inscriptionData);

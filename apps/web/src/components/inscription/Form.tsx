@@ -169,6 +169,14 @@ function InscriptionForm(props: any) {
     }
   }, [selectedOption]);
 
+  const [inscribingDots, setInscribingDots] = useState("");
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setInscribingDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <form className="flex flex-col items-center justify-center w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[35%] px-8 py-4 gap-2 bg-[var(--color-tertiary-dark)] rounded-xl shadow-xl" onSubmit={handleSubmit}>
       <div className="flex flex-row items-center justify-around gap-2 w-full bg-[var(--color-primary)] rounded-[1.5rem] p-1">
@@ -194,7 +202,8 @@ function InscriptionForm(props: any) {
           <div className="flex gap-2 p-1 flex-wrap justify-center items-center h-full">
             {selectedEmoji ? (
               <div
-                className="flex items-center justify-center w-full h-full"
+                className="flex items-center justify-center w-full h-full hover:scale-110 transition-transform duration-200 ease-in-out cursor-pointer
+                           hover:opacity-80 active:opacity-100 active:scale-100"
                 onClick={() => setSelectedEmoji("")}
               >
                 <span className="text-6xl">{selectedEmoji}</span>
@@ -225,12 +234,21 @@ function InscriptionForm(props: any) {
             Linked BTC Wallet : {taprootAddressShort}
           </button>
         )}
-        <button
-          type="submit"
-          className={`button--gradient button__primary text-2xl w-min ${!props.taprootAddress || !props.isStarknetConnected ? "button__primary--disabled" : "button__primary--pinging"}`}
-        >
-          Inscribe
-        </button>
+        {props.isInscribing ? (
+          <button
+            type="button"
+            className="button__primary--disabled button__primary text-2xl w-min"
+          >
+            Inscribing{inscribingDots}
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={`button--gradient button__primary text-2xl w-min ${!props.taprootAddress || !props.isStarknetConnected ? "button__primary--disabled" : "button__primary--pinging"}`}
+          >
+            Inscribe
+          </button>
+        )}
         {errorMessage && (
           <div className="absolute bottom-[-1rem] transform -translate-x-1/2 left-1/2">
             <p className="text-red-500 text-md text-center text-nowrap">

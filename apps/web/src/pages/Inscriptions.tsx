@@ -118,9 +118,6 @@ function Inscriptions(props: any) {
                 </div>
               );
             })}
-            <NavLink to="/" className="button--gradient button__circle flex flex-col items-center justify-center z-[10]">
-              <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
-            </NavLink>
           </div>
         </div>
       )}

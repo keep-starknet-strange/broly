@@ -83,7 +83,7 @@ function Account(props: any) {
     } catch (error) {
       console.log("Error fetching inscriptions", error);
     }
-  }, [inscriptionsPagination]);
+  }, [inscriptionsPagination, address, activeFilter]);
 
   const resetPagination = () => {
     setInscriptionsPagination({
@@ -100,6 +100,7 @@ function Account(props: any) {
     const fetchRequests = async () => {
       if (!address) return;
       const result = await getMyOpenInscriptionRequests(address.slice(2), requestPagination.pageLength, requestPagination.page);
+      console.log("GetmyOpenInscriptionRequests", result);
       if (result && result.data) {
         if (requestPagination.page === 1) {
           setRequests(result.data);
@@ -116,7 +117,7 @@ function Account(props: any) {
     } catch (error) {
       console.log("Error fetching requests", error);
     }
-  }, [requestPagination]);
+  }, [requestPagination, address]);
 
   // Websocket messages
   useEffect(() => {
@@ -260,7 +261,7 @@ function Account(props: any) {
       </div>
       {requests && requests.length > 0 && (
         <div className="bg__color--tertiary w-full flex flex-col items-center justify-center py-4">
-          <h1 className="text-2xl sm:text-4xl font-bold">Open Inscription Requests</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold">My Inscription Requests</h1>
           <div className="w-full flex flex-row items-center overflow-x-scroll py-6 gap-6 px-6">
             {requests.map((request, index) => {
               return (
@@ -269,9 +270,6 @@ function Account(props: any) {
                 </div>
               );
             })}
-            <NavLink to="/" className="z-[10] button--gradient button__circle flex flex-col items-center justify-center">
-              <p className="text-3xl font-bold w-[3rem] h-[3rem] text-center">+</p>
-            </NavLink>
           </div>
         </div>
       )}

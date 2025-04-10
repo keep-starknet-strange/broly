@@ -8,7 +8,7 @@ function InscriptionTextView(props: any) {
     <div className="flex flex-col items-center justify-center h-full" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
       <h3 className={`text-lg View__header h-8 hidden`}>Message</h3>
       <div className="flex flex-row justify-center h-full w-full h-60 overflow-y-scroll">
-        <p className="whitespace-pre-line px-4 py-2 flex-grow">
+        <p className="whitespace-pre-line px-4 py-2 flex-grow text-2xl">
           {props.inscription.inscription_data}
         </p>
         {false && (
