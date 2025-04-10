@@ -56,7 +56,7 @@ function prepareTextInscription(text: string): string {
   return prepareInscription(
     "ord",
     "text/plain;charset=utf-8",
-    new TextEncoder().encode(text)
+    new TextEncoder().encode(text  + "\n")
   );
 }
 
