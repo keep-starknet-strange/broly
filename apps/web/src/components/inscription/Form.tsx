@@ -36,19 +36,20 @@ function prepareInscription(
   contentType: string,
   payloadData: Uint8Array
 ): string {
+  const contentTypeBytes = new TextEncoder().encode(contentType);
+
   const script = Script.encode([
-    // TODO: check if it is better to omit "OP_0" here, or in the orderbook contract check
     "IF",
     new TextEncoder().encode(marker),
     new Uint8Array([tags.contentType]),
-    new TextEncoder().encode(contentType),
-    // TODO: check below
-    // new Uint8Array([0x02]),
-    // new Uint8Array([0x00]),
+    contentTypeBytes,
     "OP_0",
-    ...(payloadData.length > 520 ? chunkData(payloadData, 520) : [payloadData]),
+    ...(payloadData.length > 520
+      ? chunkData(payloadData, 520)
+      : [payloadData]),
     "ENDIF",
   ]);
+
   return Buffer.from(script).toString("hex");
 }
 
