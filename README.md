@@ -49,50 +49,25 @@ Try [Broly](https://www.broly-btc.com/)!
    - The Requester is able to cancel the request and get the funds back. 
    - A `RequestCanceled` event with the `inscription_id` is emitted. 
    - It is not possible to predict how fast an inscription and a transfer transaction will be included in a Bitcoin block. Even though Starknet L2 is blazing fast and cheap, this is not the case with Bitcoin in 2025. It's strong security properties require waiting for a miner to pick up a transaction, include it in a block, do the proof of work, and submit it to the blockchain. The `Requester` has to wait for the `Submitter` to get at least 1 confirmation for each transaction. For 2 sequential transactions (you can send the inscription only after it has been insribed) it may take between 15 minutes and over an hour.
-4. Locking script: 
-   - A `Submitter` can lock the transaction with the [locking script](https://github.com/keep-starknet-strange/broly/blob/main/packages/scripts/lock_request.sh). Run from Broly root:
-
-   ```
-   bash ./packages/scripts/lock_request.sh {SN_account_name} {inscription_id}
-   ```
-   where `inscription_id` is the ID of the open order.
+4. Locking inscriptions: 
+   - A `Submitter` runs the `inscribor service` which picks up open requests by the ID of the open order.
    - A `RequestLocked` event with the `inscription_id` is emitted. 
    - Order status changes to `Locked` on Broly website and in the Broly contract.
    - The lock is valid for 100 Starknet blocks. Within those 100 blocks, the `Submitter` has to create the inscription and transfer it to the `Requester`'s address on Bitcoin. 
    - The `Requester` cannot cancel the inscription if the lock has not expired. 
    - Another `Submitter` can only lock the inscription again if the lock has expired. 
-   - Note that the Starknet wallet used to lock the inscription must be the same as the Starknet wallet used to submit the inscription. 
-5. `ord` CLI (see [Installation Guide](https://github.com/ordinals/ord)) allows `Submitter` to:
-   - Create or restore a Bitcoin address. Usage: 
-   ```bash
-   ord wallet create --help
-   ``` 
-   or 
-   ```bash
-   ord wallet restore --help
-   ```
-   - Allows `Submitter` to make the Bitcoin inscription. Usage: 
-   ```bash
-   ord \
-   --bitcoin-rpc-username <USERNAME> \
-   --bitcoin-rpc-password <PASSWORD> \
-   --bitcoin-rpc-url http://127.0.0.1:8332 \
-   wallet --name <NAME> \
-   inscribe --file <FILE> \
-   --fee-rate <FEE_RATE> \
-   --destination <TAPROOT ADDRESS> \ 
-   --postage 546sat
-   ```
-   The `ord` wallet doing the inscription must have a UTXO that has enough satoshis for the postage and for the fee. Send BTC to the taproot compatible wallet starting with `bc1`. The receiver address has to be passed with the `destination` flag and `postage` is the satoshis that will be sent in the same UTXO. The minimum `postage` value is 546sat, `fee-rate` is satoshis per byte. Replace the `bitcoin-rpc-url` with the node's URL. 
-   - Note that the `ord` CLI requires the `Submitter` to run a Bitcoin full node, or use RPC connection. [Bitcoin Core](https://bitcoincore.org/en/blog/) client can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection. 
-6. `bitcoin-on-starknet.js` package:
+   - Note that the Starknet wallet (in root `.env`) used to lock the inscription must be the same as the Starknet wallet used to submit the inscription (in `bitcoin-on-starknet.js/.env`). 
+5. Inscribing on Bitcoin:
+The `inscribor service` runs `ord` (see [Installation Guide](https://github.com/ordinals/ord)) to deliver the inscriptions to the expected Bitcoin address. The `ord` wallet doing the inscription must have a UTXO that has enough satoshis for the postage and for the fee. The default `postage` value is 546sat, `fee-rate` is satoshis per byte.
+6. Submitting proof in inscription on Starknet:
+The `bitcoin-on-starknet.js` package:
    - Fetches the Bitcoin data from the creation and transfer Bitcoin transactions.
    - Registers the Bitcoin blocks and updates the canonical chain with the [Utu Relay](https://bitcoin-on-starknet.com/bitcoin/introduction#the-utu-relayer-bridging-two-worlds) contract on Starknet.
    - Serializes it for `submit_inscription` to the Broly contract on Starknet.
    - Triggers `STRK` reward release to the `Submitter` on successful inscription.
    - Order status changes to `Closed` on Broly website and in the Broly contract. 
    - A `RequestCompleted` event with `tx_hash` and `inscription_id` is emitted. 
-
+Can be used manually if for some reason an inscription was locked, but the inscription on Bitcoin failed (e.g. due to low funds) and was made with `ord` directly. 
 7. `Requester` owns the inscription on Bitcoin, `Submitter` receives reward on Starknet. 
 
 ## Running Broly locally for tests and development
@@ -120,32 +95,44 @@ docker compose up
 Head to the [Broly website](https://www.broly-btc.com/). 
 Ensure that you have a Starknet wallet extension: [Argent](https://www.argent.xyz/) or [Braavos](https://braavos.app/) with funds (on https://sepolia.starkscan.co/ testnet, where the Broly contract is currently deployed). Choose Image/Message/Gif, upload your inscription data, approve the transaction and wait for a `Submitter` to complete your request. 
 
-## For a `Submitter`: Interacting with the scripts to lock and submit transactions on Starknet 
+## For a `Submitter`: Interacting with the scripts to fetch open requests, lock and submit transactions on Starknet 
 
 Run
 ```
 cp ./packages/bitcoin-on-starknet.js/.env.example ./packages/bitcoin-on-starknet.js/.env
 ```
 
+To ensure successful runs of all the scripts, you will need `bun`, `sncast`, and `ord`.
+
+Create an account and get a Bitcoin endpoint and a key at [Quicknode](https://www.quicknode.com/). Fill out the Bitcoin environment variables. This is needed to fetch the necessary data from the Bitcoin provider.
+
+Install `bun` from [bun docs](https://bun.sh/docs/installation).
+
 Install [Starknet foundry](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html). 
 [Create](https://foundry-rs.github.io/starknet-foundry/starknet/account.html#creating-and-deploying-accounts) a Starknet account using `sncast`. The name of the account will be passed to the scripts that interact with Starknet, and the address and private key for the Starknet provider environment variables. 
 
-Lock an inscription:
-```
-bash ./packages/scripts/lock_request.sh {SN_account_name} {inscription_id}
-```
+Ensure that your `ord server` is synced and running. Syncing `ord` from scratch can take over a week, so make sure to use [pre-built indices](https://ordstuff.info/indexes/) as shared in the `Ordicord` [Discord server](https://discord.gg/947AER5J). Note that the `ord server` requires the `Submitter` to run a Bitcoin full node, or use RPC connection. [Bitcoin Core](https://bitcoincore.org/en/blog/) client (version 28.0 or above) can be downloaded and run on a remote machine or locally and requires around 600GB initial download of data. An option for running a Bitcoin node is a [Digital Ocean droplet](https://cloud.digitalocean.com/droplets?i=fb217b), which allows for one click deployment and SSH connection.
 
-Create an account and get a Bitcoin endpoint and a key at [Quicknode](https://www.quicknode.com/). Fill out the Bitcoin environment variables. 
-
-Register blocks and update canonical chain by passing the `bitcoin_tx_hash` of the inscription transaction hash: 
-```
-bun run ./packages/bitcoin-on-starknet.js/scripts/updateCanonicalChain.ts {bitcoin_tx_hash}
-```
-
-```
-bun run ./packages/bitcoin-on-starknet.js/scripts/submitInscription.ts {bitcoin_tx_hash} {inscription_id}
+Ensure you have a Bitcoin wallet in `ord` with enough satoshis. You can send BTC from any wallet, but make sure to send it to the taproot address starting with `bc1`. 
+Create or restore a Bitcoin address. Usage: 
+```bash
+ord wallet create --help
 ``` 
-where `inscription_id` is the ID of the open order.
+or 
+```bash
+ord wallet restore --help
+```
+
+Run 
+```
+export BTC_RPC_USER=user
+export BTC_RPC_PASS=password
+export BTC_RPC_URL=http://33.333.333.333:8332
+export SN_ACCOUNT=account_name
+./packages/scripts/automate_inscriptions.sh $SN_ACCOUNT $BTC_RPC_USER $BTC_RPC_PASS $BTC_RPC_URL
+```
+
+Every inscription requires an unspent `UTXO` to be used as an input to the transaction. If a `Submitter` does not have an available `UTXO`, the insciption transaction will not go through. Sometimes this happens because the change is part of the transaction that has not been confirmed yet. If you want to run the `Submitter` script so that it processes open requests in parallel, you need to ensure you have enough `UTXO`s. Currently the script processes open requests sequentially. 
 
 ## Project Structure
 
